@@ -2,12 +2,11 @@
 {
   //"editor.fontFamily": "Consolas, 'Courier New', monospace",
   "editor.fontSize": 16,
-  "git.enabled": false,
   "editor.tabSize": 2,
   "editor.detectIndentation": false,
   "editor.wordWrap": true,
   "html.suggest.angular1": false,
   "html.suggest.ionic": false,
   "javascript.validate.enable": false, //禁用自带的js校验
-  "editor.renderIndentGuides": true,
+  "editor.renderIndentGuides": true
 }
