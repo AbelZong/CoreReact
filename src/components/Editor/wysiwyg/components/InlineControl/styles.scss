@@ -1,0 +1,22 @@
+:global {
+  .editor-wrapper {
+    .inline-wrapper {
+      display: flex;
+      margin-bottom: 6px;
+    }
+    .inline-dropdown {
+      width: 50px;
+    }
+    .inline-dropdownoption {
+      height: 40px;
+      display: flex;
+      justify-content: center;
+    }
+    .inline-icon {
+      width: 15px;
+      height: 15px;
+      font-size:13px;
+    }
+
+  }
+}

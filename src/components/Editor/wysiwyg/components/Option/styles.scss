@@ -1,0 +1,35 @@
+:global {
+  .editor-wrapper {
+      .option-wrapper {
+        padding: 5px;
+        width: 25px;
+        height: 20px;
+        margin: 0 4px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        background: white;
+        text-transform: capitalize;
+        outline: 0;
+      }
+
+      .option-wrapper:hover {
+        box-shadow: 1px 1px 0 #BFBDBD;
+      }
+
+      .option-wrapper:active {
+        box-shadow: 1px 1px 0 #BFBDBD inset;
+      }
+
+      .option-active {
+        box-shadow: 1px 1px 0 #BFBDBD inset;
+      }
+
+      .option-disabled {
+        opacity: 0.3;
+        pointer-events: none;
+        cursor: not-allowed;
+      }
+  }
+}
