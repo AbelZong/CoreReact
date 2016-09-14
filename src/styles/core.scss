@@ -1,6 +1,21 @@
 @import "antdExtend.scss";
 
 :global {
+
+	.h-scroller::-webkit-scrollbar
+	{
+		width: 6px;
+	  height: 6px;
+	}
+	.h-scroller::-webkit-scrollbar-thumb
+	{
+		background-color: rgba(0,0,0,0.13);
+	  border-radius: 10px;
+	}
+	.h-scroller:hover::-webkit-scrollbar-thumb
+	{
+		background-color: rgba(0,0,0,0.3);
+	}
   // ::-webkit-input-placeholder {
   //   color: #000 !important;
   // }

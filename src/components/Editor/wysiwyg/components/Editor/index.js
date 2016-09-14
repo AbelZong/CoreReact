@@ -250,7 +250,7 @@ class WysiwygEditor extends Component {
         ) : undefined
       }
         <div
-          className={`editor-main ${editorClassName}`}
+          className={`editor-main h-scroller ${editorClassName}`}
           onClick={this._focusEditor}
           onFocus={this._onEditorFocus}
           onBlur={this._onEditorBlur}

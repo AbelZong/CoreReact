@@ -1,11 +1,12 @@
 :global {
     .editor-wrapper {
       position: relative;
+      height: 100%;
     }
     .editor-main {
-      height: 100%;
       width: 100%;
       overflow: auto;
+      min-height: 260px;
     }
     .editor-toolbar {
       padding: 6px 2px 0;
