@@ -1,13 +1,11 @@
 import React from 'react'
 import {connect} from 'react-redux'
-//import {message} from 'antd'
 import classNames from 'classnames'
 import Header from 'components/Header'
 import Aside from 'components/Aside'
-//import styles from 'styles/layout.scss'
 import styles from './WheatLayout.scss'
 import 'styles/core.scss'
-//import { Scrollbars } from 'react-custom-scrollbars'
+import {FetchModal} from 'components/Modal/index'
 import {startLoading, endLoading} from 'utils'
 import {ZGet} from 'utils/Xfetch'
 import PageLock from 'components/Lock'
@@ -80,6 +78,7 @@ const WheatLayout = React.createClass({
             </div>
           </div>
         </div>
+        <FetchModal />
       </div>
     )
   }

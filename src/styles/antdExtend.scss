@@ -46,4 +46,10 @@
       top:10px;
     }
   }
+  .ant-modal-header {
+    border-radius: 1px 1px 0 0;
+  }
+  .ant-modal-content {
+    border-radius: 1px;
+  }
 }

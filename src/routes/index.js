@@ -2,8 +2,6 @@
 import WheatLayout from 'layouts/WheatLayout'
 import PageLayout from 'layouts/PageLayout'
 import DashBordRoute from './DashBord'
-import ShopRoute from './Shop'
-import TestRoute from './Test'
 import LoginRoute from './Login'
 import ApplyRoute from './Apply'
 import NotFoundRoute from './NotFound'
@@ -25,8 +23,6 @@ export const createRoutes = (store) => ([
     component: WheatLayout,
     indexRoute: DashBordRoute(store),
     childRoutes: [
-      ShopRoute(store),
-      TestRoute(store),
       NotFoundRoute
     ],
     ignoreScrollBehavior: true

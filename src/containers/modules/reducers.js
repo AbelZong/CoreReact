@@ -1,7 +1,6 @@
 import { handleActions } from 'redux-actions'
 import update from 'react-addons-update'
 import store from 'utils/store' //吃相不太好看
-//import { combineReducers } from 'redux'
 
 const entering = handleActions({
   ENTERING_SET: (state, action) => action.payload
@@ -22,7 +21,6 @@ const authed = handleActions({
 }, false)
 const user = handleActions({
   USER_SET: (state, action) => (action.payload),
-  //USER_REVER: (state, action) => !state,
   USER_UPDATE: (state, action) => {
     return update(state, action.update)
   }
@@ -63,6 +61,13 @@ const notice_visibel = handleActions({
   NOTICE_VISIBEL_SET: (state, action) => action.payload,
   NOTICE_VISIBEL_REVER: (state, action) => !state
 }, false)
+const zhModUnq = handleActions({
+  ZHMODUNQ_SET: (state, action) => action.payload,
+  ZHMODUNQ_UPDATE: (state, action) => update(state, action.update),
+  ZHMODUNQ_RESET: (state, action) => {
+    return { mod: null, query: null, visible: false }
+  }
+}, { mod: null, query: null, visible: false })
 
 const bookmarkAIndex = handleActions({
   BOOKMARKAINDEX_SET: (state, action) => {
@@ -96,17 +101,6 @@ const bookmarks = handleActions({
   }
 ]))
 
-// const bookmarkIDs = handleActions({
-//   BOOKMARKIDS_SET: (state, action) => (action.payload),
-//   BOOKMARKIDS_UPDATE: (state, action) => {
-//     return update(state, action.update)
-//   }
-// }, store.get('g.bookmarkids', []))
-
 export default {
-  entering, loading,
-  locked, authed, proset_visibel, notice_visibel,
-  user, permissionMenus, permissionMenuFilterName,
-  collapse, mainFixed,
-  bookmarks, bookmarkAIndex
+  entering, loading, locked, authed, proset_visibel, notice_visibel, user, permissionMenus, permissionMenuFilterName, collapse, mainFixed, zhModUnq, bookmarks, bookmarkAIndex
 }

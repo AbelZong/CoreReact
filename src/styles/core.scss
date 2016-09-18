@@ -2,17 +2,20 @@
 
 :global {
 
-	.h-scroller::-webkit-scrollbar
+	.h-scroller::-webkit-scrollbar,
+	.ant-modal-wrap::-webkit-scrollbar
 	{
 		width: 6px;
 	  height: 6px;
 	}
-	.h-scroller::-webkit-scrollbar-thumb
+	.h-scroller::-webkit-scrollbar-thumb,
+	.ant-modal-wrap::-webkit-scrollbar-thumb
 	{
 		background-color: rgba(0,0,0,0.13);
 	  border-radius: 10px;
 	}
-	.h-scroller:hover::-webkit-scrollbar-thumb
+	.h-scroller:hover::-webkit-scrollbar-thumb,
+	.ant-modal-wrap:hover::-webkit-scrollbar-thumb
 	{
 		background-color: rgba(0,0,0,0.3);
 	}
@@ -287,3 +290,30 @@
 //$fa-font-path: "~font-awesome/fonts";
 //@import "~font-awesome/scss/font-awesome";
 //@import "~font-awesome/css/font-awesome";
+@font-face {
+  font-family: "WHEAT NUMBER";
+  src: url("/fonts/number1.eot"); /* IE9 */
+  src: url("/fonts/number1.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+  url("/fonts/number1.woff") format("woff"), /* chrome¡¢firefox */
+  url("/fonts/number1.ttf") format("truetype"), /* chrome¡¢firefox¡¢opera¡¢Safari, Android, iOS 4.2+ */
+  url("/fonts/number1.svg#DISPLAY FREE TFB") format("svg"); /* iOS 4.1- */
+  font-style: normal;
+  font-weight: normal;
+}
+:global {
+	.dotting {
+		display: inline-block; min-width: 2px; min-height: 2px;
+		box-shadow: 2px 0 currentColor, 6px 0 currentColor, 10px 0 currentColor;
+		-webkit-animation: dot 4s infinite step-start both;
+		animation: dot 4s infinite step-start both;
+		*zoom: expression(this.innerHTML = '...'); /* IE7 */
+	}
+	.dotting:before { content: '...'; } /* IE8 */
+	.dotting::before { content: ''; }
+	:root .dotting { margin-right: 8px; } /* IE9+,FF,CH,OP,SF */
+}
+@keyframes:global(dot) {
+    25% { box-shadow: none; }
+    50% { box-shadow: 2px 0 currentColor; }
+    75% { box-shadow: 2px 0 currentColor, 6px 0 currentColor; }
+}
