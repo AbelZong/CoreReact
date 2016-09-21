@@ -5,6 +5,7 @@ import { Menu, Icon } from 'antd'
 import {Icon as Iconfa} from 'components/Icon'
 import store from 'utils/store'
 import {changeBookmark} from 'containers/modules/actions'
+import Scrollbar from 'components/Scrollbars/index'
 const SubMenu = Menu.SubMenu
 const MenuItemGroup = Menu.ItemGroup
 
@@ -89,14 +90,16 @@ const Menus = React.createClass({
           <div className={styles.title}>
             {activePM.name}
           </div>
-          <Menu
-            onClick={this._menuClick}
-            className={styles.menus}
-            defaultOpenKeys={openKeys}
-            mode={mode}
-          >
-          {activePM.data.map((menu, i) => parseMenu(menu, i))}
-          </Menu>
+          <Scrollbar autoHide className={styles['s--wrapper']}>
+            <Menu
+              onClick={this._menuClick}
+              className={styles.menus}
+              defaultOpenKeys={openKeys}
+              mode={mode}
+            >
+            {activePM.data.map((menu, i) => parseMenu(menu, i))}
+            </Menu>
+          </Scrollbar>
           <div className={styles.operater} onClick={this.handleClick}>
             <div className={styles.bg} />
             <div className={styles.tag}>

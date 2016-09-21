@@ -264,7 +264,7 @@
       border:0;
     }
     .ant-menu {
-      background-color:transparent;
+      background-color:#EAEDF1;
       color: #333;
     }
     .ant-menu-item-active, .ant-menu-item:hover, .ant-menu-submenu-active, .ant-menu-submenu-title:hover {
@@ -274,6 +274,9 @@
       background-color:#fff !important;
       border-right: 0!important;
       color:#333;
+    }
+    .ant-menu-item {
+      background-color: #eaedf1;
     }
   }
   .operater {
