@@ -78,7 +78,7 @@ const Header = React.createClass({
                     <li onClick={() => this.handleMenuClick({key: '0'})}><Icon type='setting' />&nbsp;&nbsp;密码修改</li>
                     <li onClick={() => this.handleMenuClick({key: '1'})}><Icon type='lock' />&nbsp;&nbsp;锁屏</li>
                     <li className={styles.divider} />
-                    <li onClick={() => this.handleMenuClick({key: '2'})}><Icon type='logout' />&nbsp;&nbsp;安全登出</li>
+                    <li onClick={() => this.handleMenuClick({key: '-1'})}><Icon type='logout' />&nbsp;&nbsp;安全登出</li>
                   </ul>
                   <ModalProset />
                 </MenuDown>
