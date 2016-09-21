@@ -85,7 +85,7 @@ const Menu = React.createClass({
       <div className={styles.menuBars}>
         {permissionMenus.map((menu) => {
           return (
-            <div className={styles.col}>
+            <div className={styles.col} key={menu.id}>
               <div className={styles.name}>{menu.name}</div>
               {menu.data && menu.data.map((_menu) => this.parseMenus(_menu))}
             </div>
