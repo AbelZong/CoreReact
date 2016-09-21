@@ -4,54 +4,451 @@ import {connect} from 'react-redux'
 import {Row, Col, Icon, Button} from 'antd'
 import styles from './DB.scss'
 import Wrapper from 'components/MainWrapper'
+import {COMPANY, VERSION} from 'constants/config'
+import {startLoading, endLoading} from 'utils'
 
-//import { animationEnd } from 'utils'
-
-import echarts from 'echarts/lib/echarts'
-import 'echarts/lib/chart/bar'
-import 'echarts/lib/chart/pie'
-import 'echarts/lib/chart/map'
+import echarts from 'echarts'
 import echartsChinaMap from 'echarts/map/json/china'
 echarts.registerMap('china', echartsChinaMap)
-//import echarts from 'echarts'
 //import Scrollbar from 'components/Scrollbars/index'
   // <Scrollbar style={{ height: '80%', overflow: 'hidden' }}>
   // </Scrollbar>
   // <div style={{height: '20%', overflow: 'hidden'}}>
   //   <h1>封装方法：切换路由/本地缓存数据结构/</h1>
   // </div>
+  //todo cache last data, able to change router with no refresh fetching again
 class Main extends React.Component {
-
-  componentDidUpdate = () => {
-    console.log(1)
+  state = {
+    data: null
   }
-  componentDidMount = () => {
-    this.handleZhangTabIn(1)
-    this.props.dispatch({ type: 'ZHMODUNQ_SET', payload: {
-      mod: 'test', query: null, visible: true
-    } })
+  componentWillMount() {
+    this.refreshDataCallback()
   }
-  componentWillUnmount = () => {
+  componentWillUnmount() {
+    if (this.inited) {
+      window.removeEventListener('resize', this.resize, false)
+    }
+    ['1', '2', '3'].forEach((v) => {
+      echarts.dispose(this.refs[`EC${v}`])
+    })
   }
 
   refreshDataCallback = () => {
-    console.log('qq')
+    startLoading()
+    //ZGet('router', params, () => { ...
+    setTimeout(() => { //模拟 ZGet，对接时替换
+      //const {data, sysLogs, divFS, divSS, divAreas} = d
+      //region when api <-> connected, remove all code below until endregion
+      const data = {} //normal data object, like money...blablabla..
+      const divFS = {
+        'date': '160904,160905,160906,160907,160908,160909,160910,160911,160912,160913,160914,160915,160916,160917,160918',
+        'data': [
+          { 'dt': '160904', 'amount': '8305.0', 'qty': '12' },
+          { 'dt': '160905', 'amount': '6096.0', 'qty': '11' },
+          { 'dt': '160906', 'amount': '6718.0', 'qty': '10' },
+          { 'dt': '160907', 'amount': '6161.0', 'qty': '10' },
+          { 'dt': '160908', 'amount': '8271.0', 'qty': '15' },
+          { 'dt': '160909', 'amount': '5861.0', 'qty': '10' },
+          { 'dt': '160910', 'amount': '31848.0', 'qty': '38' },
+          { 'dt': '160911', 'amount': '8355.0', 'qty': '12' },
+          { 'dt': '160912', 'amount': '0', 'qty': '0' },
+          { 'dt': '160913', 'amount': '0', 'qty': '0' },
+          { 'dt': '160914', 'amount': '0', 'qty': '0' },
+          { 'dt': '160915', 'amount': '0', 'qty': '0' },
+          { 'dt': '160916', 'amount': '0', 'qty': '0' },
+          { 'dt': '160917', 'amount': '0', 'qty': '0' },
+          { 'dt': '160918', 'amount': '0', 'qty': '0' }
+        ]
+      }
+      const divAreas = {
+        data: [
+        { name: '江苏', value: '3160.0' },
+        { name: '广东', value: '2533.0' },
+        { name: '重庆', value: '2208.1' },
+        { name: '北京', value: '1961.0' },
+        { name: '安徽', value: '1098.0' },
+        { name: '河南', value: '1007.0' },
+        { name: '四川', value: '938.0' },
+        { name: '浙江', value: '807.0' },
+        { name: '西藏', value: '715.0' },
+        { name: '湖南', value: '564.0' },
+        { name: '上海', value: '525.0' },
+        { name: '福建', value: '516.1' },
+        { name: '新疆', value: '464.0' },
+        { name: '河北', value: '454.0' },
+        { name: '山东', value: '438.0' },
+        { name: '湖北', value: '435.0' },
+        { name: '内蒙古', value: '396.0' },
+        { name: '广西', value: '356.0' },
+        { name: '陕西', value: '238.0' },
+        { name: '云南', value: '237.0' },
+        { name: '辽宁', value: '207.0' },
+        { name: '天津', value: '109.0' },
+        { name: '山西', value: '89.0' },
+        { name: '江西', value: '79.0' },
+        { name: '黑龙江', value: '0.0' }
+        ]
+      }
+      const divSS = {
+        legend: [
+          '10268952804',
+          '10268946679',
+          '10268952827',
+          '10268946678',
+          '其它'
+        ],
+        data: [
+          {
+            value: '14',
+            name: '10268952804'
+          },
+          {
+            value: '13',
+            name: '10268946679'
+          },
+          {
+            value: '12',
+            name: '10268952827'
+          },
+          {
+            value: '10',
+            name: '10268946678'
+          },
+          {
+            value: '223',
+            name: '其它'
+          }
+        ]
+      }
+      const sysLogs = [
+        {
+          id: 8,
+          title: '【20160919】静默升级，我就默默的等着你看',
+          date: '2016/8/19 13:36:22'
+        },
+        {
+          id: 7,
+          title: '【20160819】全面来袭！小金刚变形',
+          date: '2016/8/19 13:36:22'
+        }
+      ]
+      //endregion remove all above!
+      this.setState({
+        sysLogs,
+        data
+      }, () => {
+        //this.handleZhangTabIn(1)
+        //const {divFS} = d
+        if (divAreas && divAreas.data && divAreas.data.length) {
+          (() => {
+            const data = divAreas.data
+            let max = 0
+            data.forEach((chun) => {
+              max = Math.max(max, chun.value)
+            })
+            if (this.inited) {
+              this.EC2.setOption({
+                visualMap: { max },
+                series: [{ data }]
+              })
+            } else {
+              this.EC2 = echarts.init(this.refs.EC2)
+              this.EC2.setOption({
+                title: {
+                  text: '近七天地域销售分布',
+                  subtext: '累计销售金额，单位（元）',
+                  left: 'center',
+                  textStyle: {
+                    color: '#666',
+                    fontWeight: 'normal',
+                    fontSize: 16
+                  }
+                },
+                tooltip: {
+                  trigger: 'item',
+                  extraCssText: 'pointer-events: none;'
+                },
+                visualMap: {
+                  min: 0,
+                  max: max,
+                  left: 'left',
+                  top: 'bottom',
+                  text: ['高', '低'],
+                  calculable: true
+                },
+                toolbox: {
+                  feature: {
+                    saveAsImage: {}
+                  }
+                },
+                series: [{
+                  type: 'map',
+                  mapType: 'china',
+                  label: false,
+                  data: data
+                }]
+              })
+            }
+          })()
+        }
+        if (divFS) {
+          (() => {
+            const qtyData = []
+            const amountData = []
+            const date = []
+            const dateArr = divFS.date.split(',')
+            const sd = divFS.data
+            dateArr.forEach((t) => {
+              let b = false
+              date.push(t.substring(4, 6))
+              for (let n = 0; n < sd.length; n++) {
+                const dt = sd[n].dt
+                const amount = sd[n].amount
+                const qty = sd[n].qty
+                if (t === dt) {
+                  amountData.push(parseFloat(amount))
+                  qtyData.push(parseFloat(qty))
+                  b = true
+                  break
+                }
+              }
+              if (b === false) {
+                amountData.push(0)
+                qtyData.push(0)
+              }
+            })
+            const dateTotal = dateArr.length
+            if (this.inited) {
+              this.EC1.setOption({
+                title: {
+                  text: '近' + dateTotal + '天销售',
+                  subtext: dateTotal > 0 ? '20' + dateArr[0] + '至' + '20' + dateArr[dateTotal - 1] : ''
+                },
+                xAxis: [{data: date}],
+                series: [{data: amountData}, {data: qtyData}]
+              })
+            } else {
+              this.EC1 = echarts.init(this.refs.EC1)
+              this.EC1.setOption({
+                title: {
+                  text: '近' + dateTotal + '天销售',
+                  subtext: dateTotal > 0 ? '20' + dateArr[0] + '至' + '20' + dateArr[dateTotal - 1] : '',
+                  x: 'center',
+                  textStyle: {
+                    color: '#666',
+                    fontWeight: 'normal',
+                    fontSize: 16
+                  }
+                },
+                tooltip: {
+                  trigger: 'axis',
+                  extraCssText: 'pointer-events: none;',
+                  axisPointer: {
+                    type: false
+                  }
+                },
+                legend: {
+                  data: ['金额', '订单量'],
+                  x: 'left'
+                },
+                grid: {
+                  left: '3%',
+                  right: '4%',
+                  bottom: '3%',
+                  containLabel: true
+                },
+                xAxis: [
+                  {
+                    type: 'category',
+                    data: date,
+                    axisTick: {
+                      alignWithLabel: true
+                    }
+                  }
+                ],
+                yAxis: [
+                  {
+                    name: '金额(元)',
+                    nameLocation: 'middle',
+                    type: 'value',
+                    nameGap: -20,
+                    nameTextStyle: {
+                      color: '#058DC7',
+                      fontSize: 14
+                    },
+                    splitLine: {
+                      lineStyle: {
+                        color: '#058DC7',
+                        opacity: 0.38
+                      }
+                    }
+                  },
+                  {
+                    name: '订单量(个)',
+                    nameLocation: 'middle',
+                    type: 'value',
+                    nameGap: -20,
+                    nameTextStyle: {
+                      color: '#50B432',
+                      fontSize: 14
+                    },
+                    splitLine: {
+                      lineStyle: {
+                        color: '#50B432',
+                        type: 'dashed',
+                        opacity: 0.38
+                      }
+                    }
+                  }
+                ],
+                toolbox: {
+                  feature: {
+                    saveAsImage: {}
+                  }
+                },
+                series: [
+                  {
+                    name: '金额',
+                    type: 'bar',
+                    barWidth: '25%',
+                    yAxisIndex: 0,
+                    silent: true,
+                    itemStyle: {
+                      normal: {
+                        color: '#058DC7'
+                      }
+                    },
+                    data: amountData
+                  },
+                  {
+                    name: '订单量',
+                    type: 'line',
+                    yAxisIndex: 1,
+                    symbol: 'circle',
+                    symbolSize: 10,
+                    showAllSymbol: true,
+                    smooth: true,
+                    silent: true,
+                    z: 3,
+                    itemStyle: {
+                      normal: {
+                        color: '#50B432'
+                      }
+                    },
+                    lineStyle: {
+                      normal: {
+                        type: 'dashed',
+                        width: 1
+                      }
+                    },
+                    data: qtyData
+                  }
+                ]
+              })
+            }
+          })()
+        }
+        if (divSS) {
+          (() => {
+            this.EC3 = echarts.init(this.refs.EC3)
+            this.EC3.setOption({
+              title: {
+                text: '最近七天商品销量',
+                x: 'center',
+                textStyle: {
+                  color: '#666',
+                  fontWeight: 'normal',
+                  fontSize: 16
+                }
+              },
+              tooltip: {
+                trigger: 'item',
+                formatter: '{b} : {c} ({d}%)',
+                extraCssText: 'pointer-events: none;'
+              },
+              legend: {
+                orient: 'vertical',
+                left: 'left',
+                data: divSS.legend
+              },
+              toolbox: {
+                feature: {
+                  saveAsImage: {}
+                }
+              },
+              series: [{
+                type: 'pie',
+                radius: '75%',
+                center: ['50%', '52%'],
+                data: divSS.data,
+                selectedMode: 'multiple',
+                selectedOffset: 10,
+                clockwise: true,
+                label: {
+                  normal: {
+                    show: false
+                  },
+                  emphasis: {
+                    show: true
+                  }
+                },
+                labelLine: {
+                  normal: {
+                    smooth: 0.2,
+                    length: 10,
+                    length2: 20
+                  }
+                },
+                itemStyle: {
+                  emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                  }
+                }
+              }]
+            })
+          })()
+        }
+        if (!this.inited) {
+          this.inited = true
+          window.addEventListener('resize', this.resize, false)
+        }
+        endLoading()
+      })
+    }, 250)
   }
-
+  resize = () => {
+    ['1', '2', '3'].forEach((v) => {
+      this[`EC${v}`].resize()
+    })
+  }
   handleZhangTabIn = (v) => {
     const cl = styles[`hi-${v}`]
     this.refs.zhang.className = `${styles.hi} ${cl}`
   }
-  handleZhangTabOut = (e) => {
-    //if (e.relatedTarget.classList.contains(styles.tab)) {
-      //e.target.classList.remove(styles.)
-    //}
+  handleReadNotice = () => {
+    this.props.dispatch({ type: 'ZHMODUNQ_SET', payload: {
+      mod: 'test', query: null, visible: true
+    } })
+  }
+  openLogById = (id) => {
+    this.props.dispatch({ type: 'ZHMODUNQ_SET', payload: {
+      mod: 'sys/log', query: {id}, visible: true
+    } })
+  }
+  _renderLogs = () => {
+    const {sysLogs} = this.state
+    if (sysLogs) {
+      return sysLogs.map((_v) => {
+        return (
+          <li key={_v.id}><a className='cur' onClick={() => this.openLogById(_v.id)}><span className={styles.c}>{_v.title}</span></a></li>
+        )
+      })
+    }
   }
 
   render() {
-    console.log(' -- component {Main} render...')
-
-    //{tableFlag && this.cache.table}
     return (
       <div className={styles.main}>
         <Row className={styles.maxW}>
@@ -90,8 +487,8 @@ class Main extends React.Component {
           </Col>
           <Col span='8'>
             <div className={`${styles['col-a']} ${styles['col-danger']}`}>
-              <div className={styles.box} onClick={this.handleReadNotice}>
-                <div className='cur'>
+              <div className={styles.box}>
+                <div className='cur' onClick={this.handleReadNotice}>
                   【CCAI大咖秀】崔鹏：物理模型结合大数据建模，弃用深度学习
                 </div>
               </div>
@@ -114,7 +511,7 @@ class Main extends React.Component {
         </div>
         <div className={styles.hi} ref='zhang'>
           <div className={styles['col-l']}>
-            <div className={`${styles['tab']} ${styles['tab-1']}`} onMouseEnter={() => this.handleZhangTabIn(1)} onMouseLeave={this.handleZhangTabOut}>
+            <div className={`${styles['tab']} ${styles['tab-1']}`} onMouseEnter={() => this.handleZhangTabIn(1)}>
               <div className={styles.title}>
                 待发货
               </div>
@@ -132,7 +529,7 @@ class Main extends React.Component {
                 </div>
               </div>
             </div>
-            <div className={`${styles['tab']} ${styles['tab-2']}`} onMouseEnter={() => this.handleZhangTabIn(2)} onMouseLeave={this.handleZhangTabOut}>
+            <div className={`${styles['tab']} ${styles['tab-2']}`} onMouseEnter={() => this.handleZhangTabIn(2)}>
               <div className={styles.title}>
                 待付款
               </div>
@@ -148,7 +545,7 @@ class Main extends React.Component {
                 </div>
               </div>
             </div>
-            <div className={`${styles['tab']} ${styles['tab-3']}`} onMouseEnter={() => this.handleZhangTabIn(3)} onMouseLeave={this.handleZhangTabOut}>
+            <div className={`${styles['tab']} ${styles['tab-3']}`} onMouseEnter={() => this.handleZhangTabIn(3)}>
               <div className={styles.title}>
                 今日订单
               </div>
@@ -184,19 +581,19 @@ class Main extends React.Component {
         <div className={styles.echarts}>
           <Row>
             <Col span={12}>
-              <div id='ZH-echart-sevenSkuSales' style={{width: '100%', height: 380}}>
+              <div ref='EC3' style={{width: '100%', height: 380}}>
                 loading<span className='dotting' />
               </div>
             </Col>
             <Col span={12}>
-              <div id='ZH-echart-sevenAreaSales' style={{width: '100%', height: 380}}>
+              <div ref='EC2' style={{width: '100%', height: 380}}>
                 loading<span className='dotting' />
               </div>
             </Col>
           </Row>
         </div>
         <div className={styles.echarts}>
-          <div id='ZH-echart-FSales' style={{maxWidth: 1000, minWidth: 500, height: 380}}>
+          <div ref='EC1' style={{maxWidth: 1000, minWidth: 500, height: 380}}>
             loading<span className='dotting' />
           </div>
         </div>
@@ -208,9 +605,9 @@ class Main extends React.Component {
             </div>
           </div>
           <div className={styles['col-2']}>
-            <h3>系统更新记录</h3>
-            <ul id='ZH-logs' className={styles.logs}>
-              todo
+            <h3>系统最近更新</h3>
+            <ul className={styles.logs}>
+              {this._renderLogs()}
             </ul>
           </div>
           <div className='clearfix' />
@@ -240,11 +637,12 @@ class Main extends React.Component {
             <Button type='ghost' size='small'>库存初始化-添加期初库存</Button>
           </div>
         </div>
+        <div className={styles.cp}>
+          &copy; 2016 {COMPANY}, ver.{VERSION}
+        </div>
       </div>
     )
   }
 }
 
-//export default Wrapper(Main)
-export default connect(state => ({
-}))(Main)
+export default connect()(Wrapper(Main))

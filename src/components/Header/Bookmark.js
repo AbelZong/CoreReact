@@ -2,7 +2,7 @@ import React from 'react'
 import { findDOMNode } from 'react-dom'
 import update from 'react-addons-update'
 //import { IndexLink, Link } from 'react-router'
-import {Menu} from 'antd'
+import {Menu, Icon} from 'antd'
 import {connect} from 'react-redux'
 import classNames from 'classnames'
 import styles from './Header.scss'
@@ -128,6 +128,13 @@ const Bookmark = React.createClass({
       key: '-1'
     })
   },
+  handleChunClick1(e) {
+    this.menu.target_index = e.target.getAttribute('data-index') * 1
+    this.handleMenuClick({
+      key: '-1'
+    })
+    e.stopPropagation()
+  },
   handleHuaClick(e) {
     const index = e.target.getAttribute('data-index') * 1
     if (index === this.props.activeIndex) {
@@ -144,6 +151,7 @@ const Bookmark = React.createClass({
     return (
       <div key={key} className={CN}>
         <span data-index={index} onClick={this.handleHuaClick} onDoubleClick={this.handleChunClick} onContextMenu={this.handleContextMenu}>{item.name}</span>
+        <Icon data-index={index} type='cross' onClick={this.handleChunClick1} />
       </div>
     )
   },

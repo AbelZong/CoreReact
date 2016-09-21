@@ -5,7 +5,6 @@ import Main from './Main'
 
 class DashBordContainer extends React.Component {
   render() {
-    console.log(' -- app DashBord render...')
     return (
       <div className={styles.content}>
         <Scrollbar autoHide>

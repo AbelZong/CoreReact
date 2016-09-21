@@ -40,7 +40,6 @@
     }
     .ant-modal-header {
       border-radius: 0;
-      padding: 8px 16px;
     }
     .ant-modal-close {
       top:10px;
@@ -48,7 +47,9 @@
   }
   .ant-modal-header {
     border-radius: 1px 1px 0 0;
+    padding: 8px 16px;
   }
+  .ant-input,
   .ant-modal-content {
     border-radius: 1px;
   }

@@ -13,16 +13,20 @@ $logo-percent: percentage(260/$login-width);
   width: $login-width + px;
   padding: 20px 10px 10px;
   position: relative;
-  background: rgba(0,0,0,0.4);
-  border: 1px solid rgba(0,0,0,0.6);
   border-radius: 1px;
-  transition: box-shadow 200ms;
-  //box-shadow: 0 0 80px rgba(250, 255, 189,0.08);
   z-index: 10;
   animation-name: zoomIn;
   transform-origin: center bottom;
   animation-duration: 1s;
   animation-fill-mode: both;
+  overflow: hidden;
+  &:before {
+    position: absolute;
+    left:0;top:0;right:0;bottom:0;
+    background-color: rgba(255,255,255,0.1);
+    content: '';
+    z-index: -1;
+  }
 }
 .chun {
   height:100%;
@@ -66,6 +70,9 @@ $logo-percent: percentage(260/$login-width);
     right: 0px;
     top: -10px;
   }
+  a {
+    color:#3c3c3c;
+  }
 }
 .btn {
   margin-bottom:5px;
@@ -104,7 +111,7 @@ $logo-percent: percentage(260/$login-width);
     overflow:hidden;
 }
 .logo {
-  background-image: url('/i/logo.png');
+  background-image: url('/i/menulogo-80.png');
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;

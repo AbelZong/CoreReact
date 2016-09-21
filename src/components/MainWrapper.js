@@ -1,49 +1,18 @@
 import React from 'react'
-//import invariant from 'invariant'
-//import hoistStatics from 'hoist-non-react-statics'
 import EE from 'utils/EE'
-
 const dataCB = 'refreshDataCallback'
-// const getObjectClass = (obj) => {
-//   if (typeof obj !== 'object' || obj === null) {
-//     return false
-//   }
-//   return /(\w+)\(/.exec(obj.constructor.toString())[1]
-// }
-// const getDisplayName = (Component) => {
-//   return Component.displayName || Component.name || 'Component'
-// }
-
+//const collapseCB = 'collapseCallback'
+//todo ...looool
 const MainWrapper = ComposedComponent => {
-  //console.log(ComposedComponent.refreshDataCallback)
   return React.createClass({
-    // constructor(props) {
-    //   super(props)
-    // },
-    componentWillMount() {
-      //console.warn('2222222222222222222222222222222 componentWillMount 1')
-    },
     componentDidMount() {
-      //console.info('componentDidMount', this.component)
-      //console.warn('2222222222222222222222222222222 componentDidMount 2')
       EE.bindRefreshMain(this.component[dataCB])
-      // console.group()
-      // if (ComposedComponent._dataCache) {
-      //   console.info(ComposedComponent._dataCache)
-      // } else {
-      //   ComposedComponent._dataCache = getObjectClass(this.component)
-      //   console.warn(ComposedComponent._dataCache)
-      // }
-      // console.groupEnd()
     },
     componentWillUnmount() {
-      //console.warn('2222222222222222222222222222222 componentWillUnmount 3')
       EE.offRefreshMain(this.component[dataCB])
     },
     handleChildRef(component) {
-      //why undefined? maybe test error, what ever! checking by conditions
       this.component = component
-      //console.warn('2222222222222222222222222222222 handleChildRef')
     },
     render() {
       return <ComposedComponent {...this.props} ref={this.handleChildRef} />
@@ -53,6 +22,15 @@ const MainWrapper = ComposedComponent => {
 export default MainWrapper
 
 //
+// const getObjectClass = (obj) => {
+//   if (typeof obj !== 'object' || obj === null) {
+//     return false
+//   }
+//   return /(\w+)\(/.exec(obj.constructor.toString())[1]
+// }
+// const getDisplayName = (Component) => {
+//   return Component.displayName || Component.name || 'Component'
+// }
 // export default function MainWrapper(WrappedComponent, options = {}) {
 //   // const {
 //   //     withRef = false

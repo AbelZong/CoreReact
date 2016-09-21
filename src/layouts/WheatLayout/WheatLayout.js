@@ -9,6 +9,7 @@ import {FetchModal} from 'components/Modal/index'
 import {startLoading, endLoading} from 'utils'
 import {ZGet} from 'utils/Xfetch'
 import PageLock from 'components/Lock'
+import Navs from 'components/Header/Navs'
 
 const WheatLayout = React.createClass({
   contextTypes: {
@@ -42,10 +43,6 @@ const WheatLayout = React.createClass({
       // }
     })
   },
-  // componentWillReceiveProps(nextProps) {
-  //   console.dir(this.props)
-  //   console.dir(nextProps)
-  // },
   render() {
     const {children, collapse, locked, entering, mainFixed} = this.props
     if (entering) {
@@ -56,27 +53,24 @@ const WheatLayout = React.createClass({
         <PageLock />
       )
     }
-    const CN = classNames(styles.ZHBody, {
+    const CN = classNames(styles.bbqZH, {
       collapse
     }, {
       mainFixed
     })
     return (
-      <div className={styles.bbqZH}>
-        <div className={CN}>
+      <div className={CN}>
+        <div className={styles.ZHMainHeader}>
+          <Header />
+        </div>
+        <div className={styles.ZHBody}>
           <aside className={styles.ZHAside}>
             <Aside />
           </aside>
-          <div className={styles.ZHMain}>
-            <div className={styles.ZHMainBox}>
-              <div className={styles.ZHMainHeader}>
-                <Header />
-              </div>
-              <div className={styles.ZHMainInner}>
-                {children}
-              </div>
-            </div>
-          </div>
+          <section className={styles.ZHSesion}>
+            <div className={styles.biuNavs}><Navs /></div>
+            <div className={styles.biuChildren}>{children}</div>
+          </section>
         </div>
         <FetchModal />
       </div>

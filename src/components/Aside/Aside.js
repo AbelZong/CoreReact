@@ -1,51 +1,33 @@
 import React from 'react'
-//import {connect} from 'react-redux'
 import styles from './Aside.scss'
-//import { Menu, Icon } from 'antd'
-import Scrollbar from 'components/Scrollbars/index'
-import {SOFTNAME} from 'constants/config'
-import SearchInput from './SearchInput'
-import Menus from './Menus'
+import Menus2 from './Menus2'
+import Menus3 from './Menus3'
+import classNames from 'classnames'
+import {connect} from 'react-redux'
 
 const Asider = React.createClass({
-  // contextTypes: {
-  //   router: React.PropTypes.object.isRequired
-  // },
-  // getInitialState() {
-  //   return {
-  //     openKeysDef: []
-  //   }
-  // },
-  componentWillMount() {
-    // this.setState({
-    //   openKeysDef: menuCache.openKeys
-    // })
-  },
   render() {
-    //  multiple={true}
-    //  onSelect={this._menuSelect}
-    //selectedKeys={bookmarkIDs}
+    const {collapse1, collapse2} = this.props
+    const CN1 = classNames(styles.zhang, {
+      [`${styles.collapse}`]: collapse1
+    })
+    const CN2 = classNames(styles['sec-menus'], {
+      [`${styles.collapse}`]: collapse2
+    })
     return (
-      <div className={styles.zhang}>
-        <div className={styles.chun}>
-          <a className={styles.brand}>{SOFTNAME}</a>
+      <div className={styles.aside}>
+        <div className={CN1}>
+          <Menus2 />
         </div>
-        <div className={styles.hua}>
-          <Scrollbar autoHide className={styles['s--wrapper']}>
-            <Menus />
-          </Scrollbar>
-          <div className={styles.searchBox}>
-            <div className={styles.searchMenus}>
-              <SearchInput placeholder='搜索菜单' />
-            </div>
-          </div>
+        <div className={CN2}>
+          <Menus3 />
         </div>
       </div>
     )
   }
 })
 
-export default Asider
-// export default connect(state => ({
-//   //permissionMenus: state.permissionMenus
-// }))(Asider)
+export default connect(state => ({
+  collapse1: state.asideMenuCollapse1,
+  collapse2: state.asideMenuCollapse2
+}))(Asider)

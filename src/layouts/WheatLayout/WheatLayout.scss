@@ -1,5 +1,7 @@
 .bbqZH {
   height:100%;
+  display: flex;
+  flex-direction: column;
 }
 .ZHHeader {
   position: absolute;
@@ -9,29 +11,33 @@
   color: #fff;
 }
 .ZHBody {
-  //margin-top:80px;
   height:100%;
   position: relative;
   display: flex;
 }
 .ZHAside {
-  // position: absolute;
-  // left:0;top:0;
   height:100%;
-  width:200px;
-  background: #fff;
-  //overflow: auto;
+  width:auto;
   transition: width 0.2s ease;
 }
-.ZHMain {
-  //width:100%;
+.ZHSesion {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.biuNavs {
+  flex-basis: 36px;
+}
+.biuChildren {
+  flex: 1;
   height:100%;
-  //margin-left:200px;
+}
+.ZHMain {
+  height:100%;
   flex: 1;
   background: #fff;
   overflow:auto;
   position: relative;
-  //transition: margin-left 0.2s ease;
 }
 .ZHMainBox {
   display: flex;
@@ -39,7 +45,7 @@
   height: 100%;
 }
 .ZHMainHeader {
-  //height:86px;
+  flex-basis: 50px;
 }
 .ZHnormal {
   display: flex;
@@ -53,7 +59,6 @@
   padding: 6px 8px;
 }
 .ZHMainInner {
-  //padding-top:85px;
   overflow: hidden;
   height: 100%;
   flex: 1;
@@ -65,26 +70,8 @@
   }
 }
 :global(.mainFixed) {
-  .ZHAside {
+  .ZHAside,
+  .ZHMainHeader {
     display: none;
   }
 }
-
-
-// .ZHAside::-webkit-scrollbar,
-// .ZHMain::-webkit-scrollbar
-// {
-//   width: 6px;
-//   height: 6px;
-// }
-// .ZHAside::-webkit-scrollbar-thumb,
-// .ZHMain::-webkit-scrollbar-thumb
-// {
-//   background-color: rgba(0,0,0,0.13);
-//   border-radius: 10px;
-// }
-// .ZHAside:hover::-webkit-scrollbar-thumb,
-// .ZHMain:hover::-webkit-scrollbar-thumb
-// {
-//   background-color: rgba(0,0,0,0.3);
-// }

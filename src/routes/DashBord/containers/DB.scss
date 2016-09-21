@@ -6,6 +6,10 @@
   letter-spacing: 0.3px;
   line-height: 1;
 }
+.main {
+  margin-left:5px;
+  padding-top:20px;
+}
 
 .doozy h2 {
   font-size: 16px;
@@ -31,7 +35,7 @@
 
 .col-a .box {
   padding: 1rem;
-  height: 89px;
+  height: 109px;
 }
 
 .col-a label {
@@ -50,6 +54,8 @@
 
 .col-a footer {
   padding: 8px 16px;
+  background-color: #f5f5f5;
+  color: #666;
   .btn {
     position: absolute;
     left:3px;
@@ -58,12 +64,9 @@
 }
 
 .col-primary {
-  color: #188ae2;
 }
 
 .col-primary footer {
-  background-color: #188ae2;
-  color: #fff;
   text-align: right;
   position: relative;
 }
@@ -73,8 +76,6 @@
 }
 
 .col-danger footer {
-  background-color: #ff5b5b;
-  color: #fff;
   text-align: right;
   position: relative;
 }
@@ -84,8 +85,6 @@
 }
 
 .col-success footer {
-  background-color: #0099cc;
-  color: #fff;
   text-align: right;
   position: relative;
 }
@@ -115,10 +114,7 @@
   position: absolute;
   left: 6px;
   top: 7px;
-  color:#fff;
-  &:hover {
-    color:#fff;
-  }
+  color:#666;
 }
 
 .btn-helps {
@@ -203,13 +199,17 @@
 .system .logs {
   padding-left: 15px;
   overflow: hidden;
+  margin-top: 10px;
 }
 
 .system .logs li {
   list-style-type: none;
-  margin-bottom: 6px;
+  margin-bottom: 7px;
   position: relative;
   line-height: 1;
+  a {
+    color:#666;
+  }
 }
 
 .system .logs li::before {
@@ -448,7 +448,6 @@
 
 .hi .welcome {
   text-align: center;
-  max-width: 1000px;
   margin: auto;
 }
 
@@ -525,7 +524,6 @@
   margin: 39px 10px 5px;
   padding: 10px;
   border: 1px solid #f5f5f5;
-  max-width: 1100px;
   overflow: hidden;
 }
 
@@ -539,8 +537,8 @@
 }
 
 
-.maxW {
-  :global(.ant-col-8) {
-    max-width:350px;
-  }
+.cp {
+  text-align: right;
+  margin-right: 10px;
+  color: #a9a9a9;
 }

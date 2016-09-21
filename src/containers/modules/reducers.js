@@ -61,6 +61,30 @@ const notice_visibel = handleActions({
   NOTICE_VISIBEL_SET: (state, action) => action.payload,
   NOTICE_VISIBEL_REVER: (state, action) => !state
 }, false)
+const asideMenuCollapse1 = handleActions({
+  ASIDEMENUCOLLAPSE1_SET: (state, action) => {
+    const newState = action.payload
+    store.set('g.asideC1', newState)
+    return newState
+  },
+  ASIDEMENUCOLLAPSE1_REVER: (state, action) => {
+    const newState = !state
+    store.set('g.asideC1', newState)
+    return newState
+  }
+}, store.get('g.asideC1', false))
+const asideMenuCollapse2 = handleActions({
+  ASIDEMENUCOLLAPSE2_SET: (state, action) => {
+    const newState = action.payload
+    store.set('g.asideC2', newState)
+    return newState
+  },
+  ASIDEMENUCOLLAPSE2_REVER: (state, action) => {
+    const newState = !state
+    store.set('g.asideC2', newState)
+    return newState
+  }
+}, store.get('g.asideC2', false))
 const zhModUnq = handleActions({
   ZHMODUNQ_SET: (state, action) => action.payload,
   ZHMODUNQ_UPDATE: (state, action) => update(state, action.update),
@@ -100,7 +124,10 @@ const bookmarks = handleActions({
     id: '0'
   }
 ]))
+const menuActiveID = handleActions({
+  MENUACTIVEID_SET: (state, action) => action.payload
+}, -1)
 
 export default {
-  entering, loading, locked, authed, proset_visibel, notice_visibel, user, permissionMenus, permissionMenuFilterName, collapse, mainFixed, zhModUnq, bookmarks, bookmarkAIndex
+  menuActiveID, entering, loading, locked, authed, proset_visibel, notice_visibel, asideMenuCollapse2, asideMenuCollapse1, user, permissionMenus, permissionMenuFilterName, collapse, mainFixed, zhModUnq, bookmarks, bookmarkAIndex
 }
