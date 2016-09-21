@@ -7,6 +7,7 @@ import styles from './Header.scss'
 
 import ZGrid from 'components/Grid/index'
 
+
 const CheckboxGroup = Checkbox.Group
 const RadioGroup = Radio.Group
 
@@ -99,7 +100,15 @@ const Notification = React.createClass({
       readed: defReaded,
       levels: defLevels
     }
-    this.api.setRowData(null)
+    //this.api.setRowData(null)
+    this.grid.setDatasource({
+      total: 100,
+      rowData: [],
+      getRows: (params) => {
+        console.log(params)
+      }
+    })
+
     ZPost('profile/msg', data, (s, d, m) => {
       console.log(d)
     })
