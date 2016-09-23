@@ -15,9 +15,12 @@ export default connect(state => ({
     this.refreshDataCallback()
   },
   refreshDataCallback() {
-    ZGet('print/tpl/getallsystypes', (s, d, m) => {
-      console.log(d)
-    }, true)
+    ZGet({
+      uri: 'print/tpl/getallsystypes',
+      success: (s, d, m) => {
+        this.props.dispatch({type: 'SYSTYPES_SET', payload: d || []})
+      }
+    })
   },
   render() {
     const collapse = this.props.collapse
