@@ -2,6 +2,7 @@ import React from 'react'
 import {Icon} from 'antd'
 import styles from './Header.scss'
 import {connect} from 'react-redux'
+//import {ZGet} from 'utils/Xfetch'
 
 const NoticeBtn = React.createClass({
 
@@ -12,6 +13,11 @@ const NoticeBtn = React.createClass({
   },
   componentDidMount() {
   },
+  // componentWillMount() {
+  //      ZGet('profile/msgCount', null, (s, d, m) => {
+  //       this.setState({ msgCount: d[0] })
+  //      })
+  // },
   componentWillUnmount() {
   },
   openMsgWindow() {
