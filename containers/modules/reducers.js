@@ -61,10 +61,6 @@ const notice_visibel = handleActions({
   NOTICE_VISIBEL_SET: (state, action) => action.payload,
   NOTICE_VISIBEL_REVER: (state, action) => !state
 }, false)
-const notice_add = handleActions({
-  NOTICE_ADD_SET: (state, action) => action.payload,
-  NOTICE_ADD_REVER: (state, action) => !state
-}, false)
 const asideMenuCollapse1 = handleActions({
   ASIDEMENUCOLLAPSE1_SET: (state, action) => {
     const newState = action.payload
@@ -133,5 +129,5 @@ const menuActiveID = handleActions({
 }, -1)
 
 export default {
-  menuActiveID, entering, loading, locked, authed, proset_visibel, notice_visibel,notice_add, asideMenuCollapse2, asideMenuCollapse1, user, permissionMenus, permissionMenuFilterName, collapse, mainFixed, zhModUnq, bookmarks, bookmarkAIndex
+  menuActiveID, entering, loading, locked, authed, proset_visibel, notice_visibel, asideMenuCollapse2, asideMenuCollapse1, user, permissionMenus, permissionMenuFilterName, collapse, mainFixed, zhModUnq, bookmarks, bookmarkAIndex
 }

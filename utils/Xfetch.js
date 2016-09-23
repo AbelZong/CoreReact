@@ -96,14 +96,18 @@ const _post = (uri, params, successCB, errorCB, isDEV) => {
 module.exports = {
   ZGet: function get(uri, params, successCB, errorCB, isDEV) {
     if (typeof params === 'function') {
+      errorCB = true
       return _get(uri, null, params, successCB, errorCB)
     }
+    isDEV = true
     return _get(uri, params, successCB, errorCB, isDEV)
   },
   ZPost: function get(uri, params, successCB, errorCB, isDEV) {
     if (typeof params === 'function') {
+      errorCB = true
       return _post(uri, null, params, successCB, errorCB)
     }
+    isDEV = true
     return _post(uri, params, successCB, errorCB, isDEV)
   }
 }
