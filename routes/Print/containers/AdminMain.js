@@ -4,8 +4,6 @@ import {connect} from 'react-redux'
 import {Button} from 'antd'
 import appStyles from 'components/App.scss'
 //import styles from './Print.scss'
-import Wrapper from 'components/MainWrapper'
-//import {startLoading, endLoading} from 'utils'
 import AdminCollapseBtn from './AdminCollapseBtn'
 import AdminTable from './AdminTable'
 
@@ -13,14 +11,9 @@ class AdminPanel extends React.Component {
   state = {
     data: null
   }
-  componentWillMount() {
-    this.refreshDataCallback()
-  }
   componentWillUnmount() {
   }
 
-  refreshDataCallback = () => {
-  }
   render() {
     return (
       <div className={`${appStyles.main} flex-column`}>
@@ -40,4 +33,4 @@ class AdminPanel extends React.Component {
   }
 }
 
-export default connect()(Wrapper(AdminPanel))
+export default connect()(AdminPanel)

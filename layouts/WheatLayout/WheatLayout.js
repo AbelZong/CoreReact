@@ -35,9 +35,9 @@ const WheatLayout = React.createClass({
       this.props.dispatch({ type: 'USER_SET', payload: d.user })
       endLoading()
     }, (m, s, d) => {
-      this.context.router.push('go/login')
+      this.context.router.push('/go/login')
       // if (s === -10086) {
-      //   message.error('验证登录失败，请刷新重试', 10)
+      //   console.log('验证登录失败，请刷新重试', 10)
       // } else {
       //   this.context.router.push('go/login')
       // }
