@@ -91,10 +91,8 @@ class Dropdown extends Component {
           />
         </a>
         {expanded ? (
-          <ul
-            className={`dropdown-optionwrapper ${optionWrapperClassName}`}
-          >
-          {
+          <ul className={`dropdown-optionwrapper ${optionWrapperClassName}`}>
+            {
             React.Children.map(options, (option, index) => {
               const temp = React.cloneElement(
                 option, {

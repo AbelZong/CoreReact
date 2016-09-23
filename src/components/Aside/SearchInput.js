@@ -47,7 +47,7 @@ const SearchInput = React.createClass({
           <Input placeholder={placeholder} value={this.state.value} onChange={this.handleInputChange}
             onFocus={this.handleFocusBlur} onBlur={this.handleFocusBlur} onPressEnter={this.handleSearch}
           />
-        {this.state.value && <Icon type='cross-circle' onClick={this.handleInputRemove} />}
+          {this.state.value && <Icon type='cross-circle' onClick={this.handleInputRemove} />}
           <div className='ant-input-group-wrap'>
             <Button icon='search' className={btnCls} size={size} onClick={this.handleSearch} />
           </div>

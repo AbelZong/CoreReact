@@ -113,22 +113,22 @@ class ColorPicker extends Component {
           </span>
         </span>
         <span className='colorpicker-modal-options'>
-        {
-          colors.map((color, index) =>
-            <Option
-              value={color}
-              key={index}
-              className='colorpicker-option'
-              activeClassName='colorpicker-option-active'
-              active={currentSelectedColor === `${currentStyle}-${color}`}
-              onClick={this._toggleColor}
-            >
-              <span
-                style={{ backgroundColor: color }}
-                className='colorpicker-cube'
-              />
-            </Option>)
-        }
+          {
+            colors.map((color, index) =>
+              <Option
+                value={color}
+                key={index}
+                className='colorpicker-option'
+                activeClassName='colorpicker-option-active'
+                active={currentSelectedColor === `${currentStyle}-${color}`}
+                onClick={this._toggleColor}
+              >
+                <span
+                  style={{ backgroundColor: color }}
+                  className='colorpicker-cube'
+                />
+              </Option>)
+          }
         </span>
       </div>
     )

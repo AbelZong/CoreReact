@@ -125,16 +125,16 @@ class ImageControl extends Component {
     return (
       <div className='image-modal' onClick={this._stopPropagation}>
         <div className='image-modal-header'>
-        {uploadImageCallBack ? (
-          <div
-            onClick={this._showImageUploadOption}
-            className={classNames(
-                'image-modal-header-option',
-                { 'active': showImageUpload }
-              )}>
-            图片上传
-          </div>
-        ) : undefined }
+          {uploadImageCallBack ? (
+            <div
+              onClick={this._showImageUploadOption}
+              className={classNames(
+                  'image-modal-header-option',
+                  { 'active': showImageUpload }
+                )}>
+              图片上传
+            </div>
+          ) : undefined }
           <div
             onClick={this._showImageURLOption}
             className={classNames(

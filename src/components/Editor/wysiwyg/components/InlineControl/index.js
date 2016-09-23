@@ -1,5 +1,3 @@
-/* @flow */
-
 import React, { Component, PropTypes } from 'react'
 import { RichUtils } from 'draft-js'
 import Option from '../Option'
@@ -7,12 +5,7 @@ import { Dropdown, DropdownOption } from '../Dropdown'
 import { getSelectionInlineStyle } from 'draftjs-utils'
 import Icon from 'components/Icon/index'
 
-// import bold from '../../../../images/bold.svg'
-// import italic from '../../../../images/italic.svg';
-// import underline from '../../../../images/underline.svg';
-// import strikethrough from '../../../../images/strikethrough.svg';
-// import monospace from '../../../../images/monospace.svg';
-import styles from './styles.scss' // eslint-disable-line no-unused-vars
+//import styles from './styles.scss'
 
 class InlineControl extends Component {
 
@@ -75,17 +68,17 @@ class InlineControl extends Component {
   _renderInFlatList(currentStyles: string): Object {
     return (
       <div className='inline-wrapper'>
-      {
-        this.stylesMap.map((style, index) =>
-          <Option
-            key={index}
-            value={style.value}
-            onClick={this._toggleInlineStyle}
-            active={currentStyles[style.value] === true}>
-            <Icon type={style.icon} className='inline-icon' role='presentation' />
-          </Option>
-        )
-      }
+        {
+          this.stylesMap.map((style, index) =>
+            <Option
+              key={index}
+              value={style.value}
+              onClick={this._toggleInlineStyle}
+              active={currentStyles[style.value] === true}>
+              <Icon type={style.icon} className='inline-icon' role='presentation' />
+            </Option>
+          )
+        }
       </div>
     )
   }

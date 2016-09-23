@@ -142,7 +142,7 @@ const Menus = React.createClass({
         defaultOpenKeys={openKeys}
         mode={mode}
       >
-      {this.renderMenus()}
+        {this.renderMenus()}
       </Menu>
     )
   }

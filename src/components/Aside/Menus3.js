@@ -97,7 +97,7 @@ const Menus = React.createClass({
               defaultOpenKeys={openKeys}
               mode={mode}
             >
-            {activePM.data.map((menu, i) => parseMenu(menu, i))}
+              {activePM.data.map((menu, i) => parseMenu(menu, i))}
             </Menu>
           </Scrollbar>
           <div className={styles.operater} onClick={this.handleClick}>

@@ -3,7 +3,7 @@ import { Dropdown, DropdownOption } from '../Dropdown'
 import { RichUtils } from 'draft-js'
 import { changeDepth, getSelectedBlocksType } from 'draftjs-utils'
 import Option from '../Option'
-import styles from './styles.scss'
+//import styles from './styles.scss'
 import Icon from 'components/Icon/index'
 
 class ListControl extends Component {

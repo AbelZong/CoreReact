@@ -195,7 +195,7 @@ class WysiwygEditor extends Component {
 
     return (
       <div className={`editor-wrapper ${wrapperClassName}`}>
-      {
+        {
         (hasFocus || toolbarAlwaysVisible) ? (
           <div
             className={`editor-toolbar ${toolbarClassName}`}
