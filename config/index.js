@@ -2,9 +2,11 @@
 import path from 'path'
 import _debug from 'debug'
 import { argv } from 'yargs'
-import ip from 'ip'
+// import ip from 'ip'
 
-const localip = ip.address()
+// const localip = ip.address()
+const localip = '114.55.11.89'
+// const localip = "http://localhost"
 const debug = _debug('app:config')
 debug('Creating default configuration.')
 
@@ -27,7 +29,7 @@ const config = {
   // Server Configuration
   // ----------------------------------
   server_host : localip, // use string 'localhost' to prevent exposure on local network
-  server_port : process.env.PORT || 8989,
+  server_port : process.env.PORT || 80,
 
   // ----------------------------------
   // Compiler Configuration

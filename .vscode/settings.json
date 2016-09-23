@@ -8,5 +8,19 @@
   "html.suggest.angular1": false,
   "html.suggest.ionic": false,
   "javascript.validate.enable": false, //禁用自带的js校验
-  "editor.renderIndentGuides": true
+  "editor.renderIndentGuides": true,
+  // 配置 glob 模式以排除文件和文件夹。
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/dist":true
+  },
+  // 配置 glob 模式以在搜索中排除文件和文件夹。从 files.exclude 设置中继承所有 glob 模式。
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/dist":true
+  }
 }
