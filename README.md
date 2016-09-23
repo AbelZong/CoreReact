@@ -4,3 +4,8 @@
 attention!
 use git command next time,you should run first:
 `cd /projectDir/src`
+
+
+spec files:
+	/utils/Xfetch.js
+	/constants/config.js
