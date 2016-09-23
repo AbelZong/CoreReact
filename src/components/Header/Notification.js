@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import {ZPost} from 'utils/Xfetch'
 import store from 'utils/store' //吃相不太好看
 import styles from './Header.scss'
-
+import NoticeAdd from './NoticeAdd'
 import ZGrid from 'components/Grid/index'
 
 const CheckboxGroup = Checkbox.Group
@@ -41,10 +41,18 @@ const defColumns = [
     width: 60,
     pinned: true,
     cellClassRules: {
-      'lv-1': (params) => { return params.value === '已发货' },
-      'lv-2': (params) => { return params.value === '发货中' },
-      'lv-3': (params) => { return params.value === '待付款' }
+      // 'lv-1': (params) => { return params.value === '已发货' },
+      // 'lv-2': (params) => { return params.value === '发货中' },
+      // 'lv-3': (params) => { return params.value === '待付款' }
+      'levels_0': (params) => { return params.value === '0' },
+      'levels_1': (params) => { return params.value === '1' },
+      'levels_2': (params) => { return params.value === '2' },
+      'levels_3': (params) => { return params.value === '3' }
     }
+  }, {
+    headerName: '编号',
+    field: 'Id',
+    width: 30
   }, {
     headerName: '消息',
     field: 'Msg',
@@ -55,8 +63,16 @@ const defColumns = [
     width: 120
   }, {
     headerName: '已阅',
-    //field: 'CreateDate',
-    width: 40
+    field: 'Isreaded',
+    width: 40,
+    cellStyle: { 'text-align': 'center' },
+    cellRenderer: (params) => {
+      if (params.value === true) {
+        return "<span title='true'>&#10004;</span>"
+      } else if (params.value === false) {
+        return "<span title='false'>&#10006;</span>"
+      }
+    }
   }, {
     headerName: '阅读人',
     field: 'Reador',
@@ -64,7 +80,8 @@ const defColumns = [
   }, {
     headerName: '阅读时间',
     field: 'ReadDate',
-    width: 120
+    cellStyle: { 'text-align': 'center' },
+    width: 150
   }]
 
 const Notification = React.createClass({
@@ -99,22 +116,55 @@ const Notification = React.createClass({
       readed: defReaded,
       levels: defLevels
     }
-    this.api.setRowData(null)
+    //this.api.setRowData(null)
     ZPost('profile/msg', data, (s, d, m) => {
-      console.log(d)
+      this.props.dispatch({ type: 'NOTICE_VISIBEL_SET', payload: true })
+      this.grid.setDatasource({
+        total: 100,
+        rowData: d,
+        getRows: (params) => { }
+      })
+    })
+  },
+  handleBatch(event) {
+    let nodeArr = this.grid.api.selectionController.selectedNodes
+    var selectIds = []
+    for (var p in nodeArr) {
+      selectIds.push(nodeArr[p].data.Id)
+    }
+    var data = {'selectIds': selectIds}
+    ZPost('profile/msgread', data, (s, d, m) => {
+      if (s === 1) {
+        this.handleSearch()
+      }
     })
   },
   handleGridReady(grid) {
     grid.showLoading()
     //获取默认配置
-    grid.setDatasource({
-      total: 100,
-      rowData: [],
-      getRows: (params) => {
-        console.log(params)
-      }
+    // grid.setDatasource({
+    //   total: 100,
+    //   rowData: [],
+    //   getRows: (params) => {
+    //     console.log("Readyparams"+params)
+    //   }
+    // })
+    const data = {
+      readed: defReaded,
+      levels: defLevels
+    }
+    ZPost('profile/msg', data, (s, d, m) => {
+      this.props.dispatch({ type: 'NOTICE_VISIBEL_SET', payload: true })
+      this.grid.setDatasource({
+        total: 100,
+        rowData: d,
+        getRows: (params) => {}
+      })
     })
     this.grid = grid
+  },
+  openNoticeAddWindow() {
+    this.props.dispatch({ type: 'NOTICE_ADD_REVER' })
   },
   render() {
     const {visible} = this.props
@@ -124,7 +174,7 @@ const Notification = React.createClass({
     }
     const {searchLoading} = this.state
     return (
-      <Modal wrapClassName='modalTop' width='100%' title='通知' visible={visible} onCancel={this.hideModal} footer=''>
+      <Modal wrapClassName='modalTop' width='100%' title='通知' visible={visible} onCancel={this.hideModal} footer='' mname='NotificationModel'>
         <div className='clearfix'>
           <div className={styles.levels}>
             <CheckboxGroup options={levels} defaultValue={defLevels} onChange={this.handleLevel} />
@@ -140,13 +190,15 @@ const Notification = React.createClass({
         </div>
         <div className='clearfix mt10 mb10'>
           <div className=''>
-            <Button type='primary' size='small' className='mr10'>新消息</Button>
-            <Button type='ghost' size='small' className='mr10'>批量已读</Button>
-            <Button type='ghost' size='small' shape='circle-outline' icon='reload' />
+            <Button type='primary' size='small' className='mr10' onClick={this.openNoticeAddWindow} >新消息</Button>
+            <Button type='ghost' size='small' className='mr10' onClick={this.handleBatch}>批量已读</Button>
+            <Button type='ghost' size='small' shape='circle-outline' icon='reload' onClick={this.handleSearch} />
           </div>
         </div>
         <ZGrid onReady={this.handleGridReady} storeConfig={{ prefix: 'msg' }} height={500} columnDefs={defColumns} />
+        <NoticeAdd research={this.handleSearch} />
       </Modal>
+
     )
   }
 })
