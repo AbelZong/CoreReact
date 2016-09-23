@@ -318,6 +318,20 @@
 	.dotting:before { content: '...'; } /* IE8 */
 	.dotting::before { content: ''; }
 	:root .dotting { margin-right: 8px; } /* IE9+,FF,CH,OP,SF */
+	.hMax {
+		height: 100%;
+	}
+	.flex-column {
+		display: flex;
+		flex-direction: column;
+	}
+	.flex-row {
+		display: flex;
+    flex-direction: row;
+	}
+	.flex-grow {
+		flex:1;
+	}
 }
 @keyframes:global(dot) {
     25% { box-shadow: none; }

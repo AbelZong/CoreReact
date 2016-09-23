@@ -1,7 +1,7 @@
 import React from 'react'
 //import classNames from 'classnames'
 import {connect} from 'react-redux'
-import {Row, Col, Icon, Button} from 'antd'
+import {Row, Col, Button} from 'antd'
 import styles from './DB.scss'
 import Wrapper from 'components/MainWrapper'
 import {COMPANY, VERSION} from 'constants/config'
@@ -10,7 +10,7 @@ import {startLoading, endLoading} from 'utils'
 import echarts from 'echarts'
 import echartsChinaMap from 'echarts/map/json/china'
 echarts.registerMap('china', echartsChinaMap)
-//import Scrollbar from 'components/Scrollbars/index'
+import 'echarts/theme/shine'
   // <Scrollbar style={{ height: '80%', overflow: 'hidden' }}>
   // </Scrollbar>
   // <div style={{height: '20%', overflow: 'hidden'}}>
@@ -152,7 +152,7 @@ class Main extends React.Component {
                 series: [{ data }]
               })
             } else {
-              this.EC2 = echarts.init(this.refs.EC2)
+              this.EC2 = echarts.init(this.refs.EC2, 'shine')
               this.EC2.setOption({
                 title: {
                   text: '近七天地域销售分布',
@@ -228,7 +228,7 @@ class Main extends React.Component {
                 series: [{data: amountData}, {data: qtyData}]
               })
             } else {
-              this.EC1 = echarts.init(this.refs.EC1)
+              this.EC1 = echarts.init(this.refs.EC1, 'shine')
               this.EC1.setOption({
                 title: {
                   text: '近' + dateTotal + '天销售',
@@ -350,7 +350,7 @@ class Main extends React.Component {
         }
         if (divSS) {
           (() => {
-            this.EC3 = echarts.init(this.refs.EC3)
+            this.EC3 = echarts.init(this.refs.EC3, 'shine')
             this.EC3.setOption({
               title: {
                 text: '最近七天商品销量',

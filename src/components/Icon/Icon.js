@@ -17,7 +17,7 @@ export default class Icon extends React.Component {
   };
 
   static defaultProps = {
-    Component: 'span'
+    Component: 'i'
   };
 
   render() {

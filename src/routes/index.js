@@ -5,6 +5,8 @@ import DashBordRoute from './DashBord'
 import LoginRoute from './Login'
 import ApplyRoute from './Apply'
 import NotFoundRoute from './NotFound'
+import PrintUserRoute from './Print'
+import PrintAdminRoute from './Print/admin'
 
 export const createRoutes = (store) => ([
   {
@@ -15,8 +17,18 @@ export const createRoutes = (store) => ([
       ApplyRoute(store),
       NotFoundRoute
     ],
-    ignoreScrollBehavior: true
-    //indexRoute: LoginRoute(store)
+    ignoreScrollBehavior: true,
+    indexRoute: NotFoundRoute
+  },
+  {
+    path: '/print',
+    component: WheatLayout,
+    childRoutes: [
+      PrintUserRoute(store),
+      PrintAdminRoute(store)
+    ],
+    ignoreScrollBehavior: true,
+    indexRoute: NotFoundRoute
   },
   {
     path: '/',
@@ -27,32 +39,5 @@ export const createRoutes = (store) => ([
     ],
     ignoreScrollBehavior: true
   }
-  // {
-  //   path: '*',
-  //   component: PageLayout,
-  //   indexRoute: NotFoundRoute,
-  //   childRoutes: [
-  //     //LockRoute(store)
-  //   ]
-  // }
 ])
-
-/*  Note: childRoutes can be chunked or otherwise loaded programmatically
-    using getChildRoutes with the following signature:
-
-    getChildRoutes (location, cb) {
-      require.ensure([], (require) => {
-        cb(null, [
-          // Remove imports!
-          require('./Counter').default(store)
-        ])
-      })
-    }
-
-    However, this is not necessary for code-splitting! It simply provides
-    an API for async route definitions. Your code splitting should occur
-    inside the route `getComponent` function, since it is only invoked
-    when the route exists and matches.
-*/
-
 export default createRoutes

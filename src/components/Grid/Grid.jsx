@@ -48,10 +48,7 @@ const pageSizeOptions = ['10', '20', '30', '50', '100', '200']
 class ZGrid extends React.Component {
   constructor(props) {
     super(props)
-    const {storeConfig, height} = props
-    if (!height) {
-      this.props.height = 500
-    }
+    const {storeConfig} = props
     this.storeConfig = Object.assign({
       prefix: 'zh'
     }, storeConfig)
@@ -286,44 +283,46 @@ class ZGrid extends React.Component {
     })
   }
   render() {
-    const {columnDefs, height, paged} = this.props
-    let rowData = this.state.rowData || this.props.rowData
-    console.log('-- render')
+    const {columnDefs, height, paged, className} = this.props
+    const rowData = this.state.rowData || this.props.rowData
+    const CN = className ? `z-grid ${className}` : 'z-grid'
     return (
-      <div className='z-grid'>
-        <div style={{height}} className='ag-fresh'>
-          <AgGridReact
-            gridOptions={gridOptions}
+      <div className={CN} style={{height: height || 'auto'}}>
+        <div className='grid-inner'>
+          <div className='ag-fresh'>
+            <AgGridReact
+              gridOptions={gridOptions}
 
-            onGridReady={this.onGridReady}
-            onColumnResized={this.agColumnResized}
-            onColumnMoved={this.agColumnMoved}
-            onColumnVisible={this.agColumnVisible}
+              onGridReady={this.onGridReady}
+              onColumnResized={this.agColumnResized}
+              onColumnMoved={this.agColumnMoved}
+              onColumnVisible={this.agColumnVisible}
 
-            columnDefs={columnDefs}
-            rowData={rowData}
+              columnDefs={columnDefs}
+              rowData={rowData}
 
-            rowSelection='multiple'
-            enableColResize='true'
-            groupHeaders='false'
-            rowHeight='32'
-            debug='false'
-          />
-        </div>
-        <div className='footer'>
-          <div className='op-r'>
-            {paged && (
-              <a title='刷新容器' className='cur' onClick={this.refreshRowData}><Icon type='refresh' spin={false} /></a>
-            )}
-            <a title='显示隐藏列名' className='cur' onClick={this.toggleColumnCheckedVisibe}><Icon type='eye-slash' /></a>
-            <Popconfirm placement='leftBottom' title='确定要恢复容器默认设置吗？下次进入或刷新生效' onConfirm={this.removeCache}><a title='恢复容器默认设置' className='cur'><Icon type='eraser' /></a>
-            </Popconfirm>
+              rowSelection='multiple'
+              enableColResize='true'
+              groupHeaders='false'
+              rowHeight='32'
+              debug='false'
+            />
           </div>
-          {paged && (
-            <Pagination size='small' current={this.state.current} pageSize={this.state.pageSize} onChange={this.handlePageChange} onShowSizeChange={this.handlePageShowSizeChange} total={this.state.total} showSizeChanger showQuickJumper pageSizeOptions={pageSizeOptions} showTotal={total => `共 ${total} 条`} />
-          )}
+          <div className='footer'>
+            <div className='op-r'>
+              {paged && (
+                <a title='刷新容器' className='cur' onClick={this.refreshRowData}><Icon type='refresh' spin={false} /></a>
+              )}
+              <a title='显示隐藏列名' className='cur' onClick={this.toggleColumnCheckedVisibe}><Icon type='eye-slash' /></a>
+              <Popconfirm placement='leftBottom' title='确定要恢复容器默认设置吗？下次进入或刷新生效' onConfirm={this.removeCache}><a title='恢复容器默认设置' className='cur'><Icon type='eraser' /></a>
+              </Popconfirm>
+            </div>
+            {paged && (
+              <Pagination size='small' current={this.state.current} pageSize={this.state.pageSize} onChange={this.handlePageChange} onShowSizeChange={this.handlePageShowSizeChange} total={this.state.total} showSizeChanger showQuickJumper pageSizeOptions={pageSizeOptions} showTotal={total => `共 ${total} 条`} />
+            )}
+          </div>
+          {this.state.columnsCheckedVisibe && this.renderColumnsChecked()}
         </div>
-        {this.state.columnsCheckedVisibe && this.renderColumnsChecked()}
       </div>
     )
   }
