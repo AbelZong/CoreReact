@@ -29,6 +29,12 @@ const defColumns = [
 const AdminTable = React.createClass({
   componentDidMount() {
   },
+  componentWillReceiveProps(nextProps) {
+    console.log(nextProps)
+  },
+  shouldComponentUpdate() {
+    return false
+  },
   componentWillUnmount() {
   },
   handleSearch() {
@@ -44,19 +50,24 @@ const AdminTable = React.createClass({
       console.log(d)
     })
   },
-  handleGridReady(grid) {
-    grid.showLoading()
-    //获取默认配置
-    grid.setDatasource({
-      total: 100,
-      rowData: [],
+  setSource() {
+    const {total, list, type} = this.props
+    this.grid.setDatasource({
+      total,
+      rowData: list,
       getRows: (params) => {
         console.log(params)
       }
     })
+  },
+  handleGridReady(grid) {
+    console.log(grid)
+    grid.showLoading()
     this.grid = grid
+    this.setSource()
   },
   render() {
+    console.log('1')
     return (
       <div className='flex-column flex-grow'>
         <div className={styles.toolbar}>
@@ -70,4 +81,5 @@ const AdminTable = React.createClass({
 })
 
 export default connect(state => ({
+  firstBlood: state.print_admin_tdata
 }))(AdminTable)

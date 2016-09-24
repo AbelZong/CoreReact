@@ -4,7 +4,7 @@ import { Icon, Button, Popconfirm, message } from 'antd'
 import appStyles from 'components/App.scss'
 import styles from './Print.scss'
 import classNames from 'classnames'
-import {ZPost} from 'utils/Xfetch'
+import {ZGet, ZPost} from 'utils/Xfetch'
 
 const AdminSide = React.createClass({
   getInitialState: function() {
@@ -12,11 +12,26 @@ const AdminSide = React.createClass({
       activeID: -1
     }
   },
-  handleOpCp(e, id) {
-    e.stopPropagation()
-    console.log('handleOpCp', id)
+  handleOpCp(e, {type, id}) {
     this.setState({
       activeID: id * 1
+    }, () => {
+      ZGet({
+        uri: 'print/tpl/sysesbytype',
+        data: {
+          type
+        },
+        success: (s, d, m) => {
+          this.props.dispatch({type: 'PRINT_ADMIN_TDATA_SET', payload: {
+            list: d.list || [],
+            page: d.page || 0,
+            pageSize: d.pageSize || 20,
+            pageTotal: d.pageTotal || 0,
+            total: d.Total || 0,
+            type
+          }})
+        }
+      })
     })
   },
   handleOpEdit(e, id) {
@@ -25,9 +40,10 @@ const AdminSide = React.createClass({
   },
   handleOpDelete(id) {
     const {systypes} = this.props
-    ZPost({
-      //uri: ''
-    })
+    // ZPost({
+    //   uri: 'print/tpl/sysesbytype',
+    //   data
+    // })
     const item = systypes.filter((x) => x.id === id)[0]
     if (item) {
       const index = systypes.indexOf(item)
@@ -60,7 +76,7 @@ const AdminSide = React.createClass({
                   [`${appStyles.active}`]: activeID === x.id
                 })
                 return (
-                  <li className={CN} key={x.id} onClick={(e) => this.handleOpCp(e, x.id)}><span className={`${appStyles.name} cur`}>{x.name}</span>
+                  <li className={CN} key={x.id} onClick={(e) => this.handleOpCp(e, x)}><span className={`${appStyles.name} cur`}>{x.name}</span>
                     <div className={appStyles.operators}>
                       <Icon type='edit' onClick={(e) => this.handleOpEdit(e, x.id)} />
                       <Popconfirm title={`确定要删除 ${x.name} 吗？`} onConfirm={() => this.handleOpDelete(x.id)}>

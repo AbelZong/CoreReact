@@ -15,7 +15,10 @@ const print_systypes = handleActions({
 const print_admin_sysmodify = handleActions({ //从此节操碎一地
   PRINT_ADMIN_SYSMODIFY_SET: (state, action) => action.payload
 }, 0)
+const print_admin_type_active = handleActions({
+  PRINT_ADMIN_TYPE_ACTIVE_SET: (state, action) => action.payload
+}, -1)
 
 export default {
-  print_admin_collapse, print_systypes, print_admin_sysmodify
+  print_admin_collapse, print_systypes, print_admin_sysmodify, print_admin_type_active
 }
