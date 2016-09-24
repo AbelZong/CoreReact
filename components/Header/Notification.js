@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import {ZPost} from 'utils/Xfetch'
 import store from 'utils/store' //吃相不太好看
 import styles from './Header.scss'
-
+import NoticeAdd from './NoticeAdd'
 import ZGrid from 'components/Grid/index'
 
 const CheckboxGroup = Checkbox.Group
@@ -146,6 +146,7 @@ const Notification = React.createClass({
           </div>
         </div>
         <ZGrid onReady={this.handleGridReady} storeConfig={{ prefix: 'msg' }} height={500} columnDefs={defColumns} />
+        <NoticeAdd research={this.handleSearch} />
       </Modal>
     )
   }
