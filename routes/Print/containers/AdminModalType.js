@@ -5,6 +5,9 @@ import {ZGet, ZPost} from 'utils/Xfetch'
 import {startLoading, endLoading} from 'utils'
 const createForm = Form.create
 const FormItem = Form.Item
+// function noop() {
+//   return false
+// }
 
 const DEFAULT_TITLE = '创建新类型'
 const WangWangWang = React.createClass({
