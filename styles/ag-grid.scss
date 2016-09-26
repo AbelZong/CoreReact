@@ -238,7 +238,7 @@
   }
 
   .ag-fresh .ag-body {
-    background-color: #f9f9f9;
+    background-color: #fff; //f9
     color: #777;
     font-size: 12px;
   }
@@ -676,6 +676,7 @@
       }
       .ant-pagination {
         float: right;
+        margin:8px;
         &.mini .ant-pagination-options-quick-jumper input {
           margin:0 3px;
         }

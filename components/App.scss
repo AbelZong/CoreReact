@@ -89,15 +89,13 @@
 		height: 28px;
 		line-height: 28px;
 		overflow: hidden;
-		background: linear-gradient(180deg,#f9f9f9 0,#f3f3f3);
-		border-bottom: 1px solid #dedede;
+		border-bottom: 1px solid #f5f5f5;
     color: #797979;
     text-shadow: 1px 1px 1px #fff;
 		user-select: none;
 		padding: 0 10px;
 		.name {
 			font-size:14px;
-	    margin-left: 10px;
 		}
 		.r {
 			float:right;
@@ -151,6 +149,9 @@
 		}
 		&.active {
 			background: #f5f5f5;
+		}
+		.name {
+	    margin-left: 6px;
 		}
 	}
 	.operators {

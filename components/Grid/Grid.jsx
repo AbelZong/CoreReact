@@ -139,7 +139,7 @@ class ZGrid extends React.Component {
     })
   }
   setDatasource = (args) => {
-    //args = {total, getRows, page, rowData}
+    //args = {total, getRows, page, rowData, pageSize}
     const _typeRowData = typeof args.rowData
     if (this.props.paged) {
       const _states = {
@@ -147,6 +147,9 @@ class ZGrid extends React.Component {
       }
       if (_typeRowData !== 'undefined' && args.rowData) {
         _states.rowData = args.rowData
+      }
+      if (typeof args.pageSize !== 'undefined') {
+        _states.pageSize = args.pageSize * 1
       }
       this.getRowsFunc = args.getRows
       this.setState(_states, () => {
@@ -172,6 +175,9 @@ class ZGrid extends React.Component {
     this.api.hideOverlay()
     this.api.showNoRowsOverlay()
   }
+  getPageSize = () => {
+    return this.state.pageSize
+  }
   getRows = (page) => {
     if (this.getRowsFunc !== null) {
       this.api.showLoadingOverlay()
@@ -179,10 +185,11 @@ class ZGrid extends React.Component {
         success: (data) => this._getRowsSuccess(data),
         fail: (msg) => this._getRowsFail(msg),
         page: page > 0 ? page : this.state.current,
-        size: this.state.pageSize
+        pageSize: this.state.pageSize
       })
     } else {
-      message.warn('请先 setDatasource {total, getRows, [current], [rowData]}')
+      const tips = this.props.setPleaseMsg || '请先 setDatasource {total, getRows, [current], [rowData]}'
+      message.warn(tips)
     }
   }
   refreshRowData = () => {
@@ -196,7 +203,6 @@ class ZGrid extends React.Component {
       const checked = e.checked || e.selected || false
       this.columnApi.setColumnVisible(field, checked)
       this._saveColumns()
-      //console.log(field, checked)
     })
   }
   removeCache = () => {
@@ -212,21 +218,6 @@ class ZGrid extends React.Component {
   _saveCacheHideColumns = () => {
     store.set(this.storeConfig.COLUMNSHIDE_KEY, this.cacheHideColumns)
   }
-    // selectedKeys={this.state.checkedKeys}
-    // checkedKeys={this.state.checkedKeys}
-  // renderColumnsClosed = () => {
-  //   return null
-  //   const columnDefs = this.cacheColumnStates
-  //   return (
-  //     <Tree className='columnChecks' showLine checkable multiple defaultExpandAll
-  //       onSelect={this.handleColumnFilter} onCheck={this.handleColumnFilter}
-  //       >
-  //       {
-  //         columnDefs.map((node) => parseColumnSelectNodes(node))
-  //       }
-  //     </Tree>
-  //   )
-  // }
   toggleColumnCheckedVisibe = () => {
     this.setState({
       columnsCheckedVisibe: !this.state.columnsCheckedVisibe
@@ -271,7 +262,7 @@ class ZGrid extends React.Component {
     this.setState({
       current
     }, () => {
-      //重新获取page current
+      this.getRows()
     })
   }
   handlePageShowSizeChange = (index, pageSize) => {
@@ -279,7 +270,7 @@ class ZGrid extends React.Component {
       pageSize
     }, () => {
       store.set(this.storeConfig.PAGESIZE_KEY, pageSize)
-      //重新获取page 1
+      this.getRows(1)
     })
   }
   render() {

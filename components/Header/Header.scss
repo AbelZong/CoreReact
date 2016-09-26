@@ -243,31 +243,32 @@
 .levels {
   border-right: 1px solid #ccc;
   padding-right: 10px;
+      margin-top: 5px;
 }
 .readed {
   margin-left:10px;
 }
-.levels {
-  :global {
-    .ant-checkbox-group-item {
-      padding: 3px 10px;
-      border-radius: 1px;
-      &:nth-child(1) {
-        background-color:#f00;
-        color:#fff;
-      }
-      &:nth-child(2) {
-        background-color:#ffd800;
-      }
-      &:nth-child(3) {
-        background-color:#f8f5b5;
-      }
-      &:nth-child(4) {
-        background-color:#f5f5f5;
-      }
-    }
-  }
-}
+// .levels {
+//   :global {
+//     .ant-checkbox-group-item {
+//       padding: 3px 10px;
+//       border-radius: 1px;
+//       &:nth-child(1) {
+//         background-color:#f00;
+//         color:#fff;
+//       }
+//       &:nth-child(2) {
+//         background-color:#ffd800;
+//       }
+//       &:nth-child(3) {
+//         background-color:#f8f5b5;
+//       }
+//       &:nth-child(4) {
+//         background-color:#f5f5f5;
+//       }
+//     }
+//   }
+// }
 
 .menuSev {
   position: relative;
@@ -371,4 +372,18 @@
       background-color: #f2f2f2;
     }
   }
+}
+
+.damnGrid {
+  :global(.ant-rate) {
+    font-size:8px;
+  }
+}
+.readedCell1,
+.readedCell0 {
+  font-size: 14px;
+    text-align: center;
+}
+.readedCell0 {
+  cursor: pointer;
 }

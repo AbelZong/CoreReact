@@ -1,26 +1,49 @@
 import React from 'react'
-import { Modal, Checkbox, Radio, Button, message } from 'antd'
+import { Modal, Checkbox, Radio, Button, message, Rate, Icon } from 'antd'
 import {connect} from 'react-redux'
 import {ZPost} from 'utils/Xfetch'
 import store from 'utils/store' //吃相不太好看
 import styles from './Header.scss'
 import NoticeAdd from './NoticeAdd'
 import ZGrid from 'components/Grid/index'
-
 const CheckboxGroup = Checkbox.Group
 const RadioGroup = Radio.Group
-
 const levels = [
   { label: '严重', value: '3' },
   { label: '重要', value: '2' },
   { label: '普通', value: '1' },
   { label: '不重要', value: '0' }
 ]
-
 const DEFLEVELS_KEY = 'msg.deflevels'
 const DEFREADED_KEY = 'msg.defReaded'
 let defLevels = store.get(DEFLEVELS_KEY, ['0', '1', '2', '3'])
 let defReaded = store.get(DEFREADED_KEY, '0')
+class LevelCellRenderer extends React.Component {
+  render() {
+    const value = Number(this.props.value)
+    return <Rate disabled defaultValue={value} count={3} />
+  }
+}
+class ReadCellRenderer extends React.Component {
+  handleClick = (e) => {
+    e.stopPropagation()
+    const data = {ids: [this.props.data.Id]}
+    ZPost('profile/msgread', data, (s, d, m) => {
+      this.props.data.Isreaded = true
+      this.props.refreshCell()
+    })
+  }
+  render() {
+    if (this.props.value) {
+      return (
+        <div className={styles.readedCell1}><Icon type='check-circle' /></div>
+      )
+    }
+    return (
+      <div className={styles.readedCell0} onClick={this.handleClick}><Icon type='check-circle-o' /></div>
+    )
+  }
+}
 const defColumns = [
   // {
   //   headerName: 'sdf',
@@ -38,21 +61,9 @@ const defColumns = [
   }, {
     headerName: '优先级',
     field: 'MsgLevel',
-    width: 60,
+    width: 68,
     pinned: true,
-    cellClassRules: {
-      // 'lv-1': (params) => { return params.value === '已发货' },
-      // 'lv-2': (params) => { return params.value === '发货中' },
-      // 'lv-3': (params) => { return params.value === '待付款' }
-      'levels_0': (params) => { return params.value === '0' },
-      'levels_1': (params) => { return params.value === '1' },
-      'levels_2': (params) => { return params.value === '2' },
-      'levels_3': (params) => { return params.value === '3' }
-    }
-  }, {
-    headerName: '编号',
-    field: 'Id',
-    width: 30
+    cellRendererFramework: LevelCellRenderer
   }, {
     headerName: '消息',
     field: 'Msg',
@@ -65,14 +76,7 @@ const defColumns = [
     headerName: '已阅',
     field: 'Isreaded',
     width: 40,
-    cellStyle: { 'text-align': 'center' },
-    cellRenderer: (params) => {
-      if (params.value === true) {
-        return "<span title='true'>&#10004;</span>"
-      } else if (params.value === false) {
-        return "<span title='false'>&#10006;</span>"
-      }
-    }
+    cellRendererFramework: ReadCellRenderer
   }, {
     headerName: '阅读人',
     field: 'Reador',
@@ -91,10 +95,6 @@ const Notification = React.createClass({
       searchLoading: false
     }
   },
-  componentDidMount() {
-  },
-  componentWillUnmount() {
-  },
   hideModal() {
     this.props.dispatch({ type: 'NOTICE_VISIBEL_SET', payload: false })
   },
@@ -107,61 +107,59 @@ const Notification = React.createClass({
     store.set(DEFREADED_KEY, defReaded)
   },
   handleSearch() {
-    //这里需要重设 setDatasource
     if (!this.grid) {
       message.warn('请等待容器初始化')
       return
     }
-    const data = {
-      readed: defReaded,
-      levels: defLevels
-    }
-    //this.api.setRowData(null)
-    ZPost('profile/msg', data, (s, d, m) => {
-      this.props.dispatch({ type: 'NOTICE_VISIBEL_SET', payload: true })
-      this.grid.setDatasource({
-        total: 100,
-        rowData: d,
-        getRows: (params) => { }
-      })
-    })
+    this._firstBlood()
   },
   handleBatch(event) {
-    let nodeArr = this.grid.api.selectionController.selectedNodes
+    const nodeArr = this.grid.api.selectionController.selectedNodes
     var selectIds = []
-    for (var p in nodeArr) {
-      selectIds.push(nodeArr[p].data.Id)
-    }
-    var data = {'selectIds': selectIds}
+    Object.keys(nodeArr).forEach((index) => {
+      selectIds.push(nodeArr[index].data.Id)
+    })
+    const data = {ids: selectIds}
     ZPost('profile/msgread', data, (s, d, m) => {
-      if (s === 1) {
-        this.handleSearch()
-      }
+      this.handleSearch()
     })
   },
   handleGridReady(grid) {
-    grid.showLoading()
-    //获取默认配置
-    // grid.setDatasource({
-    //   total: 100,
-    //   rowData: [],
-    //   getRows: (params) => {
-    //     console.log("Readyparams"+params)
-    //   }
-    // })
-    const data = {
+    this.grid = grid
+    this._firstBlood()
+  },
+  _firstBlood(_data) {
+    this.grid.showLoading()
+    const data = Object.assign({
       readed: defReaded,
-      levels: defLevels
-    }
+      levels: defLevels,
+      pageSize: this.grid.getPageSize(),
+      page: 1
+    }, _data || {})
     ZPost('profile/msg', data, (s, d, m) => {
-      this.props.dispatch({ type: 'NOTICE_VISIBEL_SET', payload: true })
       this.grid.setDatasource({
-        total: 100,
-        rowData: d,
-        getRows: (params) => {}
+        total: d.total,
+        rowData: d.list,
+        page: d.page,
+        getRows: (params) => {
+          if (params.page === 1) {
+            this._firstBlood()
+          } else {
+            const qData = {
+              readed: defReaded,
+              levels: defLevels,
+              pageSize: params.pageSize,
+              page: params.page
+            }
+            ZPost('profile/msg', qData, (s, d, m) => {
+              params.success(d.list)
+            }, (m) => {
+              params.fail(m)
+            })
+          }
+        }
       })
     })
-    this.grid = grid
   },
   openNoticeAddWindow() {
     this.props.dispatch({ type: 'NOTICE_ADD_REVER' })
@@ -195,7 +193,7 @@ const Notification = React.createClass({
             <Button type='ghost' size='small' shape='circle-outline' icon='reload' onClick={this.handleSearch} />
           </div>
         </div>
-        <ZGrid onReady={this.handleGridReady} storeConfig={{ prefix: 'msg' }} height={500} columnDefs={defColumns} />
+        <ZGrid className={styles.damnGrid} onReady={this.handleGridReady} storeConfig={{ prefix: 'msg' }} paged height={398} columnDefs={defColumns} />
         <NoticeAdd research={this.handleSearch} />
       </Modal>
     )

@@ -6,7 +6,7 @@ import AdminSide from './AdminSide'
 import AdminMain from './AdminMain'
 import Wrapper from 'components/MainWrapper'
 import {ZGet} from 'utils/Xfetch'
-//import {startLoading, endLoading} from 'utils'
+import {startLoading, endLoading} from 'utils'
 
 export default connect(state => ({
   collapse: state.print_admin_collapse
@@ -15,12 +15,13 @@ export default connect(state => ({
     this.refreshDataCallback()
   },
   refreshDataCallback() {
+    startLoading()
     ZGet({
       uri: 'print/tpl/getallsystypes',
       success: (s, d, m) => {
         this.props.dispatch({type: 'SYSTYPES_SET', payload: d || []})
       }
-    })
+    }).then(endLoading)
   },
   render() {
     const collapse = this.props.collapse

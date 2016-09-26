@@ -1,10 +1,12 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import { Icon, Button, Popconfirm, message } from 'antd'
+import { Icon, Button, Popconfirm } from 'antd'
 import appStyles from 'components/App.scss'
 import styles from './Print.scss'
 import classNames from 'classnames'
-import {ZGet, ZPost} from 'utils/Xfetch'
+import {ZPost} from 'utils/Xfetch'
+import {startLoading, endLoading} from 'utils'
+import AdminModalType from './AdminModalType'
 
 const AdminSide = React.createClass({
   getInitialState: function() {
@@ -16,44 +18,37 @@ const AdminSide = React.createClass({
     this.setState({
       activeID: id * 1
     }, () => {
-      ZGet({
-        uri: 'print/tpl/sysesbytype',
-        data: {
-          type
-        },
-        success: (s, d, m) => {
-          this.props.dispatch({type: 'PRINT_ADMIN_TDATA_SET', payload: {
-            list: d.list || [],
-            page: d.page || 0,
-            pageSize: d.pageSize || 20,
-            pageTotal: d.pageTotal || 0,
-            total: d.Total || 0,
-            type
-          }})
-        }
-      })
+      this.props.dispatch({type: 'PRINT_ADMIN_TYPE_ACTIVE_SET', payload: type})
     })
   },
   handleOpEdit(e, id) {
     e.stopPropagation()
-    console.log('handleOpEdit', id)
+    this.props.dispatch({type: 'PRINT_TYPE_DOGE_SET', payload: id})
   },
   handleOpDelete(id) {
     const {systypes} = this.props
-    // ZPost({
-    //   uri: 'print/tpl/sysesbytype',
-    //   data
-    // })
-    const item = systypes.filter((x) => x.id === id)[0]
-    if (item) {
-      const index = systypes.indexOf(item)
-      this.props.dispatch({type: 'SYSTYPES_UPDATE', update: {
-        $splice: [[index, 1]]
-      }})
-    }
+    startLoading()
+    ZPost({
+      uri: 'print/tpl/delsysestype',
+      data: {
+        id
+      },
+      success: (s, d, m) => {
+        const item = systypes.filter((x) => x.id === id)[0]
+        if (item) {
+          const index = systypes.indexOf(item)
+          this.props.dispatch({type: 'SYSTYPES_UPDATE', update: {
+            $splice: [[index, 1]]
+          }})
+        }
+      }
+    }).then(endLoading)
   },
   _handleHold(e) {
     e.stopPropagation()
+  },
+  handleCreateNew() {
+    this.props.dispatch({type: 'PRINT_TYPE_DOGE_CREATE'})
   },
   render() {
     const {activeID} = this.state
@@ -66,7 +61,7 @@ const AdminSide = React.createClass({
           </div>
           <div className={appStyles.toolbar}>
             <div className={appStyles.r}>
-              <Button type='ghost' size='small' icon='plus'>新增类型</Button>
+              <Button type='ghost' size='small' icon='plus' onClick={this.handleCreateNew}>新增类型</Button>
             </div>
           </div>
           <div className={appStyles.inner}>
@@ -89,6 +84,7 @@ const AdminSide = React.createClass({
             </ul>
           </div>
         </div>
+        <AdminModalType />
       </aside>
     )
   }

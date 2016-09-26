@@ -1,24 +1,45 @@
 import React from 'react'
 import { Form, Input, Modal } from 'antd'
 import {connect} from 'react-redux'
-import {ZPost} from 'utils/Xfetch'
+import {ZGet, ZPost} from 'utils/Xfetch'
 const createForm = Form.create
 const FormItem = Form.Item
 function noop() {
   return false
 }
 
-const Demo = React.createClass({
+const DEFAULT_TITLE = '创建新类型'
+const WangWangWang = React.createClass({
   getInitialState() {
     return {
-      confirmLoading: false
+      visible: false,
+      confirmLoading: false,
+      title: DEFAULT_TITLE
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.doge < 0) {
+      this.setState({
+        visible: false
+      })
+    } else if (nextProps.doge === 0) {
+      this.setState({
+        visible: true,
+        title: DEFAULT_TITLE
+      })
+    } else {
+      ZGet({
+        uri: '',
+        success: (s, d, m) => {
+          //
+        }
+      })
     }
   },
   handleSubmit() {
     this.props.form.validateFields((errors, values) => {
-      const wtf = !!errors
-      if (wtf) {
-        return false
+      if (!errors || typeof errors === 'object' && Object.keys(errors).length > 0) {
+        return
       }
       this.setState({
         confirmLoading: true
@@ -34,7 +55,7 @@ const Demo = React.createClass({
   },
 
   hideModal() {
-    this.props.dispatch({ type: 'PROSET_VISIBEL_SET', payload: false })
+    this.props.dispatch({ type: 'PRINT_TYPE_DOGE_HIDE' })
     this.props.form.resetFields()
   },
   checkPass(rule, value, callback) {
@@ -54,7 +75,7 @@ const Demo = React.createClass({
   },
   render() {
     const { getFieldProps } = this.props.form
-    const {visible} = this.props
+    const {visible, title} = this.state
 
     const formItemLayout = {
       labelCol: { span: 4 },
@@ -79,7 +100,7 @@ const Demo = React.createClass({
     })
     return (
       <div>
-        <Modal title='修改密码' visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={this.state.confirmLoading}>
+        <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={this.state.confirmLoading} maskClosable={false} closable={false}>
           <Form horizontal>
             <FormItem {...formItemLayout} label='旧&nbsp;密码'>
               <Input {...oldPwdProps} type='password' autoComplete='off' onContextMenu={noop} onPaste={noop} onCopy={noop} onCut={noop} />
@@ -98,5 +119,5 @@ const Demo = React.createClass({
 })
 
 export default connect(state => ({
-  visible: state.proset_visibel
-}))(createForm()(Demo))
+  doge: state.print_type_doge
+}))(createForm()(WangWangWang))
