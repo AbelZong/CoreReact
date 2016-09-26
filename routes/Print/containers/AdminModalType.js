@@ -4,9 +4,9 @@ import {connect} from 'react-redux'
 import {ZGet, ZPost} from 'utils/Xfetch'
 const createForm = Form.create
 const FormItem = Form.Item
-function noop() {
-  return false
-}
+// function noop() {
+//   return false
+// }
 
 const DEFAULT_TITLE = '创建新类型'
 const WangWangWang = React.createClass({
