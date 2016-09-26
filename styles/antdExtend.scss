@@ -56,6 +56,22 @@
   .ant-radio, .ant-radio-wrapper {
     cursor: pointer;
   }
+  .pos-form {
+    .ant-form-item,
+    .ant-form-item-with-help {
+      margin-bottom: 12px;
+    }
+    .has-error {
+      .ant-form-explain {
+        display: block;
+        position: absolute;
+        right: 5px;
+        top: 2px;
+        pointer-events: none;
+        background-color: #fff;
+      }
+    }
+  }
   .modalTop {
     .ant-modal {
       top: 0;

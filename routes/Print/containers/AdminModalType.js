@@ -18,35 +18,58 @@ const WangWangWang = React.createClass({
     }
   },
   componentWillReceiveProps(nextProps) {
-    if (nextProps.doge < 0) {
-      this.setState({
-        visible: false
-      })
-    } else if (nextProps.doge === 0) {
-      this.setState({
-        visible: true,
-        title: DEFAULT_TITLE
-      })
-    } else {
-      ZGet({
-        uri: '',
-        success: (s, d, m) => {
-          //
-        }
-      })
+    if (this.props.doge !== nextProps.doge) {
+      if (nextProps.doge < 0) {
+        this.setState({
+          visible: false,
+          confirmLoading: false
+        })
+      } else if (nextProps.doge === 0) {
+        this.setState({
+          visible: true,
+          title: DEFAULT_TITLE,
+          confirmLoading: false
+        })
+      } else {
+        ZGet({
+          uri: 'print/tpl/sysestype',
+          success: (s, d, m) => {
+            // this.setState({
+            //
+            // })
+          }
+        })
+      }
     }
   },
   handleSubmit() {
     this.props.form.validateFields((errors, values) => {
-      if (!errors || typeof errors === 'object' && Object.keys(errors).length > 0) {
-        return
+      const wtf = !!errors
+      if (wtf) {
+        return false
       }
       this.setState({
         confirmLoading: true
       })
-      ZPost('account/password', values, (s, d, m) => {
+      const {doge} = this.props
+      const data = {
+        id: doge > 0 ? doge : 0,
+        name: values.name,
+        presets: typeof values.presets === 'undefined' ? '' : values.presets,
+        emu_data: typeof values.emu_data === 'undefined' ? '' : values.emu_data,
+        setting: typeof values.setting === 'undefined' ? '' : values.setting
+      }
+      ZPost('print/tpl/savesysestype', data, (s, d, m) => {
+        console.log(d)
+        this.props.dispatch({type: 'SYSTYPES_UPDATE', update: {
+          $push: [{
+            id: d.id,
+            name: d.name,
+            type: d.type
+          }]
+        }})
         this.hideModal()
-      }).then(() => {
+      }, () => {
         this.setState({
           confirmLoading: false
         })
@@ -81,39 +104,33 @@ const WangWangWang = React.createClass({
       labelCol: { span: 4 },
       wrapperCol: { span: 20 }
     }
-    const oldPwdProps = getFieldProps('oldPwd', {
+    const propsName = getFieldProps('name', {
       rules: [
-        { required: true, whitespace: true, message: '请填写旧密码' }
-      ]
-    })
-    const newPwdProps = getFieldProps('newPwd', {
-      rules: [
-        { required: true, whitespace: true, min: 6, message: '请填写六位新密码' },
-        { validator: this.checkPass }
-      ]
-    })
-    const reNewPwdProps = getFieldProps('reNewPwd', {
-      rules: [
-        { required: true, whitespace: true, min: 6, message: '请再一次填写新密码' },
-        { validator: this.checkPass2 }
+        { required: true, message: '名称必填' }
       ]
     })
     return (
-      <div>
-        <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={this.state.confirmLoading} maskClosable={false} closable={false}>
-          <Form horizontal>
-            <FormItem {...formItemLayout} label='旧&nbsp;密码'>
-              <Input {...oldPwdProps} type='password' autoComplete='off' onContextMenu={noop} onPaste={noop} onCopy={noop} onCut={noop} />
+      <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={this.state.confirmLoading} width={780} maskClosable={false} closable={false}>
+        <Form horizontal className='pos-form'>
+          {this.props.doge > 0 && (
+            <FormItem {...formItemLayout} label='模板编号'>
+              <p className='ant-form-text'>自动生成</p>
             </FormItem>
-            <FormItem {...formItemLayout} label='新&nbsp;密码'>
-              <Input {...newPwdProps} type='password' autoComplete='off' onContextMenu={noop} onPaste={noop} onCopy={noop} onCut={noop} />
-            </FormItem>
-            <FormItem {...formItemLayout} label='重输新密码'>
-              <Input {...reNewPwdProps} type='password' placeholder='两次输入密码保持一致' autoComplete='off' onContextMenu={noop} onPaste={noop} onCopy={noop} onCut={noop} />
-            </FormItem>
-          </Form>
-        </Modal>
-      </div>
+          )}
+          <FormItem {...formItemLayout} label='类型名称'>
+            <Input {...propsName} type='text' />
+          </FormItem>
+          <FormItem {...formItemLayout} label='预设元素'>
+            <Input {...getFieldProps('presets')} type='textarea' autosize={{minRows: 2, maxRows: 8}} />
+          </FormItem>
+          <FormItem {...formItemLayout} label='预演数据'>
+            <Input {...getFieldProps('emu_data')} type='textarea' autosize={{minRows: 2, maxRows: 8}} />
+          </FormItem>
+          <FormItem {...formItemLayout} label='模板设置'>
+            <Input {...getFieldProps('setting')} type='textarea' autosize={{minRows: 1, maxRows: 3}} />
+          </FormItem>
+        </Form>
+      </Modal>
     )
   }
 })
