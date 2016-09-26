@@ -4,46 +4,7 @@ import {Pagination, Popconfirm, message} from 'antd'
 import {Icon} from 'components/Icon'
 import store from 'utils/store' //吃相不太好看
 import {ZHCN} from 'constants/gridLocaleText'
-//const TreeNode = Tree.TreeNode
-const gridOptions = {
-  //onModelUpdated: () => {
-    //console.log('event onModelUpdated received')
-  //},
-  rowBuffer: 10, // no need to set this, the default is fine for almost all scenarios
-  //rowModelType: 'pagination',
-  //enableColResize: true,
-  localeText: ZHCN
-  //paginationPageSize: 20,
-  // datasource: {
-  //   rowCount: 0,
-  //   getRows: function(params) {
-  //     console.warn('get frist', params)
-  //     params.failCallback()
-  //   }
-  // }
-}
 const pageSizeOptions = ['10', '20', '30', '50', '100', '200']
-
-// const formatColumnState = function(states) {
-//
-// }
-// let columnFiledTmp = 0
-// const parseColumnSelectNodes = function(node) {
-//   //disabled equal stroeState
-//   const key = node.colId
-//   if (node.children) {
-//     return (
-//       <TreeNode title={node.headerName} key={key}>
-//         {
-//           node.children.map((_node, i) => parseColumnSelectNodes(_node))
-//         }
-//       </TreeNode>
-//     )
-//   }
-//   return (
-//     <TreeNode title={node.headerName} key={key} />
-//   )
-// }
 
 class ZGrid extends React.Component {
   constructor(props) {
@@ -80,6 +41,13 @@ class ZGrid extends React.Component {
     }
     this.cacheHideColumns = store.get(this.storeConfig.COLUMNSHIDE_KEY, [])
     this.getRowsFunc = null
+    this.gridOptions = {
+      //onModelUpdated: () => {
+        //console.log('event onModelUpdated received')
+      //},
+      grid: this.props.grid,
+      localeText: ZHCN
+    }
   }
   onGridReady = (params) => {
     this.api = params.api
@@ -188,7 +156,7 @@ class ZGrid extends React.Component {
         pageSize: this.state.pageSize
       })
     } else {
-      const tips = this.props.setPleaseMsg || '请先 setDatasource {total, getRows, [current], [rowData]}'
+      const tips = this.props.setPleaseTip || '请先 setDatasource {total, getRows, [current], [rowData]}'
       message.warn(tips)
     }
   }
@@ -282,7 +250,7 @@ class ZGrid extends React.Component {
         <div className='grid-inner'>
           <div className='ag-fresh'>
             <AgGridReact
-              gridOptions={gridOptions}
+              gridOptions={this.gridOptions}
 
               onGridReady={this.onGridReady}
               onColumnResized={this.agColumnResized}

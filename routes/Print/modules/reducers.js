@@ -10,6 +10,17 @@ const print_systypes = handleActions({
   SYSTYPES_SET: (state, action) => action.payload,
   SYSTYPES_UPDATE: (state, action) => {
     return update(state, action.update)
+  },
+  SYSTYPES_MODIFY: (state, action) => {
+    const index = state.findIndex((x) => x.id === action.modify.id)
+    if (index > -1) {
+      return update(state, {
+        $merge: {
+          [`${index}`]: action.modify
+        }
+      })
+    }
+    return state
   }
 }, [])
 const print_admin_sysmodify = handleActions({ //从此节操碎一地

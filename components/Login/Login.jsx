@@ -14,10 +14,6 @@ const helpContent = (
 )
 
 class Login extends React.Component {
-  // static propTypes = {
-  //   loginAsync: React.PropTypes.func.isRequired
-  // }
-
   constructor(props) {
     super(props)
     this.state = {
@@ -25,14 +21,12 @@ class Login extends React.Component {
     }
     this.timer = null
   }
-
   componentDidMount() {
     (() => {
       endLoading()
       runCanvas()
     })()
   }
-
   componentWillUnMount() {
     this.ignoreCase = true
     clearTimeout(this.timer)
@@ -80,7 +74,6 @@ class Login extends React.Component {
     }
     const url = 'sign/in'
     return ZPost(url, data, (s, d, m) => {
-      //this.context.router.push('/')
       this.props.setCurrentBookmark()
     }, () => {
       this.timerOut(false)

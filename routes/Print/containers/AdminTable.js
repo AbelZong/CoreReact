@@ -3,7 +3,7 @@ import { Button, message, Popconfirm } from 'antd'
 import {connect} from 'react-redux'
 import {ZGet, ZPost} from 'utils/Xfetch'
 import styles from './Print.scss'
-
+import AdminOperatorsRender from './AdminOperatorsRender'
 import ZGrid from 'components/Grid/index'
 
 const defColumns = [
@@ -25,11 +25,13 @@ const defColumns = [
     headerName: '最后更新',
     field: 'mtime',
     width: 130
+  }, {
+    headerName: '',
+    width: 60,
+    cellRendererFramework: AdminOperatorsRender
   }]
 
 const AdminTable = React.createClass({
-  componentDidMount() {
-  },
   componentWillReceiveProps(nextProps) {
     const {activeTypeID} = nextProps
     this._firstBlood(activeTypeID)
@@ -37,7 +39,18 @@ const AdminTable = React.createClass({
   shouldComponentUpdate() {
     return false
   },
-  componentWillUnmount() {
+  refreshRowData() {
+    this._firstBlood()
+  },
+  deleteRowByIDs(ids) {
+    const data = {ids: ids}
+    this.grid.showLoading()
+    ZPost('print/tpl/delsyses', data, (s, d, m) => {
+      message.success('删除成功')
+      this.refreshRowData()
+    }, () => {
+      this.grid.hideLoading()
+    })
   },
   handleDoRemove() {
     const nodeArr = this.grid.api.selectionController.selectedNodes
@@ -49,14 +62,7 @@ const AdminTable = React.createClass({
     keys.forEach((index) => {
       selectIds.push(nodeArr[index].data.id)
     })
-    const data = {ids: selectIds}
-    this.grid.showLoading()
-    ZPost('print/tpl/delsyses', data, (s, d, m) => {
-      message.success('删除成功')
-      this._firstBlood()
-    }, () => {
-      this.grid.hideLoading()
-    })
+    this.deleteRowByIDs(selectIds)
   },
   _firstBlood(_activeTypeID) {
     this.grid.showLoading()
@@ -104,7 +110,7 @@ const AdminTable = React.createClass({
             </Popconfirm>
           </Button>
         </div>
-        <ZGrid setPleaseMsg='请先选择左侧【模板类型】' className={styles.zgrid} onReady={this.handleGridReady} paged storeConfig={{ prefix: 'print_admin' }} columnDefs={defColumns} />
+        <ZGrid setPleaseTip='请先选择左侧【模板类型】' className={styles.zgrid} onReady={this.handleGridReady} paged storeConfig={{ prefix: 'print_admin' }} columnDefs={defColumns} grid={this} />
       </div>
     )
   }
@@ -113,3 +119,11 @@ const AdminTable = React.createClass({
 export default connect(state => ({
   activeTypeID: state.print_admin_type_active
 }))(AdminTable)
+
+/*
+<ZGrid setPleaseTip='请先选择左侧【模板类型】' className={styles.zgrid} onReady={this.handleGridReady} storeConfig={{ prefix: 'print_admin' }} columnDefs={defColumns} paged grid={this} />
+* setPleaseTip: 未执行 setDatasource 但点击了右下角的刷新按钮 所给出的提示消息
+* storeConfig: grid配置缓存， prefix未缓存key的前缀，必须唯一
+* paged: 开启分页
+* grid: 吃相问题，记得加上
+*/

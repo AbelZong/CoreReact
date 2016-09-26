@@ -24,7 +24,7 @@ const WheatLayout = React.createClass({
   //   return { location: this.props.location }
   // },
 //fuck end
-  componentWillMount() { //this for refreh example: F5
+  componentWillMount() {
     startLoading()
     return ZGet('profile/refresh', (s, d, m) => {
       this.props.dispatch({ 'type': 'ENTERING_SET', payload: false })
@@ -35,12 +35,9 @@ const WheatLayout = React.createClass({
       this.props.dispatch({ type: 'USER_SET', payload: d.user })
       endLoading()
     }, (m, s, d) => {
-      this.context.router.push('/go/login')
-      // if (s === -10086) {
-      //   console.log('验证登录失败，请刷新重试', 10)
-      // } else {
-      //   this.context.router.push('go/login')
-      // }
+      if (s !== -10086) {
+        this.context.router.push('/go/login')
+      }
     })
   },
   render() {

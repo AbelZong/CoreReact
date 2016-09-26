@@ -68,12 +68,12 @@ const Bookmark = React.createClass({
   },
   _getIndexByBM(bookmark, bookmarks) {
     let index = -1
-    bookmarks.every((item, i) => {
+    bookmarks.some((item, i) => {
       if (item.path === bookmark.path && item.id === bookmark.id) {
         index = i
-        return false
+        return true
       }
-      return true
+      return false
     })
     return index > -1 ? index : 0
   },

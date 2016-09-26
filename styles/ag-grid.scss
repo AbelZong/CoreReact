@@ -600,6 +600,18 @@
     position: relative;
     height:100%;
     flex:1;
+    .ag-cell {
+      .operators {
+        text-align: center;
+        a.link,
+        i.anticon,
+        i.fa {
+          margin-left:2px;
+          margin-right:3px;
+          cursor: pointer;
+        }
+      }
+    }
     .grid-inner {
       position: absolute;
       left:0;right:0;

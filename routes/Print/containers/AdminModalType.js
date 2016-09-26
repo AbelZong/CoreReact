@@ -2,6 +2,7 @@ import React from 'react'
 import { Form, Input, Modal } from 'antd'
 import {connect} from 'react-redux'
 import {ZGet, ZPost} from 'utils/Xfetch'
+import {startLoading, endLoading} from 'utils'
 const createForm = Form.create
 const FormItem = Form.Item
 
@@ -28,14 +29,21 @@ const WangWangWang = React.createClass({
           confirmLoading: false
         })
       } else {
+        startLoading()
         ZGet({
-          uri: 'print/tpl/sysestype',
+          uri: 'print/tpl/sysesType',
+          data: {
+            id: nextProps.doge
+          },
           success: (s, d, m) => {
-            // this.setState({
-            //
-            // })
+            this.props.form.setFieldsValue(d)
+            this.setState({
+              title: `修改 [${d.id}]: ${d.name}`,
+              visible: true,
+              confirmLoading: false
+            })
           }
-        })
+        }).then(endLoading)
       }
     }
   },
@@ -56,29 +64,27 @@ const WangWangWang = React.createClass({
         setting: typeof values.setting === 'undefined' ? '' : values.setting
       }
       let uri = ''
-      //let isModify = false
+      let isModify = false
       if (doge === 0) {
         uri = 'print/tpl/createSysesType'
       } else {
         uri = 'print/tpl/modifySysesType'
         data.id = doge
-        //isModify = true
+        isModify = true
       }
       ZPost(uri, data, (s, d, m) => {
-        console.log(d)
-        // let update
-        // if (isModify) {
-        //   update = {
-        //
-        //   }
-        // }
-        this.props.dispatch({type: 'SYSTYPES_UPDATE', update: {
-          $push: [{
-            id: d.id,
-            name: d.name,
-            type: d.type
-          }]
-        }})
+        const dd = {
+          id: d.id,
+          name: d.name,
+          type: d.type
+        }
+        if (isModify) {
+          this.props.dispatch({type: 'SYSTYPES_MODIFY', modify: dd})
+        } else {
+          this.props.dispatch({type: 'SYSTYPES_UPDATE', update: {
+            $push: [dd]
+          }})
+        }
         this.hideModal()
       }, () => {
         this.setState({
@@ -91,21 +97,6 @@ const WangWangWang = React.createClass({
   hideModal() {
     this.props.dispatch({ type: 'PRINT_TYPE_DOGE_HIDE' })
     this.props.form.resetFields()
-  },
-  checkPass(rule, value, callback) {
-    const { validateFields } = this.props.form
-    if (value) {
-      validateFields(['reNewPwd'], { force: true })
-    }
-    callback()
-  },
-  checkPass2(rule, value, callback) {
-    const { getFieldValue } = this.props.form
-    if (value && value !== getFieldValue('newPwd')) {
-      callback('两次输入密码不一致！')
-    } else {
-      callback()
-    }
   },
   render() {
     const { getFieldProps } = this.props.form
@@ -123,11 +114,6 @@ const WangWangWang = React.createClass({
     return (
       <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={this.state.confirmLoading} width={780} maskClosable={false} closable={false}>
         <Form horizontal className='pos-form'>
-          {this.props.doge > 0 && (
-            <FormItem {...formItemLayout} label='模板编号'>
-              <p className='ant-form-text'>自动生成</p>
-            </FormItem>
-          )}
           <FormItem {...formItemLayout} label='类型名称'>
             <Input {...propsName} type='text' />
           </FormItem>

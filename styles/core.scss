@@ -3,19 +3,22 @@
 :global {
 
 	.h-scroller::-webkit-scrollbar,
-	.ant-modal-wrap::-webkit-scrollbar
+	.ant-modal-wrap::-webkit-scrollbar,
+	textarea::-webkit-scrollbar
 	{
 		width: 6px;
 	  height: 6px;
 	}
 	.h-scroller::-webkit-scrollbar-thumb,
-	.ant-modal-wrap::-webkit-scrollbar-thumb
+	.ant-modal-wrap::-webkit-scrollbar-thumb,
+	textarea::-webkit-scrollbar-thumb
 	{
 		background-color: rgba(0,0,0,0.13);
 	  border-radius: 10px;
 	}
 	.h-scroller:hover::-webkit-scrollbar-thumb,
-	.ant-modal-wrap:hover::-webkit-scrollbar-thumb
+	.ant-modal-wrap:hover::-webkit-scrollbar-thumb,
+	textarea:hover::-webkit-scrollbar-thumb
 	{
 		background-color: rgba(0,0,0,0.3);
 	}
