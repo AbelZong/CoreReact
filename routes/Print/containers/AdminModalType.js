@@ -53,14 +53,28 @@ const WangWangWang = React.createClass({
       })
       const {doge} = this.props
       const data = {
-        id: doge > 0 ? doge : 0,
         name: values.name,
         presets: typeof values.presets === 'undefined' ? '' : values.presets,
         emu_data: typeof values.emu_data === 'undefined' ? '' : values.emu_data,
         setting: typeof values.setting === 'undefined' ? '' : values.setting
       }
-      ZPost('print/tpl/savesysestype', data, (s, d, m) => {
+      let uri = ''
+      //let isModify = false
+      if (doge === 0) {
+        uri = 'print/tpl/createSysesType'
+      } else {
+        uri = 'print/tpl/modifySysesType'
+        data.id = doge
+        //isModify = true
+      }
+      ZPost(uri, data, (s, d, m) => {
         console.log(d)
+        // let update
+        // if (isModify) {
+        //   update = {
+        //
+        //   }
+        // }
         this.props.dispatch({type: 'SYSTYPES_UPDATE', update: {
           $push: [{
             id: d.id,
