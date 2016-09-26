@@ -29,7 +29,7 @@ const AdminSide = React.createClass({
     const {systypes} = this.props
     startLoading()
     ZPost({
-      uri: 'print/tpl/delsysestype',
+      uri: 'print/tpl/deleteSysesType',
       data: {
         id
       },
