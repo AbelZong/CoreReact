@@ -110,7 +110,7 @@ const AdminTable = React.createClass({
             </Popconfirm>
           </Button>
         </div>
-        <ZGrid setPleaseTip='请先选择左侧【模板类型】' className={styles.zgrid} onReady={this.handleGridReady} paged storeConfig={{ prefix: 'print_admin' }} columnDefs={defColumns} grid={this} />
+        <ZGrid setPleaseTip='请先选择左侧【模板类型】' className={styles.zgrid} onReady={this.handleGridReady} storeConfig={{ prefix: 'print_admin' }} columnDefs={defColumns} paged grid={this} />
       </div>
     )
   }
