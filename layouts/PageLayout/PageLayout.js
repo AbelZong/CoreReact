@@ -1,33 +1,35 @@
 import React from 'react'
-import {endLoading} from 'utils'
+import {connect} from 'react-redux'
+import {startLoading} from 'utils'
 import 'styles/core.scss'
+import PageLock from 'components/ToolPages/Lock'
+import PageEntering from 'components/ToolPages/Entering'
+import PageAccessPermission from 'components/ToolPages/AccessPermission'
 
 const PageLayout = React.createClass({
   contextTypes: {
     router: React.PropTypes.object
   },
-  getInitialState() {
-    return {
-      entering: true
-    }
+  componentWillMount() {
+    startLoading()
   },
-  componentDidMount() {
-    this.setState({
-      entering: false
-    })
-    endLoading()
-  },
-  // componentWillReceiveProps(nextProps) {
-  // },
   render() {
-    if (this.state.entering) {
-      return null
+    const {children, locked, entering, accessLevel} = this.props
+    if (entering) {
+      return <PageEntering />
     }
-    return this.props.children
+    if (locked) {
+      return <PageLock />
+    }
+    if (accessLevel < 1) {
+      return <PageAccessPermission />
+    }
+    return children
   }
 })
-// export default connect(state => ({
-//   authed: state.authed
-// }))(PageLayout)
 
-export default PageLayout
+export default connect(state => ({
+  locked: state.locked,
+  entering: state.entering,
+  accessLevel: state.accessLevel
+}))(PageLayout)

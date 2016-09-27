@@ -46,11 +46,14 @@ const AdminTable = React.createClass({
     const data = {ids: ids}
     this.grid.showLoading()
     ZPost('print/tpl/delsyses', data, (s, d, m) => {
-      message.success('删除成功')
       this.refreshRowData()
     }, () => {
       this.grid.hideLoading()
     })
+  },
+  modifyRowByID(id) {
+    //打开新的标签页面
+    message.success('切换路由去' + id)
   },
   handleDoRemove() {
     const nodeArr = this.grid.api.selectionController.selectedNodes

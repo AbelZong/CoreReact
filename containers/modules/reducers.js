@@ -15,10 +15,12 @@ const locked = handleActions({
     return newState
   }
 }, store.get('g.locked', false))
-
-const authed = handleActions({
-  AUTHED_SET: (state, action) => action.payload
-}, false)
+//页面主窗口访问权限级别，0 为没有权限 >0则是访问级别标记
+//pagelayout 为当前页
+//wheatlayout为当前窗口
+const accessLevel = handleActions({
+  ACCESSLEVEL_SET: (state, action) => action.payload
+}, 0)
 const user = handleActions({
   USER_SET: (state, action) => (action.payload),
   USER_UPDATE: (state, action) => {
@@ -133,5 +135,5 @@ const menuActiveID = handleActions({
 }, -1)
 
 export default {
-  menuActiveID, entering, loading, locked, authed, proset_visibel, notice_visibel, notice_add, asideMenuCollapse2, asideMenuCollapse1, user, permissionMenus, permissionMenuFilterName, collapse, mainFixed, zhModUnq, bookmarks, bookmarkAIndex
+  menuActiveID, entering, loading, locked, accessLevel, proset_visibel, notice_visibel, notice_add, asideMenuCollapse2, asideMenuCollapse1, user, permissionMenus, permissionMenuFilterName, collapse, mainFixed, zhModUnq, bookmarks, bookmarkAIndex
 }

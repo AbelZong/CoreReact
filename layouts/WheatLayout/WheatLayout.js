@@ -8,8 +8,9 @@ import 'styles/core.scss'
 import {FetchModal} from 'components/Modal/index'
 import {startLoading, endLoading} from 'utils'
 import {ZGet} from 'utils/Xfetch'
-import PageLock from 'components/Lock'
 import Navs from 'components/Header/Navs'
+import PageLock from 'components/ToolPages/Lock'
+import PageEntering from 'components/ToolPages/Entering'
 
 const WheatLayout = React.createClass({
   contextTypes: {
@@ -43,7 +44,7 @@ const WheatLayout = React.createClass({
   render() {
     const {children, collapse, locked, entering, mainFixed} = this.props
     if (entering) {
-      return null
+      return <PageEntering />
     }
     if (locked) {
       return (
