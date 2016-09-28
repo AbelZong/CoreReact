@@ -251,7 +251,7 @@ class ZGrid extends React.Component {
           <div className='ag-fresh'>
             <AgGridReact
               gridOptions={this.gridOptions}
-
+              containerStyle={{position: 'absolute', width: '100%'}}
               onGridReady={this.onGridReady}
               onColumnResized={this.agColumnResized}
               onColumnMoved={this.agColumnMoved}

@@ -1,0 +1,50 @@
+.normal {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #ececec;
+}
+.content {
+  flex: 1;
+  display: flex;
+}
+.foot {
+  overflow: hidden;
+  padding: 5px 8px;
+  position: relative;
+}
+.print_msg {
+  background-color: rgba(173,255,47,.9);
+  padding: 5px 8px;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.normal.blur {
+  filter: blur(1px);
+  opacity: 0.7;
+}
+.enterLoading {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 9999;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.hide {
+  display: none;
+}
+.height100 {
+  height: 100%;
+}
+
+@media print {
+  .normal {
+    display: none;
+  }
+}

@@ -90,16 +90,18 @@ const Menus = React.createClass({
           <div className={styles.title}>
             {activePM.name}
           </div>
-          <Scrollbar autoHide className={styles['s--wrapper']}>
-            <Menu
-              onClick={this._menuClick}
-              className={styles.menus}
-              defaultOpenKeys={openKeys}
-              mode={mode}
-            >
-              {activePM.data.map((menu, i) => parseMenu(menu, i))}
-            </Menu>
-          </Scrollbar>
+          <div className={styles.con}>
+            <div className={styles.er}>
+              <Scrollbar autoHide className={styles['s--wrapper']}>
+                <Menu onClick={this._menuClick}
+                  className={styles.menus}
+                  defaultOpenKeys={openKeys}
+                  mode={mode}>
+                  {activePM.data.map((menu, i) => parseMenu(menu, i))}
+                </Menu>
+              </Scrollbar>
+            </div>
+          </div>
           <div className={styles.operater} onClick={this.handleClick}>
             <div className={styles.bg} />
             <div className={styles.tag}>

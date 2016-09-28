@@ -1,0 +1,27 @@
+
+.tableWarper {
+  position: absolute;
+  background-color: rgba(193, 193, 193,0.36);
+  //white-space: nowrap;
+  padding: 6px;
+  z-index: 1;
+  border-radius: 5px;
+  cursor: move;
+}
+.table {
+  position: relative;
+  border: 1px solid #696969;
+  color: #999;
+  width: auto;
+  height: auto;
+  z-index: 1;
+  vertical-align: middle;
+  overflow: hidden;
+  text-shadow: 0 0 1px #fff;
+  border-collapse: collapse;
+  background-color: #fff;
+  //white-space: nowrap;
+  cursor: default;
+  display: flex;
+  //flex-wrap: wrap;
+}

@@ -8,7 +8,9 @@ class DashBordContainer extends React.Component {
     return (
       <div className={styles.content}>
         <Scrollbar autoHide>
-          <Main />
+          <div className={styles.zHint}>
+            <Main />
+          </div>
         </Scrollbar>
       </div>
     )
@@ -16,6 +18,3 @@ class DashBordContainer extends React.Component {
 }
 
 export default DashBordContainer
-// export default connect(state => ({
-//
-// }))(DashBordContainer)

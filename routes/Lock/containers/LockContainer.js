@@ -1,9 +1,4 @@
 import { connect } from 'react-redux'
+import LockPage from 'components/ToolPages/Lock'
 
-import Lock from 'components/Lock'
-
-const mapDispatchToProps = null
-
-const mapStateToProps = null
-
-export default connect(mapStateToProps, mapDispatchToProps)(Lock)
+export default connect()(LockPage)

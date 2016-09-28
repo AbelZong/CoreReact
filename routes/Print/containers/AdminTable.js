@@ -52,8 +52,13 @@ const AdminTable = React.createClass({
     })
   },
   modifyRowByID(id) {
-    //打开新的标签页面
-    message.success('切换路由去' + id)
+    const win = window.open(`/page/print/modify?sys_id=${id}`)
+    const loop = setInterval(() => {
+      if (win.closed) {
+        clearInterval(loop)
+        this.refreshRowData()
+      }
+    }, 1000)
   },
   handleDoRemove() {
     const nodeArr = this.grid.api.selectionController.selectedNodes
@@ -121,7 +126,7 @@ const AdminTable = React.createClass({
 
 export default connect(state => ({
   activeTypeID: state.print_admin_type_active
-}))(AdminTable)
+}), null, null, { withRef: true })(AdminTable)
 
 /*
 <ZGrid setPleaseTip='请先选择左侧【模板类型】' className={styles.zgrid} onReady={this.handleGridReady} storeConfig={{ prefix: 'print_admin' }} columnDefs={defColumns} paged grid={this} />

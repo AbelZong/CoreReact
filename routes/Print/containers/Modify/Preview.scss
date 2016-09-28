@@ -1,0 +1,224 @@
+.wraper {
+  background: #f5f5f5 url("static/i/bg.preview.png") repeat;
+  z-index: 1100;
+  overflow: auto;
+  height: 100%;
+}
+.head {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  line-height: 30px;
+  //overflow: hidden;
+  background-color: rgba(255,255,255,0.9);
+  clear: both;
+  zoom: 1;
+  z-index: 10;
+}
+.headR {
+  float: right;
+  margin-right: 8px;
+}
+.footTips {
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 28px;
+  line-height: 28px;
+  overflow: hidden;
+  background-color: rgba(173, 255, 47, 0.9);
+  color: #505050;
+  zoom: 1;
+  z-index: 10;
+}
+.preview {
+  background-color: #fff;
+  margin: 50px auto 35px;
+  position: relative;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+  page-break-after: always;
+  overflow: hidden;
+}
+.tableWarper {
+  position: absolute;
+  padding: 6px;
+  z-index: 1;
+}
+.table {
+  position: relative;
+  border: 1px solid #696969;
+  color: #999;
+  z-index: 1;
+  vertical-align: middle;
+  overflow: hidden;
+  text-shadow: 0 0 1px #fff;
+  border-collapse: collapse;
+  background-color: #fff;
+}
+.column {
+  display: inline-block;
+  float: left; //for lodop
+  border-right: 1px solid #696969;
+}
+.column:last-child,
+.column_last {
+  border-right: 0;
+}
+.thWarper {
+  border-bottom: 1px solid #696969;
+  overflow: hidden;
+}
+.coderImg {
+  //display: table-cell;
+  //vertical-align: middle;
+}
+.tdWarper {
+  //overflow: hidden;
+  border-bottom: 1px solid #696969;
+  display: flex;
+  align-items: center;
+}
+.tdWarper:last-child,
+.tdWarper_last {
+  border-bottom: 0;
+}
+.th {
+  color: #333;
+  font-weight: 500;
+  display: block;
+  padding: 2px;
+}
+.td {
+  color: #999;
+  display: table-cell;
+  vertical-align: middle;
+  padding: 2px;
+  line-height: 1;
+}
+.pro {
+  position: absolute;
+  color: #666;
+  width: auto;
+  height: auto;
+  z-index: 2;
+  padding: 2px; //去掉了边框，这里要多1个像素
+  vertical-align: middle;
+  line-height: 1;
+}
+.pro_cust {
+  border: 0;
+  padding: 3px;
+}
+.line {
+  position: absolute;
+  border: 1px solid #aaa;
+  color: #333333;
+  width: 100px;
+  height: 36px;
+  z-index: 1;
+  overflow: hidden;
+}
+.line-LineBlock {}
+.line-DotteLineBlock {
+  border-style: dotted;
+}
+.line-VLine {
+  border-color: #f5f5f5;
+  border-right-width: 1px;
+  border-right-style: solid;
+  border-right-color: rgb(51, 51, 51);
+  width: 10px;
+  height: 100px;
+}
+.line-DotteVLine {
+  border-color: #f5f5f5;
+  border-right-width: 1px;
+  border-right-style: dotted;
+  border-right-color: rgb(0, 0, 0);
+  width: 10px;
+  height: 100px;
+}
+.line-HLine {
+  border-color: #f5f5f5;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: rgb(51, 51, 51);
+  width: 100px;
+  height: 10px;
+}
+.line-DotteHLine {
+  border-color: #f5f5f5;
+  border-bottom-width: 1px;
+  border-bottom-style: dotted;
+  border-bottom-color: rgb(0, 0, 0);
+  width: 100px;
+  height: 10px;
+}
+.logo {
+  position: absolute;
+  color: #333333;
+  z-index: 1;
+  overflow: hidden;
+  padding: 1px;
+}
+.qrcode {
+  border: 0;
+  padding: 1px;
+}
+.rotePreview {
+  transform: rotate(-90deg);
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+.inputSmall {
+  width: 32px;
+  text-align: center;
+  padding: 1px 2px;
+}
+.mr8 {
+  margin-right: 8px;
+}
+.height100 {
+  height: 100%;
+}
+.print {
+  background-color: #fff;
+  position: relative;
+}
+.printIframe {
+  border: 0;
+  position: absolute;
+  width: 0;
+  height: 0;
+  left: 0;
+  top: 0;
+}
+.print_lodop {
+  height: auto;
+}
+.print_lodop .preview {
+  box-shadow: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow-x: hidden;
+  position: relative;
+}
+@page {
+  size: A4; //letter landscape
+  margin: 0;
+}
+@media print {
+  .preview {
+    box-shadow: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow-x: hidden;
+  }
+}

@@ -3,7 +3,6 @@ import {connect} from 'react-redux'
 import {startLoading} from 'utils'
 import 'styles/core.scss'
 import PageLock from 'components/ToolPages/Lock'
-import PageEntering from 'components/ToolPages/Entering'
 import PageAccessPermission from 'components/ToolPages/AccessPermission'
 
 const PageLayout = React.createClass({
@@ -12,12 +11,10 @@ const PageLayout = React.createClass({
   },
   componentWillMount() {
     startLoading()
+    this.props.dispatch({type: 'ENTERING_START'})
   },
   render() {
-    const {children, locked, entering, accessLevel} = this.props
-    if (entering) {
-      return <PageEntering />
-    }
+    const {children, locked, accessLevel} = this.props
     if (locked) {
       return <PageLock />
     }
@@ -30,6 +27,5 @@ const PageLayout = React.createClass({
 
 export default connect(state => ({
   locked: state.locked,
-  entering: state.entering,
   accessLevel: state.accessLevel
 }))(PageLayout)

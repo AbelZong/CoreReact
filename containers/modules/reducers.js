@@ -3,8 +3,10 @@ import update from 'react-addons-update'
 import store from 'utils/store' //吃相不太好看
 
 const entering = handleActions({
-  ENTERING_SET: (state, action) => action.payload
-}, true)
+  ENTERING_SET: (state, action) => action.payload,
+  ENTERING_START: (state, action) => 1,
+  ENTERING_STOP: (state, action) => 0
+}, 1)
 const loading = handleActions({
   LOADING_SET: (state, action) => action.payload
 }, true)
@@ -19,8 +21,10 @@ const locked = handleActions({
 //pagelayout 为当前页
 //wheatlayout为当前窗口
 const accessLevel = handleActions({
-  ACCESSLEVEL_SET: (state, action) => action.payload
-}, 0)
+  ACCESSLEVEL_SET: (state, action) => action.payload,
+  ACCESSLEVEL_ALLOW: (state, action) => 1,
+  ACCESSLEVEL_FORBID: (state, action) => 0
+}, 1)
 const user = handleActions({
   USER_SET: (state, action) => (action.payload),
   USER_UPDATE: (state, action) => {

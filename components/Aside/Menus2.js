@@ -66,11 +66,13 @@ const Menus = React.createClass({
           <div className={styles['zzz']} />
         </div>
         <div className={styles.hua}>
-          <Scrollbar autoHide className={styles['s--wrapper']}>
-            <ul className={styles.menuUL}>
-              {this.renderMenus()}
-            </ul>
-          </Scrollbar>
+          <div className={styles.er}>
+            <Scrollbar autoHide className={styles['s--wrapper']}>
+              <ul className={styles.menuUL}>
+                {this.renderMenus()}
+              </ul>
+            </Scrollbar>
+          </div>
         </div>
       </div>
     )

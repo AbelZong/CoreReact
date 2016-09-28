@@ -1,0 +1,17 @@
+
+.main {
+  flex: 1 0 auto;
+  border: 1px solid #ccc;
+  position: relative;
+  overflow: auto;
+}
+.main::-webkit-scrollbar
+{
+	width: 6px;
+  height: 6px;
+}
+.main::-webkit-scrollbar-thumb
+{
+	background-color: #ccc;
+  border-radius: 10px;
+}
