@@ -8,19 +8,20 @@ const InputGroup = Input.Group
 
 class Header extends Component {
   checkBoxChange(field, e) {
-    console.log(field, e.target.checked)
     this.props.dispatch({ type: field, checked: e.target.checked })
   }
   handleInputChange = (e) => {
     this.props.dispatch({ type: 'PM_TPL_NAME_SET', text: e.target.value })
   }
   handleSave = () => {
-    const qq = window.ZCH || {}
-    if (qq.my_id === 0 && qq.type > 0) {
-      this.props.dispatch(saveSys())
-    } else {
-      this.props.dispatch(saveTpl())
+    const {my_id, sys_id, type} = window.ZCH
+    if (my_id !== null) {
+      return this.props.dispatch(saveTpl(my_id, sys_id, type))
     }
+    if (sys_id !== null) {
+      return this.props.dispatch(saveSys(sys_id, type))
+    }
+    alert('error method')
   }
   tplHover(flag) {
     this.props.dispatch({ type: 'PM_SIDETPL_ACTIVIED_SET', actived: flag })

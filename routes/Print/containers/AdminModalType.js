@@ -5,9 +5,6 @@ import {ZGet, ZPost} from 'utils/Xfetch'
 import {startLoading, endLoading} from 'utils'
 const createForm = Form.create
 const FormItem = Form.Item
-// function noop() {
-//   return false
-// }
 
 const DEFAULT_TITLE = '创建新类型'
 const WangWangWang = React.createClass({
@@ -102,32 +99,38 @@ const WangWangWang = React.createClass({
     this.props.form.resetFields()
   },
   render() {
-    const { getFieldProps } = this.props.form
+    const { getFieldDecorator } = this.props.form
     const {visible, title} = this.state
-
     const formItemLayout = {
       labelCol: { span: 4 },
       wrapperCol: { span: 20 }
     }
-    const propsName = getFieldProps('name', {
-      rules: [
-        { required: true, message: '名称必填' }
-      ]
-    })
     return (
       <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={this.state.confirmLoading} width={780} maskClosable={false} closable={false}>
         <Form horizontal className='pos-form'>
           <FormItem {...formItemLayout} label='类型名称'>
-            <Input {...propsName} type='text' />
+            {getFieldDecorator('name', {
+              rules: [
+                { required: true, message: '名称必填' }
+              ]
+            })(
+              <Input type='text' />
+            )}
           </FormItem>
           <FormItem {...formItemLayout} label='预设元素'>
-            <Input {...getFieldProps('presets')} type='textarea' autosize={{minRows: 2, maxRows: 8}} />
+            {getFieldDecorator('presets')(
+              <Input type='textarea' autosize={{minRows: 2, maxRows: 8}} />
+            )}
           </FormItem>
           <FormItem {...formItemLayout} label='预演数据'>
-            <Input {...getFieldProps('emu_data')} type='textarea' autosize={{minRows: 2, maxRows: 8}} />
+            {getFieldDecorator('emu_data')(
+              <Input type='textarea' autosize={{minRows: 2, maxRows: 8}} />
+            )}
           </FormItem>
           <FormItem {...formItemLayout} label='模板设置'>
-            <Input {...getFieldProps('setting')} type='textarea' autosize={{minRows: 1, maxRows: 3}} />
+            {getFieldDecorator('setting')(
+              <Input type='textarea' autosize={{minRows: 1, maxRows: 3}} />
+            )}
           </FormItem>
         </Form>
       </Modal>

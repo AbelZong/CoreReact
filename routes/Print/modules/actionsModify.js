@@ -521,12 +521,12 @@ export function keybordMoveEditItem(direction) {
   }
 }
 //hack
-export function saveSys() {
+export function saveSys(sys_id, type) {
   return (dispatch, getState) => {
     const { pm_tpl_name, pm_setting, pm_tableStyle, pm_tableHelp, pm_doms, pm_tableColumns } = getState()
     const save_data = {
-      type: window.ZCH.type,
-      sys_id: window.ZCH.sys_id,
+      type,
+      sys_id,
       name: pm_tpl_name,
       state: {
         setting: pm_setting,
@@ -536,9 +536,9 @@ export function saveSys() {
         tableColumns: pm_tableColumns
       }
     }
-    const uri = window.ZCH.sys_id > 0 ? 'print/tpl/modifySys' : 'print/tpl/createSys'
+    const uri = sys_id > 0 ? 'print/tpl/modifySys' : 'print/tpl/createSys'
     ZPost(uri, save_data, (s, d, m) => {
-      if (window.ZCH.sys_id > 0) {
+      if (sys_id > 0) {
         message.success('保存模板成功')
       } else {
         window.location.href = `/page/print/modify?sys_id=${d.sys_id}`
@@ -548,10 +548,9 @@ export function saveSys() {
 }
 
 //保存
-export function saveTpl() {
+export function saveTpl(my_id, sys_id, type) {
   return (dispatch, getState) => {
-    //return dispatch(saveSys());
-    const { pm_tpl_name, pm_setting, pm_print_setting, pm_tableStyle, pm_tableHelp, pm_doms, pm_tableColumns } = getState()
+    const { pm_tpl_name, pm_setting, pm_print_setting, pm_tableStyle, pm_tableHelp, pm_doms, pm_tableColumns, pm_lodop_target } = getState()
     const len = pm_tpl_name.length
     if (len < 1 || len > 20) {
       message.error('模板名长度必须1~20字')
@@ -562,10 +561,11 @@ export function saveTpl() {
       Lodop = false
     }
     const save_data = {
-      my_id: window.ZCH.my_id, //currentTplID,
-      sys_id: window.ZCH.sys_id,
-      type: window.ZCH.type,
-      pm_tpl_name,
+      my_id, //currentTplID,
+      sys_id,
+      type,
+      tpl_name: pm_tpl_name,
+      lodop_target: pm_lodop_target,
       state: {
         setting: pm_setting,
         tableStyle: pm_tableStyle,
@@ -580,12 +580,12 @@ export function saveTpl() {
         quality: pm_print_setting.quality
       }
     }
-    //如果是创建，要跳转
-    ZPost('print/tpl/saveMy', save_data, (s, d, m) => {
-      if (!window.ZCH.my_id) {
-        window.location.href = `/?my_id=${d.my_id}`
-      } else {
+    const uri = my_id > 0 ? 'print/tpl/modifyMy' : 'print/tpl/createMy'
+    ZPost(uri, save_data, (s, d, m) => {
+      if (my_id > 0) {
         message.success('保存模板成功')
+      } else {
+        window.location.href = `/page/print/modify?my_id=${d.my_id}`
       }
     })
   }

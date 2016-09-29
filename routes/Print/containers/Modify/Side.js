@@ -16,7 +16,7 @@ const custBoxs = [
   { field: 'DotteHLine', name: '虚横线', type: 1, width: 100, height: 10, act: 0 }
 ]
 
-export default class Side extends Component {
+class Side extends Component {
   constructor() {
     super()
     this.state = {

@@ -18,35 +18,35 @@ import {endLoading, getUriParam} from 'utils/index'
 @DragDropContext(HTML5Backend)
 class Layout extends Component {
   componentWillMount() {
-    const zch = {
-      my_id: getUriParam('my_id') || 0,
-      sys_id: getUriParam('sys_id') || 0,
-      type: getUriParam('type') || 0,
-      modifyType: 0
+    const my_id = getUriParam('my_id')
+    const sys_id = getUriParam('sys_id')
+    const type = getUriParam('type')
+    window.ZCH = {
+      my_id, sys_id, type
     }
-    window.ZCH = zch
     let uri = ''
     let params = null
     switch (true) {
-      case zch.my_id > 0: { //加载个人模板
+      case my_id > 0: { //加载个人模板
         uri = 'print/tpl/my'
-        params = { my_id: zch.my_id }
+        params = {my_id, type}
         break
       }
-      case zch.sys_id > 0: { //加载系统模板，以及模块数据
+      case sys_id > 0: { //加载系统模板，以及模块数据
         uri = 'print/tpl/sys'
-        params = { sys_id: zch.sys_id }
-        this.props.dispatch({type: 'PM_ROLELV_SET', payload: 1})
+        params = { sys_id, type }
         break
       }
       default: { //只加载模块数据
         uri = 'print/tpl/type'
-        params = { type: zch.type }
-        this.props.dispatch({type: 'PM_ROLELV_SET', payload: 1})
+        params = { type }
       }
     }
+    if (my_id === null) {
+      this.props.dispatch({type: 'PM_ROLELV_SET', payload: 1})
+    }
     ZGet(uri, params, (s, d, m) => {
-      this.props.dispatch(initRender(d, zch))
+      this.props.dispatch(initRender(d, window.ZCH))
       //dispatch({type: 'ACCESSLEVEL_ALLOW'})
     }, (m, s, d) => {
       this.props.dispatch({type: 'ACCESSLEVEL_FORBID'})

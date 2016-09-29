@@ -48,7 +48,7 @@ const columnTarget = {
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging()
 }))
-export default class Column extends Component {
+class Column extends Component {
   static propTypes = {
     connectDragSource: PropTypes.func.isRequired,
     connectDropTarget: PropTypes.func.isRequired,

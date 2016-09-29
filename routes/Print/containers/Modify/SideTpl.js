@@ -25,16 +25,10 @@ class SideTpl extends Component {
   }
   componentDidMount() {
     ZGet('print/tpl/sideTpls', { type: window.ZCH.type }, (s, d, m) => {
-      this._updateState({
-        myTpls: {
-          $set: d.myTpls || []
-        },
-        sysTpls: {
-          $set: d.sysTpls || []
-        },
-        loading: {
-          $set: false
-        }
+      this.setState({
+        loading: false,
+        myTpls: d.myTpls || [],
+        sysTpls: d.sysTpls || []
       })
     })
   }
@@ -83,7 +77,6 @@ class SideTpl extends Component {
   }
   modifyClick(my_tpl_id) {
     if (window.confirm('确定要离开当前页面编辑模板吗？建议先保存。')) {
-      //const uri = window.ZCH.modifyType === 1 ? '' : ``
       window.location.href = `/page/print/modify`
     }
   }
@@ -133,7 +126,7 @@ class SideTpl extends Component {
 
   createBySysTpl(sys_tpl_id) {
     if (window.confirm('确定要离开当前页面创建一个新模板吗？建议先保存。')) {
-      window.location.href = `/?sys_id=${sys_tpl_id}` //todo
+      window.location.href = `/page/print/modify?my_id=0&sys_id=${sys_tpl_id}`
     }
   }
   renderSysTpl(item, key) {
@@ -148,9 +141,6 @@ class SideTpl extends Component {
   }
 
   render() {
-    // const sideCN = classNames(styles.sideTpl, {
-    //   [`${styles.active}`]: this.props.sideTplActived,
-    // })
     const { myTpls, sysTpls, loading } = this.state
     return (
       <div id='ccacheer_tplsider' className={styles.sideTpl}>
