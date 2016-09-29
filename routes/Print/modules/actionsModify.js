@@ -613,56 +613,67 @@ export function selectPrintMachine(key) {
     dispatch({ type: 'PM_PRINTSETTING_MERGE', merge })
   }
 }
+
+const renderLodopScript = (src, cb) => {
+  let oscript = document.getElementById('zh_qbb_cdr_lodop')
+  if (oscript) {
+    oscript.parentNode.removeChild(oscript)
+  }
+  const head = document.head || document.getElementsByTagName('head')[0] || document.documentElement
+  oscript = document.createElement('script')
+  oscript.src = src
+  oscript.id = 'zh_qbb_cdr_lodop'
+  head.insertBefore(oscript, head.firstChild)
+  oscript.onload = oscript.onreadystatechange = () => {
+    if ((!oscript.readyState || /loaded|complete/.test(oscript.readyState))) {
+      setTimeout(cb, 10)
+    }
+  }
+}
 export function selectPrintOri(src, print_setting) {
   return (dispatch, getState) => {
     let setting = print_setting
     if (!print_setting) {
       setting = getState().pm_print_setting
     }
-    const head = document.head || document.getElementsByTagName('head')[0] || document.documentElement
-    const oscript = document.createElement('script')
-    oscript.src = src
-    head.insertBefore(oscript, head.firstChild)
-    oscript.onload = oscript.onreadystatechange = () => {
-      if ((!oscript.readyState || /loaded|complete/.test(oscript.readyState))) {
-        const Lodop = getLodop()
-        if (typeof Lodop === 'string') {
-          dispatch({ type: 'PM_PRINTMSG_SET', payload: Lodop })
-        } else if (Lodop) {
-          const len = Lodop.GET_PRINTER_COUNT()
-          if (len > 0) {
-            let machine_index = 0
-            let paper = '*'
-            let direction = '1'
-            let quality = 100
-            const machines = []
-            for (let i = 0; i < len; i++) {
-              const name = Lodop.GET_PRINTER_NAME(i)
-              if (name === setting.machine_name) { //这个名字是从后台获取的
-                machine_index = i
-                paper = setting.paper
-                direction = setting.direction //.GET_PRINTER_NAME('0:Orientation')
-                quality = setting.quality //.GET_PRINTER_NAME(`${machine_index}:PrintQuality`);
-              }
-              machines.push({
-                key: i + '',
-                value: name
-              })
+    renderLodopScript(src, () => {
+      const Lodop = getLodop()
+      if (typeof Lodop === 'string') {
+        dispatch({ type: 'PM_PRINTMSG_SET', payload: Lodop })
+      } else if (Lodop) {
+        const len = Lodop.GET_PRINTER_COUNT()
+        if (len > 0) {
+          let machine_index = 0
+          let paper = '*'
+          let direction = '1'
+          let quality = 100
+          const machines = []
+          for (let i = 0; i < len; i++) {
+            const name = Lodop.GET_PRINTER_NAME(i)
+            if (name === setting.machine_name) { //这个名字是从后台获取的
+              machine_index = i
+              paper = setting.paper
+              direction = setting.direction //.GET_PRINTER_NAME('0:Orientation')
+              quality = setting.quality //.GET_PRINTER_NAME(`${machine_index}:PrintQuality`);
             }
-            const merge = {
-              machines,
-              papers: getPagers(machine_index),
-              direction,
-              paper,
-              machine: machine_index + '',
-              quality
-            }
-            dispatch({type: 'PM_LODOP_TARGET_SET', payload: src})
-            dispatch({ type: 'PM_PRINTSETTING_MERGE', merge })
+            machines.push({
+              key: i + '',
+              value: name
+            })
           }
+          const merge = {
+            machines,
+            papers: getPagers(machine_index),
+            direction,
+            paper,
+            machine: machine_index + '',
+            quality
+          }
+          dispatch({type: 'PM_LODOP_TARGET_SET', payload: src})
+          dispatch({ type: 'PM_PRINTSETTING_MERGE', merge })
         }
       }
-    }
+    })
   }
 }
 
