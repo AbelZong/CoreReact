@@ -57,6 +57,7 @@ const defColumns = [
     headerName: '#',
     width: 30,
     checkboxSelection: true,
+    cellStyle: {textAlign: 'center'},
     pinned: true
   }, {
     headerName: '优先级',

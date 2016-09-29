@@ -223,9 +223,7 @@
     margin-top: 4px;
     border: 1px solid transparent;
     border-radius: 3px;
-    /* When using bootstrap, box-sizing was set to 'border-box' */
     box-sizing: content-box;
-    /* normal line height, a space was appearing below the menu button */
     line-height: 0;
   }
 
@@ -258,7 +256,9 @@
   .ag-fresh .ag-row-selected {
     background-color: #2db7f5;
     color: #fff;
-    //transition: all 0.16s;
+    i.anticon {
+      color: #545454;
+    }
   }
 
   .ag-fresh .ag-floating-top .ag-row {
