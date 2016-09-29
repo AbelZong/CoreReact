@@ -9,6 +9,7 @@ import NotFoundRoute from './NotFound'
 import PrintUserRoute from './Print'
 import PrintAdminRoute from './Print/admin'
 import PrintModifyRoute from './Print/modify'
+import AdminShopsRoute from './Admin/Shops'
 
 export const createRoutes = (store) => ([
   {
@@ -38,6 +39,15 @@ export const createRoutes = (store) => ([
     childRoutes: [
       PrintUserRoute(store),
       PrintAdminRoute(store)
+    ],
+    ignoreScrollBehavior: true,
+    indexRoute: NotFoundRoute
+  },
+  {
+    path: '/admin',
+    component: WheatLayout,
+    childRoutes: [
+      AdminShopsRoute(store)
     ],
     ignoreScrollBehavior: true,
     indexRoute: NotFoundRoute
