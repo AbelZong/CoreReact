@@ -120,6 +120,9 @@ const Notification = React.createClass({
     Object.keys(nodeArr).forEach((index) => {
       selectIds.push(nodeArr[index].data.Id)
     })
+    if (selectIds.length < 1) {
+      return
+    }
     const data = {ids: selectIds}
     ZPost('profile/msgread', data, (s, d, m) => {
       this.handleSearch()
