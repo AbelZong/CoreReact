@@ -2,9 +2,11 @@
   flex-basis: 35px;
   line-height:35px;
   padding-left:10px;
+  padding-right:5px;
 }
 .main {
   padding-left:10px;
+  padding-right:5px;
   flex: 1;
   display: flex;
   :global(.z-grid) {

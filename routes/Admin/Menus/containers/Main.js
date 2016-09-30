@@ -15,7 +15,7 @@ const Main = React.createClass({
       this.grid.setRowData(d)
       this.grid.api.hideOverlay()
     }, (m) => {
-      this.api.showNoRowsOverlay()
+      this.grid.api.showNoRowsOverlay()
     })
   },
   handleGridReady(grid) {
