@@ -45,7 +45,7 @@ const WangWangWang = React.createClass({
               iconPrefix: d.icon[1],
               name: d.name,
               order: d.order,
-              pid: d.parentid + '',
+              pid: d.parentid > 0 ? d.parentid + '' : undefined,
               remark: d.remark,
               router: d.router,
               access: d.access
@@ -155,7 +155,9 @@ const WangWangWang = React.createClass({
             null
           </FormItem>
           <FormItem {...formItemLayout} label='排序'>
-            {getFieldDecorator('order')(
+            {getFieldDecorator('order', {
+              initialValue: 0
+            })(
               <InputNumber min={1} size='small' />
             )}
           </FormItem>

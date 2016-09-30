@@ -5,7 +5,6 @@ const TreeNode = TreeSelect.TreeNode
 
 const Trr = React.createClass({
   handleChange(value) {
-    console.log(arguments)
     this.props.onChange(value)
   },
   renderMenus(menu) {
@@ -21,7 +20,6 @@ const Trr = React.createClass({
   },
   render() {
     const {menus, value} = this.props
-    console.log(this.props)
     return (
       <TreeSelect style={{ width: 300 }}
         value={value}
