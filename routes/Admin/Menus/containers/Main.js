@@ -1,21 +1,41 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import {ZGet} from 'utils/Xfetch'
+import {ZGet, ZPost} from 'utils/Xfetch'
 import ZGrid from 'components/Grid/index'
 import styles from './Menus.scss'
 import Wrapper from 'components/MainWrapper'
-import {Icon} from 'antd'
+import {Icon, Popconfirm} from 'antd'
 import {Icon as Iconfa} from 'components/Icon'
 import {reactCellRendererFactory} from 'ag-grid-react' //bad kid
 
 const Main = React.createClass({
+  componentWillUnmount() {
+    this.ignore = true
+  },
   refreshDataCallback() {
     this.grid.api.showLoadingOverlay()
     ZGet('admin/menus', (s, d, m) => {
-      this.grid.setRowData(d)
-      this.grid.api.hideOverlay()
+      if (!this.ignore) {
+        this.props.dispatch({type: 'ADMIN_MENUS_SET', payload: d})
+        this.grid.setRowData(d)
+        this.grid.api.hideOverlay()
+      }
     }, (m) => {
-      this.grid.api.showNoRowsOverlay()
+      if (!this.ignore) {
+        this.grid.api.showNoRowsOverlay()
+      }
+    })
+  },
+  modifyRowByID(id) {
+    this.props.dispatch({type: 'ADMIN_MENUS_MODAL_VIS_SET', payload: id})
+  },
+  deleteRowByIDs(ids) {
+    const data = {ids: ids}
+    this.grid.showLoading()
+    ZPost('admin/delmenus', data, (s, d, m) => {
+      this.refreshDataCallback()
+    }, () => {
+      this.grid.hideLoading()
     })
   },
   handleGridReady(grid) {
@@ -60,10 +80,32 @@ const BadName = React.createClass({
   render() {
     const {data} = this.props
     return (
-      <span>
+      <div className={styles.nameWrap}>
         {parseIcon(data.icon)}
         {data.name}
-      </span>
+      </div>
+    )
+  }
+})
+const OperatorsRender = React.createClass({
+  handleEditClick(e) {
+    e.stopPropagation()
+    const Yyah = this.props.api.gridOptionsWrapper.gridOptions
+    Yyah.grid.modifyRowByID(this.props.data.id)
+  },
+  handleDeleteClick(e) {
+    e.stopPropagation()
+    const Yyah = this.props.api.gridOptionsWrapper.gridOptions
+    Yyah.grid.deleteRowByIDs([this.props.data.id])
+  },
+  render() {
+    return (
+      <div className='operators'>
+        <Icon type='edit' onClick={this.handleEditClick} />
+        <Popconfirm title='确定要删除 我 吗？' onConfirm={this.handleDeleteClick}>
+          <Iconfa type='remove' />
+        </Popconfirm>
+      </div>
     )
   }
 })
@@ -96,7 +138,8 @@ const columnDefs = [{
   width: 50
 }, {
   headerName: '操作',
-  width: 150
+  width: 150,
+  cellRendererFramework: OperatorsRender
 }]
 const gridOptions = {
   enableColResize: true,
