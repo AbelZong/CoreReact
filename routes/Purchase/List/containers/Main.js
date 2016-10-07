@@ -93,7 +93,8 @@ const OperatorsRender = React.createClass({
     const Yyah = this.props.api.gridOptionsWrapper.gridOptions
     Yyah.grid.modifyRowByID(this.props.data.id)
   },
-  handleDeleteClick() {
+  handleDeleteClick(e) {
+    e.stopPropagation()
     const Yyah = this.props.api.gridOptionsWrapper.gridOptions
     Yyah.grid.deleteRowByIDs([this.props.data.id])
   },

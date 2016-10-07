@@ -3,16 +3,19 @@
     width: 0;
     height: 0;
   }
+  .ag-pinned-right-cols-viewport::-webkit-scrollbar,
   .ag-body-viewport::-webkit-scrollbar {
     width: 6px;
     height: 10px;
   }
 
+  .ag-pinned-right-cols-viewport::-webkit-scrollbar-thumb,
   .ag-body-viewport::-webkit-scrollbar-thumb {
     background-color: rgba(0,0,0,0.1);
     border-radius: 6px;
   }
 
+  .ag-pinned-right-cols-viewport:hover::-webkit-scrollbar-thumb,
   .ag-body-viewport:hover::-webkit-scrollbar-thumb {
     background-color: rgba(0,0,0,0.2);
   }

@@ -1,0 +1,14 @@
+import {handleActions} from 'redux-actions'
+const admin_users_modal_vis = handleActions({
+  ADMIN_USERS_MODAL_VIS_SET: (state, action) => (action.payload)
+}, -1)
+const admin_users_filter_conditions = handleActions({
+  ADMIN_USERS_FILTER_CONDITIONS_SET: (state, action) => (action.payload)
+}, null)
+const admin_users_loading = handleActions({
+  ADMIN_USERS_LOADING_SET: (state, action) => (action.payload)
+}, false)
+
+export default {
+  admin_users_modal_vis, admin_users_filter_conditions, admin_users_loading
+}

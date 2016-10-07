@@ -77,7 +77,7 @@ class SideTpl extends Component {
   }
   modifyClick(my_tpl_id) {
     if (window.confirm('确定要离开当前页面编辑模板吗？建议先保存。')) {
-      window.location.href = `/page/print/modify`
+      window.location.href = `/page/print/modify?my_id=${my_tpl_id}`
     }
   }
   removeClick(my_tpl_id) {

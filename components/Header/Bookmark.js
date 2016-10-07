@@ -42,8 +42,10 @@ const Bookmark = React.createClass({
   handleContextMenu(e) {
     e.preventDefault()
     const index = e.target.getAttribute('data-index') * 1
-    let xOffset = Math.max(document.documentElement.scrollLeft, document.body.scrollLeft)
-    let yOffset = Math.max(document.documentElement.scrollTop, document.body.scrollTop)
+    const doc = document.documentElement
+    const dob = document.body
+    let xOffset = Math.max(doc.scrollLeft, dob.scrollLeft)
+    let yOffset = Math.max(doc.scrollTop, dob.scrollTop)
     const rect = findDOMNode(this.refs.main).getBoundingClientRect()
     //console.log(rect)
     //console.log(menu.style)
@@ -157,7 +159,6 @@ const Bookmark = React.createClass({
   },
   render() {
     const {bookmarks} = this.props
-    console.log('--render')
     return (
       <div className={styles.bookmarks} ref='main'>
         <div className={styles.inner} ref='inner'>
