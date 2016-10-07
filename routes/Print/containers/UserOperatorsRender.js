@@ -1,8 +1,7 @@
 import React from 'react'
-import {connect} from 'react-redux'
 import {Icon, Popconfirm} from 'antd'
 
-export default connect()(React.createClass({
+export default React.createClass({
   handleEditClick(e) {
     e.stopPropagation()
     const Yyah = this.props.api.gridOptionsWrapper.gridOptions
@@ -13,8 +12,7 @@ export default connect()(React.createClass({
     const Yyah = this.props.api.gridOptionsWrapper.gridOptions
     Yyah.grid.deleteRowByIDs([this.props.data.id])
   },
-  handleSetDefedClick(e) {
-    e.stopPropagation()
+  handleSetDefedClick() {
     const Yyah = this.props.api.gridOptionsWrapper.gridOptions
     Yyah.grid.setDefedByID(this.props.data.id)
   },
@@ -36,4 +34,4 @@ export default connect()(React.createClass({
       </div>
     )
   }
-}))
+})

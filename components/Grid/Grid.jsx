@@ -51,6 +51,7 @@ class ZGrid extends React.Component {
   }
   onGridReady = (params) => {
     this.api = params.api
+    //this.api.sizeColumnsToFit()
     this.columnApi = params.columnApi
     const cacheColumnStates = store.get(this.storeConfig.COLUMNS_KEY, null)
     if (cacheColumnStates) {
@@ -177,7 +178,7 @@ class ZGrid extends React.Component {
     store.remove(this.storeConfig.COLUMNSHIDE_KEY)
     store.remove(this.storeConfig.PAGESIZE_KEY)
     store.remove(this.storeConfig.COLUMNS_KEY)
-    message.info('重置默认设置成功')
+    this.columnApi.resetColumnState()
   }
   _saveColumns = () => {
     const cacheColumnStates = this.columnApi.getColumnState()
@@ -242,15 +243,16 @@ class ZGrid extends React.Component {
     })
   }
   render() {
-    const {columnDefs, height, paged, className} = this.props
+    const {columnDefs, height, paged, className, gridOptions} = this.props
     const rowData = this.state.rowData || this.props.rowData
     const CN = className ? `z-grid ${className}` : 'z-grid'
+    const _gridOptions = Object.assign({}, this.gridOptions, gridOptions)
     return (
       <div className={CN} style={{height: height || 'auto'}}>
         <div className='grid-inner'>
           <div className='ag-fresh'>
             <AgGridReact
-              gridOptions={this.gridOptions}
+              gridOptions={_gridOptions}
               containerStyle={{position: 'absolute', width: '100%'}}
               onGridReady={this.onGridReady}
               onColumnResized={this.agColumnResized}
@@ -262,9 +264,7 @@ class ZGrid extends React.Component {
 
               rowSelection='multiple'
               enableColResize='true'
-              groupHeaders='false'
               rowHeight='32'
-              debug='false'
             />
           </div>
           <div className='footer'>

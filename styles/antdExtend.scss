@@ -45,6 +45,7 @@
   .ant-modal-close {
     top:10px;
   }
+  .ant-select-selection,
   .ant-input,
   .ant-modal-content {
     border-radius: 1px;
@@ -72,6 +73,7 @@
         top: 2px;
         pointer-events: none;
         background-color: #fff;
+            z-index: 10;
       }
     }
   }

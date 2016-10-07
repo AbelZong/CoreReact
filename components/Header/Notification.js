@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import {ZPost} from 'utils/Xfetch'
 import store from 'utils/store' //吃相不太好看
 import styles from './Header.scss'
-import NoticeAdd from './NoticeAdd'
+//import NoticeAdd from './NoticeAdd'
 import ZGrid from 'components/Grid/index'
 const CheckboxGroup = Checkbox.Group
 const RadioGroup = Radio.Group
@@ -120,6 +120,9 @@ const Notification = React.createClass({
     Object.keys(nodeArr).forEach((index) => {
       selectIds.push(nodeArr[index].data.Id)
     })
+    if (selectIds.length < 1) {
+      return
+    }
     const data = {ids: selectIds}
     ZPost('profile/msgread', data, (s, d, m) => {
       this.handleSearch()
@@ -189,18 +192,16 @@ const Notification = React.createClass({
         </div>
         <div className='clearfix mt10 mb10'>
           <div className=''>
-            <Button type='primary' size='small' className='mr10' onClick={this.openNoticeAddWindow} >新消息</Button>
             <Button type='ghost' size='small' className='mr10' onClick={this.handleBatch}>批量已读</Button>
             <Button type='ghost' size='small' shape='circle-outline' icon='reload' onClick={this.handleSearch} />
           </div>
         </div>
         <ZGrid className={styles.damnGrid} onReady={this.handleGridReady} storeConfig={{ prefix: 'msg' }} paged height={398} columnDefs={defColumns} />
-        <NoticeAdd research={this.handleSearch} />
       </Modal>
     )
   }
 })
-
+//<NoticeAdd research={this.handleSearch} /><Button type='primary' size='small' className='mr10' onClick={this.openNoticeAddWindow} >新消息</Button>
 export default connect(state => ({
   visible: state.notice_visibel
 }))(Notification)

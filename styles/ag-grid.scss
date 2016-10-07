@@ -254,10 +254,10 @@
   }
 
   .ag-fresh .ag-row-selected {
-    background-color: #2db7f5;
-    color: #fff;
+    background-color: #2db7f5 !important;
+    color: #fff !important;
     i.anticon {
-      color: #545454;
+      color: #545454 !important;
     }
   }
 
@@ -299,7 +299,7 @@
   }
 
   .ag-fresh .ag-group-cell {
-    font-style: italic;
+    //font-style: italic;
   }
 
   .ag-fresh .ag-group-expanded {
@@ -609,6 +609,7 @@
           margin-left:2px;
           margin-right:3px;
           cursor: pointer;
+          font-size: 14px;
         }
       }
     }
@@ -697,7 +698,7 @@
       .op-r {
         float: right;
         margin-left: 6px;
-        margin-right: 6px;
+        margin-right: 12px;
         .cur {
           margin-left: 6px;
           margin-right:3px;
