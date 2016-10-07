@@ -36,7 +36,7 @@ class ZGrid extends React.Component {
       columnsCheckedVisibe: false,
       total: 0,
       rowData: null,
-      pageSize: store.get(this.storeConfig.PAGESIZE_KEY, Number(pageSizeOptions[0])),
+      pageSize: store.get(this.storeConfig.PAGESIZE_KEY, Number(pageSizeOptions[1])),
       current: 1
     }
     this.cacheHideColumns = store.get(this.storeConfig.COLUMNSHIDE_KEY, [])
@@ -243,7 +243,7 @@ class ZGrid extends React.Component {
     })
   }
   render() {
-    const {columnDefs, height, paged, className, gridOptions} = this.props
+    const {columnDefs, height, paged, className, gridOptions, children} = this.props
     const rowData = this.state.rowData || this.props.rowData
     const CN = className ? `z-grid ${className}` : 'z-grid'
     const _gridOptions = Object.assign({}, this.gridOptions, gridOptions)
@@ -267,13 +267,14 @@ class ZGrid extends React.Component {
               rowHeight='32'
             />
           </div>
-          <div className='footer'>
+          <div className='footer clearfix'>
+            {children}
             <div className='op-r'>
               {paged && (
                 <a title='刷新容器' className='cur' onClick={this.refreshRowData}><Icon type='refresh' spin={false} /></a>
               )}
               <a title='显示隐藏列名' className='cur' onClick={this.toggleColumnCheckedVisibe}><Icon type='eye-slash' /></a>
-              <Popconfirm placement='leftBottom' title='确定要恢复容器默认设置吗？下次进入或刷新生效' onConfirm={this.removeCache}><a title='恢复容器默认设置' className='cur'><Icon type='eraser' /></a>
+              <Popconfirm placement='leftBottom' title='确定要恢复容器默认设置吗？' onConfirm={this.removeCache}><a title='恢复容器默认设置' className='cur'><Icon type='eraser' /></a>
               </Popconfirm>
             </div>
             {paged && (
