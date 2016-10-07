@@ -30,6 +30,9 @@ const Main = React.createClass({
       this.grid.hideLoading()
     })
   },
+  modifyPwdByID(id) {
+    this.props.dispatch({type: 'ADMIN_USERS_PWDMOD_VIS_SET', payload: id})
+  },
   handleGridReady(grid) {
     this.grid = grid
     //this.refreshDataCallback()
@@ -99,16 +102,21 @@ const OperatorsRender = React.createClass({
   handleEditClick(e) {
     e.stopPropagation()
     const Yyah = this.props.api.gridOptionsWrapper.gridOptions
-    Yyah.grid.modifyRowByID(this.props.data.id)
+    Yyah.grid.modifyRowByID(this.props.data.ID)
   },
   handleDeleteClick() {
     const Yyah = this.props.api.gridOptionsWrapper.gridOptions
-    Yyah.grid.deleteRowByIDs([this.props.data.id])
+    Yyah.grid.deleteRowByIDs([this.props.data.ID])
+  },
+  handlePwdClick() {
+    const Yyah = this.props.api.gridOptionsWrapper.gridOptions
+    Yyah.grid.modifyPwdByID(this.props.data.ID)
   },
   render() {
     return (
       <div className='operators'>
-        <Icon type='edit' onClick={this.handleEditClick} />
+        <Icon type='edit' onClick={this.handleEditClick} title='编辑用户' />
+        <Iconfa type='key' onClick={this.handlePwdClick} title='修改密码' />
         <Popconfirm title='确定要删除 我 吗？' onConfirm={this.handleDeleteClick}>
           <Iconfa type='remove' />
         </Popconfirm>
@@ -120,11 +128,12 @@ const OperatorsRender = React.createClass({
 const AbledRender = React.createClass({
   handleClick(e) {
     e.stopPropagation()
+    const checked = e.target.checked
     ZPost('XyUser/User/UserEnable', {
       IDLst: [this.props.data.ID],
-      Enable: e.target.checked
+      Enable: checked
     }, (s, d, m) => {
-      this.props.data.Enable = d
+      this.props.data.Enable = checked
       this.props.refreshCell()
     })
   },
@@ -171,6 +180,11 @@ const columnDefs = [
     cellStyle: {textAlign: 'center'},
     width: 50
   }, {
+    headerName: '角色',
+    field: 'RoleName',
+    cellStyle: {textAlign: 'center'},
+    width: 130
+  }, {
     headerName: '手机',
     field: 'Mobile',
     cellStyle: {textAlign: 'center'},
@@ -187,11 +201,6 @@ const columnDefs = [
     headerName: '公司',
     field: 'CompanyName',
     width: 180
-  }, {
-    headerName: '角色',
-    field: 'RoleName',
-    cellStyle: {textAlign: 'center'},
-    width: 130
   }, {
     headerName: '创建时间',
     field: 'CreateDate',

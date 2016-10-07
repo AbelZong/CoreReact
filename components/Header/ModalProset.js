@@ -8,7 +8,7 @@ function noop() {
   return false
 }
 
-const Demo = React.createClass({
+const FCK = React.createClass({
   getInitialState() {
     return {
       confirmLoading: false
@@ -59,45 +59,43 @@ const Demo = React.createClass({
       wrapperCol: { span: 20 }
     }
     return (
-      <div>
-        <Modal title='修改密码' visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={this.state.confirmLoading}>
-          <Form horizontal>
-            <FormItem {...formItemLayout} label='旧&nbsp;密码'>
-              {getFieldDecorator('oldPwd', {
-                rules: [
-                  { required: true, whitespace: true, message: '请填写旧密码' }
-                ]
-              })(
-                <Input type='password' autoComplete='off' onContextMenu={noop} onPaste={noop} onCopy={noop} onCut={noop} />
-              )}
-            </FormItem>
-            <FormItem {...formItemLayout} label='新&nbsp;密码'>
-              {getFieldDecorator('newPwd', {
-                rules: [
-                  { required: true, whitespace: true, min: 6, message: '请填写六位新密码' },
-                  { validator: this.checkPass }
-                ]
-              })(
-                <Input type='password' autoComplete='off' onContextMenu={noop} onPaste={noop} onCopy={noop} onCut={noop} />
-              )}
-            </FormItem>
-            <FormItem {...formItemLayout} label='重输新密码'>
-              {getFieldDecorator('newPwd', {
-                rules: [
-                  { required: true, whitespace: true, min: 6, message: '请再一次填写新密码' },
-                  { validator: this.checkPass2 }
-                ]
-              })(
-                <Input type='password' autoComplete='off' placeholder='两次输入密码保持一致' onContextMenu={noop} onPaste={noop} onCopy={noop} onCut={noop} />
-              )}
-            </FormItem>
-          </Form>
-        </Modal>
-      </div>
+      <Modal title='修改密码' visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={this.state.confirmLoading}>
+        <Form horizontal>
+          <FormItem {...formItemLayout} label='旧&nbsp;密码'>
+            {getFieldDecorator('oldPwd', {
+              rules: [
+                { required: true, whitespace: true, message: '请填写旧密码' }
+              ]
+            })(
+              <Input type='password' autoComplete='off' onContextMenu={noop} onPaste={noop} onCopy={noop} onCut={noop} />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout} label='新&nbsp;密码'>
+            {getFieldDecorator('newPwd', {
+              rules: [
+                { required: true, whitespace: true, min: 6, message: '请填写六位新密码' },
+                { validator: this.checkPass }
+              ]
+            })(
+              <Input type='password' autoComplete='off' onContextMenu={noop} onPaste={noop} onCopy={noop} onCut={noop} />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout} label='重输新密码'>
+            {getFieldDecorator('newPwd', {
+              rules: [
+                { required: true, whitespace: true, min: 6, message: '请再一次填写新密码' },
+                { validator: this.checkPass2 }
+              ]
+            })(
+              <Input type='password' autoComplete='off' placeholder='两次输入密码保持一致' onContextMenu={noop} onPaste={noop} onCopy={noop} onCut={noop} />
+            )}
+          </FormItem>
+        </Form>
+      </Modal>
     )
   }
 })
 
 export default connect(state => ({
   visible: state.proset_visibel
-}))(createForm()(Demo))
+}))(createForm()(FCK))

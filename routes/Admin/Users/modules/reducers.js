@@ -2,6 +2,9 @@ import {handleActions} from 'redux-actions'
 const admin_users_modal_vis = handleActions({
   ADMIN_USERS_MODAL_VIS_SET: (state, action) => (action.payload)
 }, -1)
+const admin_users_pwdmod_vis = handleActions({
+  ADMIN_USERS_PWDMOD_VIS_SET: (state, action) => action.payload
+}, -1)
 const admin_users_filter_conditions = handleActions({
   ADMIN_USERS_FILTER_CONDITIONS_SET: (state, action) => (action.payload)
 }, null)
@@ -10,5 +13,5 @@ const admin_users_loading = handleActions({
 }, false)
 
 export default {
-  admin_users_modal_vis, admin_users_filter_conditions, admin_users_loading
+  admin_users_modal_vis, admin_users_filter_conditions, admin_users_loading, admin_users_pwdmod_vis
 }

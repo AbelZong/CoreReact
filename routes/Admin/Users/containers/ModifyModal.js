@@ -7,7 +7,6 @@ import EE from 'utils/EE'
 const createForm = Form.create
 const FormItem = Form.Item
 const InputGroup = Input.Group
-import ModifyMenusTree from './ModifyMenusTree'
 
 const DEFAULT_TITLE = '创建新用户'
 const WangWangWang = React.createClass({
@@ -57,7 +56,7 @@ const WangWangWang = React.createClass({
             })
           },
           error: () => {
-            this.props.dispatch({type: 'ADMIN_MENUS_MODAL_VIS_SET', payload: -1})
+            this.props.dispatch({type: 'ADMIN_USERS_MODAL_VIS_SET', payload: -1})
           }
         }).then(endLoading)
       }
@@ -93,7 +92,7 @@ const WangWangWang = React.createClass({
   },
 
   hideModal() {
-    this.props.dispatch({ type: 'ADMIN_MENUS_MODAL_VIS_SET', payload: -1 })
+    this.props.dispatch({ type: 'ADMIN_USERS_MODAL_VIS_SET', payload: -1 })
     this.props.form.resetFields()
   },
   render() {
@@ -106,11 +105,6 @@ const WangWangWang = React.createClass({
     return (
       <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={confirmLoading} width={780} maskClosable={false} closable={false}>
         <Form horizontal className='pos-form'>
-          <FormItem {...formItemLayout} label='上级菜单'>
-            {getFieldDecorator('pid')(
-              <ModifyMenusTree />
-            )}
-          </FormItem>
           <FormItem {...formItemLayout} label='菜单名称'>
             {getFieldDecorator('name', {
               rules: [
