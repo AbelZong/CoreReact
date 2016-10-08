@@ -1,12 +1,13 @@
 import React from 'react'
-import { InputNumber, Form, Input, Modal, Col } from 'antd'
+import { Form, Input, Modal, Row, Col, Radio, Switch, Select } from 'antd'
 import {connect} from 'react-redux'
 import {ZGet, ZPost} from 'utils/Xfetch'
-import {startLoading, endLoading} from 'utils'
 import EE from 'utils/EE'
+import {startLoading, endLoading} from 'utils'
 const createForm = Form.create
 const FormItem = Form.Item
-const InputGroup = Input.Group
+const RadioGroup = Radio.Group
+const Option = Select.Option
 
 const DEFAULT_TITLE = '创建新用户'
 const WangWangWang = React.createClass({
@@ -14,7 +15,8 @@ const WangWangWang = React.createClass({
     return {
       visible: false,
       confirmLoading: false,
-      title: DEFAULT_TITLE
+      title: DEFAULT_TITLE,
+      roles: []
     }
   },
   componentWillReceiveProps(nextProps) {
@@ -24,41 +26,51 @@ const WangWangWang = React.createClass({
           visible: false,
           confirmLoading: false
         })
-      } else if (nextProps.doge === 0) {
-        this.setState({
-          visible: true,
-          title: DEFAULT_TITLE,
-          confirmLoading: false
-        })
       } else {
-        startLoading()
         ZGet({
-          uri: 'admin/onemenu',
-          data: {
-            id: nextProps.doge
-          },
+          uri: 'role/rolelist',
           success: (s, d, m) => {
-            this.props.form.setFieldsValue({
-              id: d.id,
-              iconName: d.icon[0],
-              iconPrefix: d.icon[1],
-              name: d.name,
-              order: d.order,
-              pid: d.parentid > 0 ? d.parentid + '' : undefined,
-              remark: d.remark,
-              router: d.router,
-              access: d.access
-            })
             this.setState({
-              title: `修改 [${d.id}]: ${d.name}`,
-              visible: true,
-              confirmLoading: false
+              roles: d
             })
-          },
-          error: () => {
-            this.props.dispatch({type: 'ADMIN_USERS_MODAL_VIS_SET', payload: -1})
           }
-        }).then(endLoading)
+        })
+        if (nextProps.doge === 0) {
+          this.setState({
+            visible: true,
+            title: DEFAULT_TITLE,
+            confirmLoading: false
+          })
+        } else {
+          startLoading()
+          ZGet({
+            uri: 'XyUser/User/UserEdit',
+            data: {
+              id: nextProps.doge
+            },
+            success: (s, d, m) => {
+              this.props.form.setFieldsValue({
+                id: d.ID,
+                Account: d.Account,
+                Name: d.Name,
+                Enable: d.Enable,
+                Email: d.Email,
+                Gender: d.Gender,
+                Mobile: d.Mobile,
+                QQ: d.QQ,
+                RoleID: d.RoleID + ''
+              })
+              this.setState({
+                title: `修改 [${d.ID}]: ${d.Name}`,
+                visible: true,
+                confirmLoading: false
+              })
+            },
+            error: () => {
+              this.props.dispatch({type: 'ADMIN_USERS_MODAL_VIS_SET', payload: -1})
+            }
+          }).then(endLoading)
+        }
       }
     }
   },
@@ -75,9 +87,9 @@ const WangWangWang = React.createClass({
       const data = values
       let uri = ''
       if (doge === 0) {
-        uri = 'admin/createmenus'
+        uri = 'XyUser/User/InsertUser'
       } else {
-        uri = 'admin/modifymenus'
+        uri = 'XyUser/User/UpdateUser'
         data.id = doge
       }
       ZPost(uri, data, (s, d, m) => {
@@ -90,76 +102,139 @@ const WangWangWang = React.createClass({
       })
     })
   },
-
+  checkPwd(rule, value, callback) {
+    const { getFieldValue } = this.props.form
+    if (value) {
+      if (value === getFieldValue('Account') || value === getFieldValue('Name')) {
+        return callback('不能与账号或用户名相同')
+      } else if (!/^[0-9a-zA-Z]+$/.test(value)) {
+        return callback('必须包含数字和字母')
+      }
+    }
+    callback()
+  },
   hideModal() {
     this.props.dispatch({ type: 'ADMIN_USERS_MODAL_VIS_SET', payload: -1 })
     this.props.form.resetFields()
   },
   render() {
     const { getFieldDecorator } = this.props.form
-    const {visible, title, confirmLoading} = this.state
+    const {visible, title, confirmLoading, roles} = this.state
     const formItemLayout = {
-      labelCol: { span: 4 },
-      wrapperCol: { span: 20 }
+      labelCol: { span: 6 },
+      wrapperCol: { span: 18 }
     }
     return (
       <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={confirmLoading} width={780} maskClosable={false} closable={false}>
         <Form horizontal className='pos-form'>
-          <FormItem {...formItemLayout} label='菜单名称'>
-            {getFieldDecorator('name', {
-              rules: [
-                { required: true, message: '名称必填' }
-              ]
-            })(
-              <Input type='text' />
-            )}
-          </FormItem>
-          <FormItem {...formItemLayout} label='前端路由'>
-            {getFieldDecorator('router', {
-              rules: [
-                { required: true, message: '路由必填' }
-              ]
-            })(
-              <Input type='text' />
-            )}
-          </FormItem>
-          <FormItem {...formItemLayout} label='显示图标'>
-            <InputGroup>
-              <Col span='5'>
-                <FormItem>
-                  {getFieldDecorator('iconName', {
+          <Row>
+            <Col sm={12}>
+              <FormItem {...formItemLayout} label='账号'>
+                {getFieldDecorator('Account', {
+                  rules: [
+                    { required: true, whitespace: true, message: '必填' }
+                  ]
+                })(
+                  <Input type='text' />
+                )}
+              </FormItem>
+            </Col>
+            <Col sm={12}>
+              <FormItem {...formItemLayout} label='用户名'>
+                {getFieldDecorator('Name', {
+                  rules: [
+                    { required: true, whitespace: true, message: '必填' }
+                  ]
+                })(
+                  <Input type='text' />
+                )}
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            {this.props.doge === 0 && (
+              <Col sm={12}>
+                <FormItem {...formItemLayout} label='密码'>
+                  {getFieldDecorator('Password', {
                     rules: [
-                      { required: true, message: '图标名称必填' }
+                      { required: true, min: 6, message: '至少6位' },
+                      { validator: this.checkPwd }
                     ]
                   })(
-                    <Input type='text' />
+                    <Input type='password' />
                   )}
                 </FormItem>
               </Col>
-              <Col span='5'>
-                <FormItem>
-                  {getFieldDecorator('iconPrefix')(
-                    <Input addonBefore='前缀' type='text' />
-                  )}
-                </FormItem>
-              </Col>
-            </InputGroup>
-          </FormItem>
-          <FormItem {...formItemLayout} label='访问权限'>
-            null
-          </FormItem>
-          <FormItem {...formItemLayout} label='排序'>
-            {getFieldDecorator('order', {
-              initialValue: 0
-            })(
-              <InputNumber min={1} size='small' />
             )}
-          </FormItem>
-          <FormItem {...formItemLayout} label='备注'>
-            {getFieldDecorator('remark')(
-              <Input type='textarea' autosize={{minRows: 1, maxRows: 3}} />
-            )}
-          </FormItem>
+            <Col sm={12}>
+              <FormItem {...formItemLayout} label='所属角色'>
+                {getFieldDecorator('RoleID', {
+                  rules: [
+                    { required: true, message: '所属角色必填' }
+                  ]
+                })(
+                  <Select placeholder='所属角色' style={{ width: '100%' }}>
+                    {roles.length && roles.map((x) => {
+                      return <Option value={`${x.id}`} key={x.id}>{x.name}</Option>
+                    })}
+                  </Select>
+                )}
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={12}>
+              <FormItem {...formItemLayout} label='性别'>
+                {getFieldDecorator('Gender', {
+                  initialValue: '男'
+                })(
+                  <RadioGroup>
+                    <Radio value='男'>男</Radio>
+                    <Radio value='女'>女</Radio>
+                  </RadioGroup>
+                )}
+              </FormItem>
+            </Col>
+            <Col sm={12}>
+              <FormItem {...formItemLayout} label='是否启用'>
+                {getFieldDecorator('Enable', {
+                  valuePropName: 'checked',
+                  initialValue: true
+                })(
+                  <Switch />
+                )}
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={12}>
+              <FormItem {...formItemLayout} label='邮箱'>
+                {getFieldDecorator('Email')(
+                  <Input type='email' />
+                )}
+              </FormItem>
+            </Col>
+            <Col sm={12}>
+              <FormItem {...formItemLayout} label='QQ'>
+                {getFieldDecorator('QQ')(
+                  <Input type='text' />
+                )}
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={12}>
+              <FormItem {...formItemLayout} label='手机号'>
+                {getFieldDecorator('Mobile', {
+                  rules: [
+                    { required: true, whitespace: true, message: '必填' }
+                  ]
+                })(
+                  <Input type='mobile' />
+                )}
+              </FormItem>
+            </Col>
+          </Row>
         </Form>
       </Modal>
     )

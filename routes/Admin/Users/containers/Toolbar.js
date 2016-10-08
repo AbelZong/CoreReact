@@ -48,7 +48,7 @@ const Toolbar = React.createClass({
       <div className={styles.toolbars}>
         <div className={styles.conditionsForm}>
           <div className={styles.s1}>
-            <Input addonBefore={selectBefore} placeholder='搜索关键词' ref='keyword' />
+            <Input addonBefore={selectBefore} placeholder='搜索关键词' ref='keyword' onPressEnter={this.handleSearch} />
           </div>
           <Select
             className={styles.s2}

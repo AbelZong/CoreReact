@@ -10,7 +10,10 @@ import {reactCellRendererFactory} from 'ag-grid-react'
 
 const Main = React.createClass({
   componentWillReceiveProps(nextProps) {
-    this.refreshDataCallback()
+    this._firstBlood(nextProps.conditions)
+  },
+  componentWillUpdate(nextProps, nextState) {
+    return false
   },
   componentWillUnmount() {
     this.ignore = true
@@ -41,13 +44,14 @@ const Main = React.createClass({
     const ids = this.grid.api.getSelectedRows().map(x => x.ID)
     this.deleteRowByIDs(ids)
   },
-  _firstBlood() {
+  _firstBlood(_conditions) {
     this.grid.showLoading()
+    const conditions = _conditions || this.props.conditions || {}
     const uri = 'XyUser/User/UserLst'
     const data = Object.assign({
       PageSize: this.grid.getPageSize(),
       PageIndex: 1
-    }, this.props.conditions)
+    }, conditions)
     ZGet(uri, data, (s, d, m) => {
       if (this.ignore) {
         return
@@ -63,7 +67,7 @@ const Main = React.createClass({
             const qData = Object.assign({
               PageSize: params.pageSize,
               PageIndex: params.page
-            }, this.props.conditions)
+            }, conditions)
             ZGet(uri, qData, (s, d, m) => {
               if (this.ignore) {
                 return
@@ -198,10 +202,6 @@ const columnDefs = [
     field: 'Email',
     width: 120
   }, {
-    headerName: '公司',
-    field: 'CompanyName',
-    width: 180
-  }, {
     headerName: '创建时间',
     field: 'CreateDate',
     width: 130
@@ -209,6 +209,6 @@ const columnDefs = [
     headerName: '操作',
     width: 120,
     cellRendererFramework: OperatorsRender,
-    pinned: 'right'
+    pinned: 'left'
   }]
 const gridOptions = {}

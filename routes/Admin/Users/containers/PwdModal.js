@@ -32,7 +32,14 @@ const Huaer = React.createClass({
       })
     })
   },
-
+  checkPwd(rule, value, callback) {
+    if (value) {
+      if (!/^[0-9a-zA-Z]+$/.test(value)) {
+        return callback('必须包含数字和字母')
+      }
+    }
+    callback()
+  },
   hideModal() {
     this.props.dispatch({ type: 'ADMIN_USERS_PWDMOD_VIS_SET', payload: false })
     this.props.form.resetFields()
@@ -51,7 +58,8 @@ const Huaer = React.createClass({
           <FormItem {...formItemLayout} label='新密码'>
             {getFieldDecorator('newPwd', {
               rules: [
-                { required: true, whitespace: true, message: '请填写新密码' }
+                { required: true, whitespace: true, message: '必填' },
+                { validator: this.checkPwd }
               ]
             })(
               <Input type='password' autoComplete='off' />

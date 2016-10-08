@@ -41,6 +41,9 @@
   }
   .ant-modal-footer {
     border-top: 1px solid #f9f9f9;
+    .ant-btn-lg {
+      font-size: 12px;
+    }
   }
   .ant-modal-close {
     top:10px;
@@ -80,6 +83,9 @@
         background-color: #fff;
             z-index: 10;
       }
+     .ant-select-selection {
+       box-shadow: none;
+     }
     }
   }
   .modalTop {
