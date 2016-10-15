@@ -13,6 +13,7 @@ import AdminMenusRoute from './Admin/Menus'
 import AdminShopsRoute from './Admin/Shops'
 import AdminUsersRoute from './Admin/Users'
 import AdminCompanyRoute from './Admin/Company'
+import AdminAccessRoute from './Admin/Access'
 import PurchaseListRoute from './Purchase/List'
 
 export const createRoutes = (store) => ([
@@ -54,7 +55,8 @@ export const createRoutes = (store) => ([
       AdminShopsRoute(store),
       AdminCompanyRoute(store),
       AdminMenusRoute(store),
-      AdminUsersRoute(store)
+      AdminUsersRoute(store),
+      AdminAccessRoute(store)
     ],
     ignoreScrollBehavior: true,
     indexRoute: NotFoundRoute
