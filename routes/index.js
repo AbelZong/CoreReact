@@ -12,8 +12,13 @@ import PrintModifyRoute from './Print/modify'
 import AdminMenusRoute from './Admin/Menus'
 import AdminShopsRoute from './Admin/Shops'
 import AdminUsersRoute from './Admin/Users'
+import AdminBrandsRoute from './Admin/Brands'
 import AdminCompanyRoute from './Admin/Company'
 import PurchaseListRoute from './Purchase/List'
+// const QQ = require.context('./__ENTERIES__', false, /\.js$/)
+// console.dir(QQ)
+// console.log(QQ.keys())
+// console.log(QQ('./AdminBrandsRoute.js'))
 
 export const createRoutes = (store) => ([
   {
@@ -48,22 +53,15 @@ export const createRoutes = (store) => ([
     indexRoute: NotFoundRoute
   },
   {
-    path: '/admin',
-    component: WheatLayout,
-    childRoutes: [
-      AdminShopsRoute(store),
-      AdminCompanyRoute(store),
-      AdminMenusRoute(store),
-      AdminUsersRoute(store)
-    ],
-    ignoreScrollBehavior: true,
-    indexRoute: NotFoundRoute
-  },
-  {
     path: '/',
     component: WheatLayout,
     indexRoute: DashBordRoute(store),
     childRoutes: [
+      AdminShopsRoute(store),
+      AdminCompanyRoute(store),
+      AdminMenusRoute(store),
+      AdminUsersRoute(store),
+      AdminBrandsRoute(store),
       PurchaseListRoute(store),
       NotFoundRoute
     ],
