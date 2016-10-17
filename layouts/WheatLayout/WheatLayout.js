@@ -34,9 +34,9 @@ const WheatLayout = React.createClass({
       }
       this.props.dispatch({ type: 'PERMISSIONMENUS_SET', payload: d.permissionMenus })
       this.props.dispatch({ type: 'USER_SET', payload: d.user })
-    }, (m, s, d) => {
+    }, ({s}) => {
       if (s !== -10086) {
-        this.context.router.push('/go/login')
+        //this.context.router.push('/go/login')
       } else {
         endLoading()
       }
