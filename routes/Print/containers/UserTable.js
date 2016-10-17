@@ -46,7 +46,7 @@ const UserTable = React.createClass({
   deleteRowByIDs(ids) {
     const data = {ids: ids}
     this.grid.showLoading()
-    ZPost('print/tpl/delmine', data, (s, d, m) => {
+    ZPost('print/tpl/delmine', data, () => {
       this.refreshRowData()
     }, () => {
       this.grid.hideLoading()
@@ -62,7 +62,7 @@ const UserTable = React.createClass({
     }, 1000)
   },
   setDefedByID(id) {
-    ZPost('print/side/setdefed', { my_tpl_id: id }, (s, d, m) => {
+    ZPost('print/side/setdefed', { my_tpl_id: id }, () => {
       this.refreshRowData()
     })
   },
@@ -87,7 +87,7 @@ const UserTable = React.createClass({
       page: 1,
       type: activeTypeID
     }
-    ZGet(uri, data, (s, d, m) => {
+    ZGet(uri, data, ({d}) => {
       this.grid.setDatasource({
         total: d.total,
         rowData: d.list,
@@ -101,9 +101,9 @@ const UserTable = React.createClass({
               page: params.page,
               type: activeTypeID
             }
-            ZGet(uri, qData, (s, d, m) => {
+            ZGet(uri, qData, ({d}) => {
               params.success(d.list)
-            }, (m) => {
+            }, ({m}) => {
               params.fail(m)
             })
           }

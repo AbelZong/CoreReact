@@ -22,7 +22,7 @@ export default React.createClass({
       })
       ZGet({
         uri: 'Common/ScoCompanySimple',
-        success: (s, d, m) => {
+        success: ({d}) => {
           this.setState({
             spinning: false,
             dataList: d,
@@ -34,8 +34,19 @@ export default React.createClass({
   },
   handleOK() {
     const {value} = this.state
-    const valueName = this.state.dataList.filter(x => x.id === value)[0].sconame
+    const valueName = value ? this.state.dataList.filter(x => x.id === value)[0].sconame : ''
     this.props.onOk(value, valueName)
+  },
+  handleOk() {
+    this.setState({
+      value: null,
+      valueName: ''
+    }, () => {
+      this.props.onOk(null, '')
+    })
+  },
+  handleok() {
+    this.props.onCancel()
   },
   handleFilter(e) {
     const val = e.target.value.trim()
@@ -47,6 +58,8 @@ export default React.createClass({
     return (
       <div className={styles.footer}>
         <div className='clearfix'>
+          <Button onClick={this.handleok}>关闭</Button>
+          <Button type='ghost' onClick={this.handleOk}>清除</Button>
           <Button type='primary' onClick={this.handleOK}>确认</Button>
           <Input className={styles.filterInput} placeholder='搜索，按回车确认' onPressEnter={this.handleFilter} />
         </div>

@@ -1,8 +1,5 @@
 .toolbars {
-  flex-basis: 35px;
-  line-height:35px;
-  padding-left:10px;
-  padding-right:5px;
+  padding: 10px 5px 10px 10px;
 }
 .main {
   padding-left:10px;
@@ -19,10 +16,18 @@
   }
 }
 
-.nameWrap {
-  display: inline;
-  i {
-    font-size:14px;
-    width:20px;
+.conditionsForm {
+  .s1 {
+    display: inline-block;
+    width:240px;
+    vertical-align: middle;
+  }
+  .s2 {
+    display: inline-block;
+    width: 80px;
+    margin-left:10px;
+  }
+  .s3 {
+    margin-left: 10px;
   }
 }

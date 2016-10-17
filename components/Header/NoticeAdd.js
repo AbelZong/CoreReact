@@ -53,9 +53,8 @@ let NoticeAdd = React.createClass({
   },
   handleSubmit(e) {
     e.preventDefault()
-    //console.log('收到表单值：', this.props.form.getFieldsValue())
     this.setState({ loading: true })
-    ZPost('profile/msgadd', this.props.form.getFieldsValue(), (s, d, m) => {
+    ZPost('profile/msgadd', this.props.form.getFieldsValue(), ({s}) => {
       if (s === 1) {
         this.setState({ loading: false })
         this.props.dispatch({ type: 'NOTICE_ADD_REVER' }, false)

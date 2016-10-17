@@ -39,13 +39,13 @@ const Header = React.createClass({
       }
       case '1': {
         startLoading()
-        ZPost('profile/lock', {silence: 1}, (s, d, m) => {
+        ZPost('profile/lock', {silence: 1}, () => {
           this.props.dispatch({ type: 'LOCKED_SET', payload: true })
         }).then(endLoading)
         break
       }
       case '-1': {
-        ZPost('sign/out', (s, d, m) => {
+        ZPost('sign/out', () => {
           this.context.router.push('/go/login')
         })
         break

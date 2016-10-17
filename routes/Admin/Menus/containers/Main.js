@@ -14,13 +14,13 @@ const Main = React.createClass({
   },
   refreshDataCallback() {
     this.grid.api.showLoadingOverlay()
-    ZGet('admin/menus', (s, d, m) => {
+    ZGet('admin/menus', ({d}) => {
       if (!this.ignore) {
         this.props.dispatch({type: 'ADMIN_MENUS_SET', payload: d})
         this.grid.setRowData(d)
         this.grid.api.hideOverlay()
       }
-    }, (m) => {
+    }, ({m}) => {
       if (!this.ignore) {
         this.grid.api.showNoRowsOverlay()
       }
@@ -32,7 +32,7 @@ const Main = React.createClass({
   deleteRowByIDs(ids) {
     const data = {ids: ids}
     this.grid.showLoading()
-    ZPost('admin/delmenus', data, (s, d, m) => {
+    ZPost('admin/delmenus', data, () => {
       this.refreshDataCallback()
     }, () => {
       this.grid.hideLoading()
@@ -137,7 +137,8 @@ const columnDefs = [{
   width: 50
 }, {
   headerName: '操作',
-  width: 150,
+  width: 80,
+  pinned: 'right',
   cellRendererFramework: OperatorsRender
 }]
 const gridOptions = {

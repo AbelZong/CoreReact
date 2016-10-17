@@ -18,7 +18,7 @@ export default connect(state => ({
     startLoading()
     ZGet({
       uri: 'print/tpl/getallsystypes',
-      success: (s, d, m) => {
+      success: ({d}) => {
         this.props.dispatch({type: 'SYSTYPES_SET', payload: d || []})
       }
     }).then(endLoading)

@@ -1,0 +1,61 @@
+.zhang {
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle;
+  position: relative;
+}
+.inputArea {
+  position: relative;
+  input {
+    cursor: pointer;
+  }
+}
+.operator {
+  position: absolute;
+  z-index:1;
+  right:8px;
+  top: 25%;
+  pointer-events: none;
+  :global(.fa-minus) {
+    pointer-events: all;
+  }
+}
+
+
+.hua {
+  :global {
+    .ant-spin {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      margin-left: -16px;
+    }
+    .ant-radio-group {
+      width: 100%;
+    }
+    .ant-radio-wrapper {
+      margin-right:0;
+      display: inline-block;
+      height: 24px;
+      width: 32%;
+      line-height: 24px;
+      float: left;
+      &:hover {
+        .ant-radio-inner {
+          border-color: #2db7f5;
+        }
+      }
+    }
+  }
+}
+.hua,
+.dataList {
+  height:380px;
+}
+
+.footer {
+}
+.filterInput {
+  float:left;
+  width: 260px;
+}

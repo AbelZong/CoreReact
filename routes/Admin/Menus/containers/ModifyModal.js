@@ -38,7 +38,7 @@ const WangWangWang = React.createClass({
           data: {
             id: nextProps.doge
           },
-          success: (s, d, m) => {
+          success: ({d}) => {
             this.props.form.setFieldsValue({
               id: d.id,
               iconName: d.icon[0],
@@ -81,7 +81,7 @@ const WangWangWang = React.createClass({
         uri = 'admin/modifymenus'
         data.id = doge
       }
-      ZPost(uri, data, (s, d, m) => {
+      ZPost(uri, data, () => {
         this.hideModal()
         EE.triggerRefreshMain()
       }, () => {
@@ -133,11 +133,7 @@ const WangWangWang = React.createClass({
             <InputGroup>
               <Col span='5'>
                 <FormItem>
-                  {getFieldDecorator('iconName', {
-                    rules: [
-                      { required: true, message: '图标名称必填' }
-                    ]
-                  })(
+                  {getFieldDecorator('iconName')(
                     <Input type='text' />
                   )}
                 </FormItem>

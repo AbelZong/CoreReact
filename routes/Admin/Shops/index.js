@@ -3,7 +3,7 @@ import {
 } from 'store/reducers'
 
 export default (store) => ({
-  path: 'shops',
+  path: 'admin/shops',
   getComponent(nextState, cb) {
     require.ensure([], (require) => {
       const Shop = require('./containers/Container').default

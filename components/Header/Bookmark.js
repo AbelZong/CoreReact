@@ -1,15 +1,12 @@
 import React from 'react'
 import { findDOMNode } from 'react-dom'
 import update from 'react-addons-update'
-//import { IndexLink, Link } from 'react-router'
 import {Menu, Icon} from 'antd'
 import {connect} from 'react-redux'
 import classNames from 'classnames'
 import styles from './Header.scss'
 import Scrollbar from 'components/Scrollbars/index'
 import {changeBookmark} from 'containers/modules/actions'
-
-//const SubMenu = Menu.SubMenu
 
 const Bookmark = React.createClass({
   // propTypes: {

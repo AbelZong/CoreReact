@@ -35,7 +35,7 @@ const WangWangWang = React.createClass({
           data: {
             id: nextProps.doge
           },
-          success: (s, d, m) => {
+          success: ({d}) => {
             this.props.form.setFieldsValue(d)
             this.setState({
               title: `修改 [${d.id}]: ${d.name}`,
@@ -72,7 +72,7 @@ const WangWangWang = React.createClass({
         data.id = doge
         isModify = true
       }
-      ZPost(uri, data, (s, d, m) => {
+      ZPost(uri, data, ({d}) => {
         const dd = {
           id: d.id,
           name: d.name,

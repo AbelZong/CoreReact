@@ -85,7 +85,33 @@ export function animationEnd(element, callback, flag) {
     addFixedEventListener(element, 'AnimationEnd', callback)
   }
 }
-
+export function listToTree(_data, options) {
+  const data = [].concat(_data)
+  const ID_KEY = options && options.idKey || 'id'
+  const PARENT_KEY = options && options.parentKey || 'parent'
+  const CHILDREN_KEY = options && options.childrenKey || 'children'
+  const tree = []
+  const childrenOf = {}
+  let item
+  let id
+  let parentId
+  let i = 0
+  const len = data.length
+  for (i; i < len; i++) {
+    item = data[i]
+    id = item[ID_KEY]
+    parentId = item[PARENT_KEY] || 0
+    childrenOf[id] = childrenOf[id] || []
+    item[CHILDREN_KEY] = childrenOf[id]
+    if (parentId !== 0) {
+      childrenOf[parentId] = childrenOf[parentId] || []
+      childrenOf[parentId].push(item)
+    } else {
+      tree.push(item)
+    }
+  }
+  return tree
+}
 const whichTransitionEvent = (() => {
   const el = document.createElement('fakeElement')
   const transitions = {

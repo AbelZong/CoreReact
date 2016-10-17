@@ -2,14 +2,16 @@ import React from 'react'
 import {connect} from 'react-redux'
 import {endLoading} from 'utils'
 import styles from 'components/App.scss'
-
 import Wrapper from 'components/MainWrapper'
-
 import Toolbar from './Toolbar'
 import Main from './Main'
+import ApiLog from './ApiLog'
 
 class Container extends React.Component {
   componentWillMount = () => {
+    if (this.props.location.query.code !== undefined) {
+      window.close()
+    }
     this.refreshDataCallback()
   }
   componentDidMount = () => {
@@ -17,14 +19,14 @@ class Container extends React.Component {
   componentWillUnmount = () => {
   }
   refreshDataCallback = () => {
-    console.warn('getFirst Data')
     endLoading()
   }
   render() {
     return (
       <div className={`${styles.content} flex-column`}>
-        <Toolbar />
+        <Toolbar ref='mytoolbar' />
         <Main />
+        <ApiLog />
       </div>
     )
   }

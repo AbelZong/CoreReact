@@ -33,7 +33,7 @@ class Lock extends React.Component {
     const data = {
       password
     }
-    return ZPost('profile/unlock', data, (s, d, m) => {
+    return ZPost('profile/unlock', data, () => {
       this.props.dispatch({ type: 'LOCKED_SET', payload: false })
     }, () => {
       this.refs.lockInput.focus()

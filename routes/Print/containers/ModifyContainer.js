@@ -45,10 +45,10 @@ class Layout extends Component {
     if (my_id === null) {
       this.props.dispatch({type: 'PM_ROLELV_SET', payload: 1})
     }
-    ZGet(uri, params, (s, d, m) => {
+    ZGet(uri, params, ({d}) => {
       this.props.dispatch(initRender(d, window.ZCH))
       //dispatch({type: 'ACCESSLEVEL_ALLOW'})
-    }, (m, s, d) => {
+    }, () => {
       this.props.dispatch({type: 'ACCESSLEVEL_FORBID'})
     }).then(() => {
       this.props.dispatch({type: 'ENTERING_STOP'})

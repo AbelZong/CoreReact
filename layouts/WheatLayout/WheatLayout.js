@@ -27,7 +27,7 @@ const WheatLayout = React.createClass({
 //fuck end
   componentWillMount() {
     startLoading()
-    return ZGet('profile/refresh', (s, d, m) => {
+    return ZGet('profile/refresh', ({d}) => {
       this.props.dispatch({ 'type': 'ENTERING_SET', payload: false })
       if (d.isLocked && this.props.locked) {
         this.props.dispatch({ type: 'LOCKED_SET', payload: true })

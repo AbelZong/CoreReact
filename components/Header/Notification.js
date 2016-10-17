@@ -28,7 +28,7 @@ class ReadCellRenderer extends React.Component {
   handleClick = (e) => {
     e.stopPropagation()
     const data = {ids: [this.props.data.Id]}
-    ZPost('profile/msgread', data, (s, d, m) => {
+    ZPost('profile/msgread', data, () => {
       this.props.data.Isreaded = true
       this.props.refreshCell()
     })
@@ -102,10 +102,12 @@ const Notification = React.createClass({
   handleLevel(checkedValues) {
     defLevels = checkedValues
     store.set(DEFLEVELS_KEY, checkedValues)
+    this.handleSearch()
   },
   handleReaded(e) {
     defReaded = e.target.value
     store.set(DEFREADED_KEY, defReaded)
+    this.handleSearch()
   },
   handleSearch() {
     if (!this.grid) {
@@ -115,16 +117,17 @@ const Notification = React.createClass({
     this._firstBlood()
   },
   handleBatch(event) {
-    const nodeArr = this.grid.api.selectionController.selectedNodes
-    var selectIds = []
-    Object.keys(nodeArr).forEach((index) => {
-      selectIds.push(nodeArr[index].data.Id)
-    })
-    if (selectIds.length < 1) {
+    const ids = this.grid.api.getSelectedRows().map(x => x.Id)
+    // const nodeArr = this.grid.api.selectionController.selectedNodes
+    // var selectIds = []
+    // Object.keys(nodeArr).forEach((index) => {
+    //   selectIds.push(nodeArr[index].data.Id)
+    // })
+    if (ids.length < 1) {
       return
     }
-    const data = {ids: selectIds}
-    ZPost('profile/msgread', data, (s, d, m) => {
+    const data = {ids}
+    ZPost('profile/msgread', data, () => {
       this.handleSearch()
     })
   },
@@ -140,7 +143,7 @@ const Notification = React.createClass({
       pageSize: this.grid.getPageSize(),
       page: 1
     }, _data || {})
-    ZPost('profile/msg', data, (s, d, m) => {
+    ZPost('profile/msg', data, ({d}) => {
       this.grid.setDatasource({
         total: d.total,
         rowData: d.list,
@@ -155,15 +158,15 @@ const Notification = React.createClass({
               pageSize: params.pageSize,
               page: params.page
             }
-            ZPost('profile/msg', qData, (s, d, m) => {
+            ZPost('profile/msg', qData, ({d}) => {
               params.success(d.list)
-            }, (m) => {
+            }, ({m}) => {
               params.fail(m)
             })
           }
         }
       })
-    })
+    }, this.grid.showNoRows)
   },
   openNoticeAddWindow() {
     this.props.dispatch({ type: 'NOTICE_ADD_REVER' })
@@ -177,7 +180,7 @@ const Notification = React.createClass({
     const {searchLoading} = this.state
     return (
       <Modal wrapClassName='modalTop' width='100%' title='通知' visible={visible} onCancel={this.hideModal} footer='' mname='NotificationModel'>
-        <div className='clearfix'>
+        <div className={styles.damnGH}>
           <div className={styles.levels}>
             <CheckboxGroup options={levels} defaultValue={defLevels} onChange={this.handleLevel} />
           </div>
@@ -189,14 +192,11 @@ const Notification = React.createClass({
             </RadioGroup>
             <Button type='primary' onClick={this.handleSearch} loading={searchLoading}>检索</Button>
           </div>
+          <div className='clearfix' />
         </div>
-        <div className='clearfix mt10 mb10'>
-          <div className=''>
-            <Button type='ghost' size='small' className='mr10' onClick={this.handleBatch}>批量已读</Button>
-            <Button type='ghost' size='small' shape='circle-outline' icon='reload' onClick={this.handleSearch} />
-          </div>
-        </div>
-        <ZGrid className={styles.damnGrid} onReady={this.handleGridReady} storeConfig={{ prefix: 'msg' }} paged height={398} columnDefs={defColumns} />
+        <ZGrid className={styles.damnGrid} onReady={this.handleGridReady} storeConfig={{ prefix: 'msg' }} paged height={498} columnDefs={defColumns}>
+          <Button type='ghost' size='small' className='mr10' onClick={this.handleBatch}>批量已读</Button>
+        </ZGrid>
       </Modal>
     )
   }

@@ -6,10 +6,22 @@ import styles from './index.scss'
 
 export default React.createClass({
   getInitialState: function() {
+    const {initialValue} = this.props
     return {
       visible: false,
-      value: null,
-      name: ''
+      value: initialValue ? initialValue.id : null,
+      name: initialValue ? initialValue.name : ''
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (typeof nextProps.value === 'undefined') {
+      if (this.state.value !== nextProps.value) {
+        this._setValue(null, '')
+      }
+    } else {
+      if (this.state.value !== nextProps.value.id) {
+        this._setValue(nextProps.value.id, nextProps.value.name)
+      }
     }
   },
   handleSelect() {
@@ -23,26 +35,29 @@ export default React.createClass({
     })
   },
   handleModalOk(value, name) {
+    this._setValue(value, name)
+  },
+  handleRemove(e) {
+    e.stopPropagation()
+    this._setValue('', null)
+  },
+  _setValue(value, name) {
     this.setState({
       visible: false,
       value,
       name
+    }, () => {
+      this.props.onChange && this.props.onChange({id: value, name})
     })
-    this.props.onChange && this.props.onChange(value, name)
-  },
-  handleRemove(e) {
-    e.stopPropagation()
-    this.setState({
-      name: '',
-      value: null
-    })
-    this.props.onChange && this.props.onChange(null, '')
   },
   render() {
+    const {style, className} = this.props
+    const CN = className ? `${styles.zhang} ${className}` : styles.zhang
+    const styler = style ? {width: this.props.width || 126, ...style} : {width: this.props.width || 126}
     return (
-      <div className={styles.zhang} style={{width: this.props.width || 126}}>
+      <div className={CN} style={styler}>
         <div className={styles.inputArea} onClick={this.handleSelect}>
-          <Input value={this.state.name} placeholder='供货商' size={this.props.size || 'default'} className={styles.input} />
+          <Input value={this.state.name} placeholder='指定供货商' size={this.props.size || 'default'} className={styles.input} />
           <span className={styles.operator}>
             {this.state.name !== '' ? <Icon type='minus' onClick={this.handleRemove} title='点击移除' /> : <Icon type='ellipsis-h' title='点击选择' />}
           </span>

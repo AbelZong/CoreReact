@@ -47,6 +47,9 @@ const Toolbar = React.createClass({
     return (
       <div className={styles.toolbars}>
         <div className={styles.conditionsForm}>
+          <div className='pull-right'>
+            <Button type='ghost' size='small' icon='plus' onClick={this.handleCreateNew}>新增用户</Button>
+          </div>
           <div className={styles.s1}>
             <Input addonBefore={selectBefore} placeholder='搜索关键词' ref='keyword' onPressEnter={this.handleSearch} />
           </div>
@@ -60,9 +63,7 @@ const Toolbar = React.createClass({
             <Option value='false'>禁用</Option>
           </Select>
           <Button type='primary' icon='search' className={styles.s3} onClick={this.handleSearch} loading={this.props.loading}>搜索</Button>
-        </div>
-        <div className='pull-right'>
-          <Button type='ghost' size='small' icon='plus' onClick={this.handleCreateNew}>新增用户</Button>
+          <div className='clearfix' />
         </div>
       </div>
     )

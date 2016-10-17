@@ -13,7 +13,7 @@ const FFTuan = React.createClass({
     this.ignoreCase = false
     if (visible) {
       this.setState({loading: true})
-      ZGet(mod, query, (s, d, m) => {
+      ZGet(mod, query, ({d}) => {
         if (this.ignoreCase) { return }
         this.setState({ ...d, loading: false })
       })

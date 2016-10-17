@@ -94,6 +94,39 @@
     box-sizing: border-box;
     cursor: se-resize;
   }
+[data-title] {
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+	&:after {
+		position: absolute;
+    transform: translate3d(0,0,0);
+    visibility: hidden;
+    opacity: 0;
+    z-index: 1000000;
+    pointer-events: none;
+    transition: .3s ease;
+    transition-delay: 0ms;
+	}
+	&:after {
+	  content: attr(data-title);
+		background: #383838;
+    color: #fff;
+    padding: 8px 10px;
+    font-size: 12px;
+    line-height: 12px;
+    white-space: nowrap;
+    text-shadow: 0 -1px 0 #000;
+    box-shadow: 4px 4px 8px rgba(0,0,0,.3);
+	}
+	&:hover:after {
+	  visibility: visible;
+	  opacity: 1;
+	}
+	&[data-title-right]:after {
+		left: 100%;
+	}
+}
   .ant-tooltip-inner {
     min-height: auto;
     padding: 3px 6px
@@ -149,6 +182,25 @@
       animation: Load#{$i} 2s cubic-bezier(0.645, 0.045, 0.355, 1) infinite alternate;
     }
   }
+	.hr {
+		width: 100%;
+		height:1px;
+		display: block;
+		overflow: hidden;
+		position: relative;
+		border-top: 1px solid #f5f5f5;
+		&.hr-10 {
+			margin: 10px 0;
+		}
+		&.hr-20 {
+			margin: 20px 0;
+		}
+	}
+	.ant-form {
+		.hr {
+			margin: 5px 0 15px;
+		}
+	}
   .cur {
     cursor: pointer;
   }
@@ -186,6 +238,13 @@
     margin-bottom:10px;
   }
 	.dib {
+		display: inline-block;
+	}
+	.hide {
+		display: none;
+	}
+	.help-text {
+		color: #989898;
 		display: inline-block;
 	}
 }

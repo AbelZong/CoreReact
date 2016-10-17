@@ -22,7 +22,7 @@ const FCK = React.createClass({
       this.setState({
         confirmLoading: true
       })
-      ZPost('account/password', values, (s, d, m) => {
+      ZPost('account/password', values, () => {
         this.hideModal()
       }).then(() => {
         this.setState({

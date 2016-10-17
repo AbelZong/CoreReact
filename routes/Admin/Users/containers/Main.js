@@ -27,7 +27,7 @@ const Main = React.createClass({
   deleteRowByIDs(ids) {
     const data = {IDLst: ids}
     this.grid.showLoading()
-    ZPost('XyUser/User/DeleteUser', data, (s, d, m) => {
+    ZPost('XyUser/User/DeleteUser', data, () => {
       this.refreshDataCallback()
     }, () => {
       this.grid.hideLoading()
@@ -38,6 +38,7 @@ const Main = React.createClass({
   },
   handleGridReady(grid) {
     this.grid = grid
+    //this.grid.api.setSortModel([{field: 'Account', sort: 'asc'}])
     //this.refreshDataCallback()
   },
   handleDelete() {
@@ -46,20 +47,20 @@ const Main = React.createClass({
   },
   _firstBlood(_conditions) {
     this.grid.showLoading()
-    const conditions = _conditions || this.props.conditions || {}
+    const conditions = Object.assign({}, this.props.conditions || {}, _conditions || {})
     const uri = 'XyUser/User/UserLst'
     const data = Object.assign({
       PageSize: this.grid.getPageSize(),
       PageIndex: 1
     }, conditions)
-    ZGet(uri, data, (s, d, m) => {
+    ZGet(uri, data, ({d}) => {
       if (this.ignore) {
         return
       }
       this.grid.setDatasource({
         total: d.DataCount,
         rowData: d.UserLst,
-        page: d.pageSize,
+        page: 1,
         getRows: (params) => {
           if (params.page === 1) {
             this._firstBlood()
@@ -68,7 +69,7 @@ const Main = React.createClass({
               PageSize: params.pageSize,
               PageIndex: params.page
             }, conditions)
-            ZGet(uri, qData, (s, d, m) => {
+            ZGet(uri, qData, ({d}) => {
               if (this.ignore) {
                 return
               }
@@ -119,7 +120,7 @@ const OperatorsRender = React.createClass({
   render() {
     return (
       <div className='operators'>
-        <Icon type='edit' onClick={this.handleEditClick} title='编辑用户' />
+        <Iconfa type='edit' onClick={this.handleEditClick} title='编辑用户' />
         <Iconfa type='key' onClick={this.handlePwdClick} title='修改密码' />
         <Popconfirm title='确定要删除 我 吗？' onConfirm={this.handleDeleteClick}>
           <Iconfa type='remove' />
@@ -136,7 +137,7 @@ const AbledRender = React.createClass({
     ZPost('XyUser/User/UserEnable', {
       IDLst: [this.props.data.ID],
       Enable: checked
-    }, (s, d, m) => {
+    }, () => {
       this.props.data.Enable = checked
       this.props.refreshCell()
     })
@@ -151,7 +152,8 @@ const columnDefs = [
     width: 30,
     checkboxSelection: true,
     cellStyle: {textAlign: 'center'},
-    pinned: 'left'
+    pinned: 'left',
+    suppressSorting: true
   }, {
     headerName: 'ID',
     field: 'ID',
@@ -209,6 +211,23 @@ const columnDefs = [
     headerName: '操作',
     width: 120,
     cellRendererFramework: OperatorsRender,
-    pinned: 'left'
+    pinned: 'left',
+    suppressSorting: true
   }]
-const gridOptions = {}
+const gridOptions = {
+  enableSorting: true,
+  enableServerSideSorting: true,
+  onBeforeSortChanged: function(params) {
+    const sorter = this.api.getSortModel()[0]
+    const conditions = sorter ? {
+      SortField: sorter.colId,
+      SortDirection: sorter.sort.toUpperCase()
+    } : {
+      SortField: null,
+      SortDirection: null
+    }
+    this.grid.props.dispatch({type: 'ADMIN_USERS_FILTER_CONDITIONS_UPDATE', update: {
+      $merge: conditions
+    }})
+  }
+}

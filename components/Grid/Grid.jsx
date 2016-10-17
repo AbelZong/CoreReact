@@ -2,60 +2,47 @@ import React from 'react'
 import {AgGridReact} from 'ag-grid-react'
 import {Pagination, Popconfirm, message} from 'antd'
 import {Icon} from 'components/Icon'
-import store from 'utils/store' //吃相不太好看
+import store from 'utils/store'
 import {ZHCN} from 'constants/gridLocaleText'
-const pageSizeOptions = ['10', '20', '30', '50', '100', '200']
-
+const pageSizeOptions = ['20', '50', '100', '200', '500']
 class ZGrid extends React.Component {
   constructor(props) {
     super(props)
     const {storeConfig} = props
-    this.storeConfig = Object.assign({
-      prefix: 'zh'
-    }, storeConfig)
-    if (!this.storeConfig.COLUMNS_KEY) {
-      this.storeConfig.COLUMNS_KEY = `${this.storeConfig.prefix}.columns`
+    if (storeConfig) {
+      this.storeConfig = Object.assign({
+        prefix: 'zh'
+      }, storeConfig)
+      if (!this.storeConfig.COLUMNS_KEY) {
+        this.storeConfig.COLUMNS_KEY = `${this.storeConfig.prefix}.columns`
+      }
+      if (!this.storeConfig.PAGESIZE_KEY) {
+        this.storeConfig.PAGESIZE_KEY = `${this.storeConfig.prefix}.pagesize`
+      }
+      if (!this.storeConfig.COLUMNSHIDE_KEY) {
+        this.storeConfig.COLUMNSHIDE_KEY = `${this.storeConfig.prefix}.columnsHide`
+      }
     }
-    if (!this.storeConfig.PAGESIZE_KEY) {
-      this.storeConfig.PAGESIZE_KEY = `${this.storeConfig.prefix}.pagesize`
-    }
-    if (!this.storeConfig.COLUMNSHIDE_KEY) {
-      this.storeConfig.COLUMNSHIDE_KEY = `${this.storeConfig.prefix}.columnsHide`
-    }
-    // this.cacheColumnStates = store.get(this.storeConfig.COLUMNS_KEY, null)
-    // const checkedKeys = []
-    // if (this.cacheColumnStates && this.cacheColumnStates.length) {
-    //   this.cacheColumnStates.map((item) => {
-    //     if (!item.hide) {
-    //       checkedKeys.push(item.colId)
-    //     }
-    //   })
-    // }
+    const defPageSize = Number(this.props.pageSizeDef || pageSizeOptions[0])
     this.state = {
-      //paged: paged || false, //是否开启分页
       columnsCheckedVisibe: false,
       total: 0,
       rowData: null,
-      pageSize: store.get(this.storeConfig.PAGESIZE_KEY, Number(pageSizeOptions[1])),
+      pageSize: storeConfig ? store.get(this.storeConfig.PAGESIZE_KEY, defPageSize) : defPageSize,
       current: 1
     }
-    this.cacheHideColumns = store.get(this.storeConfig.COLUMNSHIDE_KEY, [])
+    this.cacheHideColumns = storeConfig ? store.get(this.storeConfig.COLUMNSHIDE_KEY, []) : []
     this.getRowsFunc = null
-    this.gridOptions = {
-      //onModelUpdated: () => {
-        //console.log('event onModelUpdated received')
-      //},
-      grid: this.props.grid,
-      localeText: ZHCN
-    }
   }
   onGridReady = (params) => {
     this.api = params.api
-    //this.api.sizeColumnsToFit()
+    this.props.columnsFited && this.api.sizeColumnsToFit()
     this.columnApi = params.columnApi
-    const cacheColumnStates = store.get(this.storeConfig.COLUMNS_KEY, null)
-    if (cacheColumnStates) {
-      this.columnApi.setColumnState(cacheColumnStates)
+    if (this.storeConfig) {
+      const cacheColumnStates = store.get(this.storeConfig.COLUMNS_KEY, null)
+      if (cacheColumnStates) {
+        this.columnApi.setColumnState(cacheColumnStates)
+      }
     }
     //不管分不分页，默认rowData没有数据就是显示没有数据
     if (!this.props.rowData || this.props.rowData.length === 0) {
@@ -99,13 +86,24 @@ class ZGrid extends React.Component {
     this.api.showLoadingOverlay()
   }
   hideLoading = () => {
+    this.hideOverlay()
+  }
+  hideOverlay = () => {
     this.api.hideOverlay()
   }
-  setRowData = (rowData) => {
+  showNoRows = () => {
+    this.setRowData(null)
+    this.api.showNoRowsOverlay()
+  }
+  appendRows = (lst) => {
+    this.api.insertItemsAtIndex(0, lst)
+    this.hideOverlay()
+  }
+  setRowData = (rowData, cb) => {
     this.setState({
       rowData,
       total: rowData ? rowData.length : 0
-    })
+    }, cb)
   }
   setDatasource = (args) => {
     //args = {total, getRows, page, rowData, pageSize}
@@ -141,7 +139,6 @@ class ZGrid extends React.Component {
     this.api.hideOverlay()
   }
   _getRowsFail = (msg) => {
-    this.api.hideOverlay()
     this.api.showNoRowsOverlay()
   }
   getPageSize = () => {
@@ -157,12 +154,18 @@ class ZGrid extends React.Component {
         pageSize: this.state.pageSize
       })
     } else {
-      const tips = this.props.setPleaseTip || '请先 setDatasource {total, getRows, [current], [rowData]}'
-      message.warn(tips)
+      if (this.props.paged) {
+        const tips = this.props.setPleaseTip || '请先 setDatasource {total, getRows, [current], [rowData]}'
+        message.warn(tips)
+      }
     }
   }
   refreshRowData = () => {
     this.getRows(this.state.current)
+  }
+  x0pCall = (xFetch) => {
+    this.showLoading()
+    return xFetch.then(this.hideLoading)
   }
   handleColumnFilter = (checkedKeys, e) => {
     this.setState({
@@ -175,17 +178,25 @@ class ZGrid extends React.Component {
     })
   }
   removeCache = () => {
-    store.remove(this.storeConfig.COLUMNSHIDE_KEY)
-    store.remove(this.storeConfig.PAGESIZE_KEY)
-    store.remove(this.storeConfig.COLUMNS_KEY)
+    if (this.storeConfig) {
+      store.remove(this.storeConfig.COLUMNSHIDE_KEY)
+      store.remove(this.storeConfig.PAGESIZE_KEY)
+      store.remove(this.storeConfig.COLUMNS_KEY)
+    }
+    this.handlePageShowSizeChange(null, Number(this.props.pageSizeDef || pageSizeOptions[0]))
     this.columnApi.resetColumnState()
+    this.cacheHideColumns = []
   }
   _saveColumns = () => {
-    const cacheColumnStates = this.columnApi.getColumnState()
-    store.set(this.storeConfig.COLUMNS_KEY, cacheColumnStates)
+    if (this.storeConfig) {
+      const cacheColumnStates = this.columnApi.getColumnState()
+      store.set(this.storeConfig.COLUMNS_KEY, cacheColumnStates)
+    }
   }
   _saveCacheHideColumns = () => {
-    store.set(this.storeConfig.COLUMNSHIDE_KEY, this.cacheHideColumns)
+    if (this.storeConfig) {
+      store.set(this.storeConfig.COLUMNSHIDE_KEY, this.cacheHideColumns)
+    }
   }
   toggleColumnCheckedVisibe = () => {
     this.setState({
@@ -238,15 +249,27 @@ class ZGrid extends React.Component {
     this.setState({
       pageSize
     }, () => {
-      store.set(this.storeConfig.PAGESIZE_KEY, pageSize)
+      if (this.storeConfig) {
+        store.set(this.storeConfig.PAGESIZE_KEY, pageSize)
+      }
       this.getRows(1)
     })
   }
   render() {
-    const {columnDefs, height, paged, className, gridOptions, children} = this.props
+    const {columnDefs, height, paged, className, gridOptions, children, pagesAlign} = this.props
     const rowData = this.state.rowData || this.props.rowData
     const CN = className ? `z-grid ${className}` : 'z-grid'
-    const _gridOptions = Object.assign({}, this.gridOptions, gridOptions)
+    const _gridOptions = Object.assign({
+      grid: this.props.grid
+    }, GOD, gridOptions)
+    let footerCN = 'footer clearfix'
+    if (pagesAlign === 'left') {
+      footerCN = `${footerCN} pages-left`
+    }
+    //cracked!
+    if (columnDefs[0].checkboxSelection && columnDefs[0].headerName === '#') {
+      columnDefs[0].headerCellTemplate = headerCellTemplate
+    }
     return (
       <div className={CN} style={{height: height || 'auto'}}>
         <div className='grid-inner'>
@@ -258,28 +281,24 @@ class ZGrid extends React.Component {
               onColumnResized={this.agColumnResized}
               onColumnMoved={this.agColumnMoved}
               onColumnVisible={this.agColumnVisible}
-
               columnDefs={columnDefs}
               rowData={rowData}
-
-              rowSelection='multiple'
-              enableColResize='true'
               rowHeight='32'
             />
           </div>
-          <div className='footer clearfix'>
-            {children}
+          <div className={footerCN}>
+            <div className='op-l'>{children}</div>
             <div className='op-r'>
               {paged && (
-                <a title='刷新容器' className='cur' onClick={this.refreshRowData}><Icon type='refresh' spin={false} /></a>
+                <span>
+                  <Pagination size='small' current={this.state.current} pageSize={this.state.pageSize} onChange={this.handlePageChange} onShowSizeChange={this.handlePageShowSizeChange} total={this.state.total} showSizeChanger showQuickJumper pageSizeOptions={pageSizeOptions} showTotal={total => `共 ${total} 条`} />
+                  <a title='刷新容器' className='cur' onClick={this.refreshRowData}><Icon type='refresh' spin={false} /></a>
+                </span>
               )}
               <a title='显示隐藏列名' className='cur' onClick={this.toggleColumnCheckedVisibe}><Icon type='eye-slash' /></a>
               <Popconfirm placement='leftBottom' title='确定要恢复容器默认设置吗？' onConfirm={this.removeCache}><a title='恢复容器默认设置' className='cur'><Icon type='eraser' /></a>
               </Popconfirm>
             </div>
-            {paged && (
-              <Pagination size='small' current={this.state.current} pageSize={this.state.pageSize} onChange={this.handlePageChange} onShowSizeChange={this.handlePageShowSizeChange} total={this.state.total} showSizeChanger showQuickJumper pageSizeOptions={pageSizeOptions} showTotal={total => `共 ${total} 条`} />
-            )}
           </div>
           {this.state.columnsCheckedVisibe && this.renderColumnsChecked()}
         </div>
@@ -287,5 +306,24 @@ class ZGrid extends React.Component {
     )
   }
 }
-
+const headerCellTemplate = (params) => {
+  const cb = document.createElement('input')
+  cb.setAttribute('type', 'checkbox')
+  cb.setAttribute('id', 'selectAllCheckbox')
+  const eHeader = document.createElement('label')
+  eHeader.appendChild(cb)
+  cb.addEventListener('change', function(e) {
+    const selected = e.target.checked
+    params.api.forEachNode(function(node) {
+      node.setSelected(selected)
+    })
+  })
+  return eHeader
+}
+const GOD = {
+  localeText: ZHCN,
+  rowSelection: 'multiple',
+  //suppressRowClickSelection: true,
+  enableColResize: true
+}
 export default ZGrid

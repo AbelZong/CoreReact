@@ -1,0 +1,112 @@
+.toolbars {
+  padding: 10px 5px 15px 10px;
+}
+.main {
+  padding-left:10px;
+  padding-right:5px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  :global(.z-grid) {
+    :global(.ag-row:hover) {
+        background-color: #f5f5f5;
+    }
+    :global(.ag-group-value > div) {
+      display: inherit;
+    }
+  }
+}
+.listMain {
+  position: relative;
+  display: flex;
+  min-height:150px;
+}
+.detailMain {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.toolbars2 {
+  position: relative;
+  .drager {
+    position: absolute;
+    left:0;right:0;
+    top:0;bottom:0;
+    cursor: row-resize;
+    z-index:0;
+  }
+  .inner {
+    z-index: 1;
+  }
+}
+.toolbars4 {
+  margin-bottom: 10px;
+}
+.detailTable {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height:150px;
+}
+.toolbars3 {
+  padding: 10px;
+}
+.liner {
+  height: 5px;
+  background-color:#f1f1f1;
+  position: absolute;
+  left:0;right:0;
+}
+.detailName {
+  font-size: 14px;
+  margin-right: 20px;
+  letter-spacing: 3px;
+  position: relative;
+  line-height: 30px;
+}
+.listWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  .status {
+    text-align: center;
+  }
+  .status0 {
+    color: #666;
+    background-color: #fde7ab;
+  }
+  .status1 {
+    background-color: rgb(171, 212, 110);
+    color: rgb(255, 255, 255);
+  }
+  .status2 {
+    background-color: rgb(0, 159, 60);
+    color: rgb(255, 255, 255);
+  }
+  .status3 {
+    color: #0a87ba;
+    background-color:#c6e3ef;
+  }
+  .status4 {
+    color: #fff;
+    background-color:#009f3c;
+  }
+  .status5 {
+    background-color: rgb(255, 0, 0);
+    color: rgb(255, 255, 255);
+  }
+}
+.topOperators {
+  display: flex;
+  flex-direction: row;
+  padding-bottom: 4px;
+  .Hleft {
+    flex: 1;
+  }
+  .Hright {
+    flex-basis: 150px;
+    text-align: right;
+  }
+}

@@ -26,7 +26,7 @@ class Preview extends Component {
   componentWillMount() {
     ZGet('print/tpl/emu_data', {
       type: window.ZCH.type
-    }, (s, d, m) => {
+    }, ({d}) => {
       this.setState({
         emus: d.emu_data
       })

@@ -29,7 +29,7 @@ const WangWangWang = React.createClass({
       } else {
         ZGet({
           uri: 'role/rolelist',
-          success: (s, d, m) => {
+          success: ({d}) => {
             this.setState({
               roles: d
             })
@@ -48,7 +48,7 @@ const WangWangWang = React.createClass({
             data: {
               id: nextProps.doge
             },
-            success: (s, d, m) => {
+            success: ({d}) => {
               this.props.form.setFieldsValue({
                 id: d.ID,
                 Account: d.Account,
@@ -61,7 +61,7 @@ const WangWangWang = React.createClass({
                 RoleID: d.RoleID + ''
               })
               this.setState({
-                title: `修改 [${d.ID}]: ${d.Name}`,
+                title: `修改用户 ID: ${d.ID}`,
                 visible: true,
                 confirmLoading: false
               })
@@ -92,7 +92,7 @@ const WangWangWang = React.createClass({
         uri = 'XyUser/User/UpdateUser'
         data.id = doge
       }
-      ZPost(uri, data, (s, d, m) => {
+      ZPost(uri, data, () => {
         this.hideModal()
         EE.triggerRefreshMain()
       }, () => {
@@ -201,7 +201,7 @@ const WangWangWang = React.createClass({
                   valuePropName: 'checked',
                   initialValue: true
                 })(
-                  <Switch />
+                  <Switch disabled={this.props.doge > 0} />
                 )}
               </FormItem>
             </Col>

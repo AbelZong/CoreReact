@@ -1,0 +1,79 @@
+.modal {
+  :global {
+    .ant-modal-body {
+          padding: 10px 3px 0;
+    }
+    .ant-modal-footer {
+      padding: 8px;
+    }
+    .ag-fresh {
+      .ag-root {
+        border-bottom: 1px solid #f6f6f6;
+      }
+    }
+  }
+}
+.status {
+  text-align: center;
+  &.statustrue {
+    color: #fff;
+    background-color: #009f3c;
+  }
+  &.statusfalse {
+    color: #fff;
+    background-color: red;
+  }
+}
+.zhang {
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle;
+  position: relative;
+}
+.inputArea {
+  position: relative;
+  input {
+    cursor: pointer;
+  }
+}
+.operator {
+  position: absolute;
+  z-index:2;
+  right:8px;
+  top: 25%;
+  pointer-events: none;
+  :global(.fa-minus) {
+    pointer-events: all;
+  }
+}
+.hua {
+  height:478px;
+  display: flex;
+  flex-direction: column;
+}
+.toolbars {
+  flex-basis: 35px;
+  padding: 0 10px;
+  :global {
+    .ant-form-inline .ant-form-item {
+      margin-right: 2px;
+    }
+  }
+}
+.footerBtns {
+  margin-right: 9px;
+  :global(.ant-btn) {
+    margin-left:4px;
+  }
+}
+.zhangs {
+  :global {
+    .ant-select-selection--single {
+      height: 22px;
+      .ant-select-selection__rendered {
+        height: 22px;
+        line-height: 20px;
+      }
+    }
+  }
+}

@@ -537,7 +537,7 @@ export function saveSys(sys_id, type) {
       }
     }
     const uri = sys_id > 0 ? 'print/tpl/modifySys' : 'print/tpl/createSys'
-    ZPost(uri, save_data, (s, d, m) => {
+    ZPost(uri, save_data, ({d}) => {
       if (sys_id > 0) {
         message.success('保存模板成功')
       } else {
@@ -581,7 +581,7 @@ export function saveTpl(my_id, sys_id, type) {
       }
     }
     const uri = my_id > 0 ? 'print/tpl/modifyMy' : 'print/tpl/createMy'
-    ZPost(uri, save_data, (s, d, m) => {
+    ZPost(uri, save_data, ({d}) => {
       if (my_id > 0) {
         message.success('保存模板成功')
       } else {

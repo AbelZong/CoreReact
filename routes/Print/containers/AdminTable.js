@@ -46,7 +46,7 @@ const AdminTable = React.createClass({
   deleteRowByIDs(ids) {
     const data = {ids: ids}
     this.grid.showLoading()
-    ZPost('print/tpl/delsyses', data, (s, d, m) => {
+    ZPost('print/tpl/delsyses', data, () => {
       this.refreshRowData()
     }, () => {
       this.grid.hideLoading()
@@ -82,7 +82,7 @@ const AdminTable = React.createClass({
       page: 1,
       type: activeTypeID
     }
-    ZGet(uri, data, (s, d, m) => {
+    ZGet(uri, data, ({d}) => {
       this.grid.setDatasource({
         total: d.total,
         rowData: d.list,
@@ -96,7 +96,7 @@ const AdminTable = React.createClass({
               page: params.page,
               type: activeTypeID
             }
-            ZGet(uri, qData, (s, d, m) => {
+            ZGet(uri, qData, ({d}) => {
               params.success(d.list)
             }, (m) => {
               params.fail(m)

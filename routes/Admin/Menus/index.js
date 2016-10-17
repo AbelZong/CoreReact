@@ -3,7 +3,7 @@ import {
 } from 'store/reducers'
 
 export default (store) => ({
-  path: 'menus',
+  path: 'admin/menus',
   getComponent(nextState, cb) {
     require.ensure([], (require) => {
       const container = require('./containers/Container').default

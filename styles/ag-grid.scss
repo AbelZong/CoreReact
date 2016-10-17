@@ -22,11 +22,15 @@
 
   .ag-fresh {
     line-height: 1.4;
-    //font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 14px;
     color: #777;
-    /* this is for the rowGroupPanel, that appears along the top of the grid */
-    /* this is for the column drops that appear in the toolPanel */
+    .ag-cell-edit-input {
+      color: #444;
+    }
+    #selectAllCheckbox {
+      margin-top: 5px;
+      cursor: pointer;
+    }
   }
 
   .ag-fresh .ag-cell {
@@ -39,15 +43,30 @@
   }
 
   .ag-fresh .ag-root {
-    border: 1px solid #d4d4d4;
+    border: 1px solid #e2e2e2;
   }
 
   .ag-fresh .ag-cell-not-inline-editing {
     padding: 2px;
+    &.editable {
+      padding-left: 14px;
+      &:before {
+        position: absolute;
+        left:0;
+        content: "\E692";
+        font-size:12px;
+        font-family: anticon!important;
+        display: block;
+      }
+    }
   }
 
   .ag-fresh .ag-cell-range-selected-1:not(.ag-cell-focus) {
-    background-color: rgba(120,120,120,0.4);
+    background-color: #2EB6F5;
+    color:#fff;
+    a {
+      color: #fff;
+    }
   }
 
   .ag-fresh .ag-cell-range-selected-2:not(.ag-cell-focus) {
@@ -77,6 +96,12 @@
   .ag-fresh .ag-cell-focus {
     border: 1px solid transparent;
     outline: 0;
+    background-color: #2DB7F5;
+    box-shadow: inset 0 0 12px hsla(0,0%,100%,.75);
+    color: #fff;
+    a {
+      color: #fff;
+    }
   }
 
   .ag-fresh .ag-cell-no-focus {
@@ -88,7 +113,7 @@
   }
 
   .ag-fresh .ag-cell-first-right-pinned {
-    border-left: 1px solid #dedede;
+    border-left: 1px dashed #dedede;
   }
 
   .ag-fresh .ag-cell-last-left-pinned {
@@ -152,6 +177,21 @@
 
   .ag-fresh .ag-large-text {
     border: 1px solid #dedede;
+    position: relative;
+    &:after {
+      position: absolute;
+    font-size: 12px;
+    bottom: 0;
+    right: 8px;
+    content: '\6309\56DE\8F66\4FDD\5B58';
+    color: #f1f1f1;
+    }
+    .ag-large-textarea {
+      textarea {
+        border: 0;
+        outline: 0;
+      }
+    }
   }
 
   .ag-fresh .ag-header {
@@ -201,7 +241,7 @@
   }
 
   .ag-fresh .ag-header-cell-label {
-    padding: 4px 2px;
+    padding: 2px;
   }
 
   .ag-fresh .ag-header-cell-text {
@@ -262,6 +302,9 @@
     i.anticon {
       color: #545454 !important;
     }
+    a {
+      color: #fff;
+    }
   }
 
   .ag-fresh .ag-floating-top .ag-row {
@@ -275,19 +318,17 @@
   .ag-fresh .ag-overlay-loading-wrapper {
     background-color: rgba(255,255,255,0.5);
   }
-
   .ag-fresh .ag-overlay-loading-center {
     background-color: #fff;
-    border: 1px solid #dedede;
-    border-radius: 10px;
+    border: 1px solid #f6f6f6;
+    border-radius: 0;
     padding: 10px;
     color: #000;
   }
-
   .ag-fresh .ag-overlay-no-rows-center {
     background-color: #fff;
-    border: 1px solid #dedede;
-    border-radius: 10px;
+    border: 1px solid #f6f6f6;
+    border-radius: 0;
     padding: 10px;
   }
 
@@ -326,11 +367,12 @@
   }
 
   .ag-fresh .ag-menu {
-    border: 1px solid #dedede;
-    background-color: #f6f6f6;
+    border: 1px solid #f5f5f5;
+    background-color: #f9f9f9;
     cursor: default;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
     font-size: 14px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
   }
 
   .ag-fresh .ag-menu .ag-tab-header {
@@ -360,7 +402,8 @@
   }
 
   .ag-fresh .ag-menu-option-active {
-    background-color: #bde2e5;
+    background-color: #2EB6F5;
+    color: #fff;
   }
 
   .ag-fresh .ag-menu-option-icon {
@@ -414,6 +457,10 @@
 
   .ag-fresh .ag-selection-checkbox {
     padding-right: 4px;
+    padding-left: 2px;
+    img {
+      cursor: pointer;
+    }
   }
 
   .ag-fresh .ag-paging-panel {
@@ -610,11 +657,17 @@
         i.anticon,
         i.fa {
           margin-left:2px;
-          margin-right:3px;
+          margin-right:4px;
           cursor: pointer;
           font-size: 14px;
+          &:hover {
+            transform: scale(1.25);
+          }
         }
       }
+    }
+    .ant-input-number {
+      height: 30px;
     }
     .grid-inner {
       position: absolute;
@@ -681,25 +734,22 @@
       }
     }
     .footer {
-      flex-basis: 40px;
-      line-height: 40px;
-      &:after {
-        content: " ";
-        display: block;
-        height: 0;
-        clear: both;
-        overflow: hidden;
-        visibility: hidden;
-      }
+      flex-basis: 36px;
+      line-height: 36px;
       .ant-pagination {
-        float: right;
+        float: left;
         margin:8px;
         &.mini .ant-pagination-options-quick-jumper input {
           margin:0 3px;
         }
       }
+      .op-l {
+        float:left;
+        display: inline-block;
+      }
       .op-r {
         float: right;
+        display: inline-block;
         margin-left: 6px;
         margin-right: 12px;
         .cur {
@@ -710,6 +760,15 @@
           &:hover {
             color:#2db7f5;
           }
+        }
+      }
+      &.pages-left {
+        .op-l {
+          float:right;
+        }
+        .op-r {
+          float: left;
+          margin-right: 5px;
         }
       }
     }

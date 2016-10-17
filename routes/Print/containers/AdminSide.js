@@ -33,7 +33,7 @@ const AdminSide = React.createClass({
       data: {
         id
       },
-      success: (s, d, m) => {
+      success: () => {
         const item = systypes.filter((x) => x.id === id)[0]
         if (item) {
           const index = systypes.indexOf(item)

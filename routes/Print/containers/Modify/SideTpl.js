@@ -24,7 +24,7 @@ class SideTpl extends Component {
     })
   }
   componentDidMount() {
-    ZGet('print/tpl/sideTpls', { type: window.ZCH.type }, (s, d, m) => {
+    ZGet('print/tpl/sideTpls', { type: window.ZCH.type }, ({d}) => {
       this.setState({
         loading: false,
         myTpls: d.myTpls || [],
@@ -47,7 +47,7 @@ class SideTpl extends Component {
     return { myTpl, index: myTpls.indexOf(myTpl) }
   }
   setDefedClick(my_tpl_id) {
-    ZPost('print/side/setdefed', { my_tpl_id }, (s, d, m) => {
+    ZPost('print/side/setdefed', { my_tpl_id }, () => {
       const { index } = this.findMyTpl(my_tpl_id)
       const updateObj = {
         [index]: {
@@ -86,7 +86,7 @@ class SideTpl extends Component {
       return
     }
     if (window.confirm('确定删除选定的模板？')) {
-      ZPost('print/side/remove', { my_tpl_id }, (s, d, m) => {
+      ZPost('print/side/remove', { my_tpl_id }, () => {
         const { index } = this.findMyTpl(my_tpl_id)
         this._updateState({
           myTpls: {

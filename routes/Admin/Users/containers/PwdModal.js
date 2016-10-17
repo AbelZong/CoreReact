@@ -23,7 +23,7 @@ const Huaer = React.createClass({
       ZPost('XyUser/User/ModifyPassWord', {
         ID: this.props.doge,
         newPwd: values.newPwd
-      }, (s, d, m) => {
+      }, () => {
         this.hideModal()
       }).then(() => {
         this.setState({
