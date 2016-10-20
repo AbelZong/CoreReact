@@ -1,6 +1,6 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import styles from './Users.scss'
+import styles from './index.scss'
 import {Button, Input, Select} from 'antd'
 const Option = Select.Option
 

@@ -17,6 +17,8 @@ import AdminCompanyRoute from './Admin/Company'
 import AdminAccessRoute from './Admin/Access'
 import PurchaseListRoute from './Purchase/List'
 import CompanyClientsRoute from './Company/Clients'
+import AdminWarehousesRoute from './Admin/Warehouses'
+//import AdminCompanyRoute from './Admin/Company'
 // const QQ = require.context('./__ENTERIES__', false, /\.js$/)
 // console.dir(QQ)
 // console.log(QQ.keys())
@@ -67,6 +69,7 @@ export const createRoutes = (store) => ([
       AdminAccessRoute(store),
       PurchaseListRoute(store),
       CompanyClientsRoute(store),
+      AdminWarehousesRoute(store),
       NotFoundRoute
     ],
     ignoreScrollBehavior: true

@@ -1,35 +1,59 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import styles from './Company.scss'
-import { Input, Button } from 'antd'
-const InputGroup = Input.Group
-import classNames from 'classnames'
+import styles from './index.scss'
+import {Button, Input, Select} from 'antd'
+const Option = Select.Option
 
-class Toolbar extends React.Component {
-
+const Toolbar = React.createClass({
+  getInitialState: function() {
+    return {
+      enabled: 'true'
+    }
+  },
+  componentDidMount() {
+    setTimeout(() => {
+      this.handleSearch()
+    }, 200)
+  },
+  handleCreateNew() {
+    this.props.dispatch({type: 'ADMIN_COMPANY_VIS_SET', payload: 0})
+  },
+  handleSelect2(value) {
+    this.setState({
+      enabled: value
+    })
+  },
+  handleSearch() {
+    const {enabled} = this.state
+    this.props.dispatch({type: 'ADMIN_COMPANY_FILTER_CONDITIONS_SET', payload: {
+      Filter: this.refs.keyword.refs.input.value,
+      Enable: enabled
+    }})
+  },
   render() {
-    const { size, placeholder } = this.props
-    const btnCls = classNames({
-      'ant-search-btn': true,
-      'ant-search-btn-noempty': !!this.state.value.trim()
-    })
-    const searchCls = classNames({
-      'ant-search-input': true,
-      'ant-search-input-focus': this.state.focus
-    })
     return (
       <div className={styles.toolbars}>
-        <InputGroup className={searchCls}>
-          <Input placeholder={placeholder} value={this.state.value} onChange={this.handleInputChange}
-            onFocus={this.handleFocusBlur} onBlur={this.handleFocusBlur} onPressEnter={this.handleSearch}
-          />
-          <div className='ant-input-group-wrap'>
-            <Button icon='search' className={btnCls} size={size} onClick={this.handleSearch} />
+        <div className='pull-right'>
+          <Button type='ghost' size='small' icon='plus' onClick={this.handleCreateNew}>新增公司</Button>
+        </div>
+        <div className={styles.conditionsForm}>
+          <div className={styles.s1}>
+            <Input placeholder='搜索关键词' ref='keyword' onPressEnter={this.handleSearch} />
           </div>
-        </InputGroup>
+          <Select
+            className={styles.s2}
+            value={this.state.enabled}
+            onChange={this.handleSelect2}>
+            <Option value='all'>全部状态</Option>
+            <Option value='true'>启用</Option>
+            <Option value='false'>禁用</Option>
+          </Select>
+          <Button type='primary' icon='search' className={styles.s3} onClick={this.handleSearch} loading={this.props.loading}>搜索</Button>
+        </div>
       </div>
     )
   }
-}
-
-export default connect()(Toolbar)
+})
+export default connect(state => ({
+  loading: state.admin_company_loading
+}))(Toolbar)
