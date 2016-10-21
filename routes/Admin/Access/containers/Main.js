@@ -61,7 +61,6 @@ const defColumns = [
 const gridOptions = {}
 const Main = React.createClass({
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps)
     this._firstBlood(nextProps.conditions)
   },
   refreshDataCallback() {

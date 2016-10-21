@@ -1,9 +1,25 @@
 import React from 'react'
-import { Form, Input, Modal, Switch, Row, Col, Radio } from 'antd'
-import {connect} from 'react-redux'
-import {ZGet, ZPost} from 'utils/Xfetch'
+import {
+  Form,
+  Input,
+  Modal,
+  Switch,
+  Row,
+  Col,
+  Radio
+} from 'antd'
+import {
+  connect
+} from 'react-redux'
+import {
+  ZGet,
+  ZPost
+} from 'utils/Xfetch'
 import EE from 'utils/EE'
-import {startLoading, endLoading} from 'utils'
+import {
+  startLoading,
+  endLoading
+} from 'utils'
 const createForm = Form.create
 const FormItem = Form.Item
 const DEFAULT_TITLE = '创建新公司'
@@ -106,7 +122,7 @@ export default connect(state => ({
           <Row>
             <Col sm={12}>
               <FormItem {...formItemLayout} label='账号'>
-                {getFieldDecorator('Account', {
+                {getFieldDecorator('User.Account', {
                   rules: [
                     { required: true, whitespace: true, message: '必填' }
                   ]
@@ -117,7 +133,7 @@ export default connect(state => ({
             </Col>
             <Col sm={12}>
               <FormItem {...formItemLayout} label='用户名'>
-                {getFieldDecorator('Name', {
+                {getFieldDecorator('User.Name', {
                   rules: [
                     { required: true, whitespace: true, message: '必填' }
                   ]
@@ -130,7 +146,7 @@ export default connect(state => ({
           <Row>
             <Col sm={12}>
               <FormItem {...formItemLayout} label='密码'>
-                {getFieldDecorator('Password', {
+                {getFieldDecorator('User.Password', {
                   rules: [
                     { required: true, min: 6, message: '至少6位' },
                     { validator: this.checkPwd }
@@ -142,7 +158,7 @@ export default connect(state => ({
             </Col>
             <Col sm={12}>
               <FormItem {...formItemLayout} label='性别'>
-                {getFieldDecorator('Gender', {
+                {getFieldDecorator('User.Gender', {
                   initialValue: '男'
                 })(
                   <RadioGroup>
@@ -156,7 +172,7 @@ export default connect(state => ({
           <Row>
             <Col sm={12}>
               <FormItem {...formItemLayout} label='邮箱'>
-                {getFieldDecorator('Email', {
+                {getFieldDecorator('User.Email', {
                   initialValue: ''
                 })(
                   <Input type='email' />
@@ -165,7 +181,7 @@ export default connect(state => ({
             </Col>
             <Col sm={12}>
               <FormItem {...formItemLayout} label='QQ'>
-                {getFieldDecorator('QQ', {
+                {getFieldDecorator('User.QQ', {
                   initialValue: ''
                 })(
                   <Input type='text' />
@@ -176,7 +192,7 @@ export default connect(state => ({
           <Row>
             <Col sm={12}>
               <FormItem {...formItemLayout} label='手机号'>
-                {getFieldDecorator('Mobile', {
+                {getFieldDecorator('User.Mobile', {
                   initialValue: '',
                   rules: [
                     { required: true, whitespace: true, message: '必填' }
@@ -243,7 +259,7 @@ export default connect(state => ({
             {getFieldDecorator('Com.mobile', {
               initialValue: ''
             })(
-              <Input type='email' />
+              <Input type='mobile' />
             )}
           </FormItem>
           <FormItem {...formItemLayout} label='简介'>

@@ -1,12 +1,23 @@
 import React from 'react'
-import {connect} from 'react-redux'
-import {ZGet, ZPost} from 'utils/Xfetch'
+import {
+  connect
+} from 'react-redux'
+import {
+  ZGet,
+  ZPost
+} from 'utils/Xfetch'
 import ZGrid from 'components/Grid/index'
 import styles from './index.scss'
 import Wrapper from 'components/MainWrapper'
-import {Checkbox} from 'antd'
-import {Icon as Iconfa} from 'components/Icon'
-import {reactCellRendererFactory} from 'ag-grid-react'
+import {
+  Checkbox
+} from 'antd'
+import {
+  Icon as Iconfa
+} from 'components/Icon'
+import {
+  reactCellRendererFactory
+} from 'ag-grid-react'
 
 const Main = React.createClass({
   componentWillReceiveProps(nextProps) {
@@ -26,10 +37,6 @@ const Main = React.createClass({
   },
   handleGridReady(grid) {
     this.grid = grid
-  },
-  handleDelete() {
-    const ids = this.grid.api.getSelectedRows().map(x => x.ID)
-    this.deleteRowByIDs(ids)
   },
   _firstBlood(_conditions) {
     const conditions = Object.assign({}, this.props.conditions || {}, _conditions || {})
@@ -73,7 +80,7 @@ const Main = React.createClass({
   render() {
     return (
       <div className={styles.main}>
-        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'admin_brands' }} columnDefs={columnDefs} paged grid={this} />
+        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'admin_company' }} columnDefs={columnDefs} paged grid={this} />
       </div>
     )
   }
@@ -100,10 +107,10 @@ const AbledRender = React.createClass({
     e.stopPropagation()
     const checked = e.target.checked
     ZPost('Company/CompanyEnable', {
-      IDLst: [this.props.data.ID],
+      IDList: [this.props.data.id],
       Enable: checked
     }, () => {
-      this.props.data.Enable = checked
+      this.props.data.enable = checked
       this.props.refreshCell()
     })
   },

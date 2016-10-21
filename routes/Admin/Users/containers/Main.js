@@ -1,12 +1,25 @@
 import React from 'react'
-import {connect} from 'react-redux'
-import {ZGet, ZPost} from 'utils/Xfetch'
+import {
+  connect
+} from 'react-redux'
+import {
+  ZGet,
+  ZPost
+} from 'utils/Xfetch'
 import ZGrid from 'components/Grid/index'
 import styles from './Users.scss'
 import Wrapper from 'components/MainWrapper'
-import {Icon, Popconfirm, Checkbox} from 'antd'
-import {Icon as Iconfa} from 'components/Icon'
-import {reactCellRendererFactory} from 'ag-grid-react'
+import {
+  Icon,
+  Popconfirm,
+  Checkbox
+} from 'antd'
+import {
+  Icon as Iconfa
+} from 'components/Icon'
+import {
+  reactCellRendererFactory
+} from 'ag-grid-react'
 
 const Main = React.createClass({
   componentWillReceiveProps(nextProps) {
@@ -90,7 +103,7 @@ const Main = React.createClass({
       <div className={styles.main}>
         <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'admin_users' }} columnDefs={columnDefs} paged grid={this}>
           批量：
-          <Popconfirm title='确定要删除 我 吗？' onConfirm={this.handleDelete}>
+          <Popconfirm title='确定要删除吗？' onConfirm={this.handleDelete}>
             <Icon type='delete' className='cur' />
           </Popconfirm>
         </ZGrid>
@@ -122,7 +135,7 @@ const OperatorsRender = React.createClass({
       <div className='operators'>
         <Iconfa type='edit' onClick={this.handleEditClick} title='编辑用户' />
         <Iconfa type='key' onClick={this.handlePwdClick} title='修改密码' />
-        <Popconfirm title='确定要删除 我 吗？' onConfirm={this.handleDeleteClick}>
+        <Popconfirm title='确定要删除吗？' onConfirm={this.handleDeleteClick}>
           <Iconfa type='remove' />
         </Popconfirm>
       </div>
@@ -176,15 +189,16 @@ const columnDefs = [
   }, {
     headerName: '启用',
     field: 'Enable',
-    width: 50,
+    width: 60,
     cellStyle: {textAlign: 'center'},
     pinned: 'left',
-    cellRenderer: reactCellRendererFactory(AbledRender)
+    cellRenderer: reactCellRendererFactory(AbledRender),
+    suppressSorting: true
   }, {
     headerName: '性别',
     field: 'Gender',
     cellStyle: {textAlign: 'center'},
-    width: 50
+    width: 70
   }, {
     headerName: '角色',
     field: 'RoleName',
@@ -226,8 +240,11 @@ const gridOptions = {
       SortField: null,
       SortDirection: null
     }
-    this.grid.props.dispatch({type: 'ADMIN_USERS_FILTER_CONDITIONS_UPDATE', update: {
-      $merge: conditions
-    }})
+    this.grid.props.dispatch({
+      type: 'ADMIN_USERS_FILTER_CONDITIONS_UPDATE',
+      update: {
+        $merge: conditions
+      }
+    })
   }
 }

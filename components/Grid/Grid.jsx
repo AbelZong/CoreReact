@@ -5,6 +5,7 @@ import {Icon} from 'components/Icon'
 import store from 'utils/store'
 import {ZHCN} from 'constants/gridLocaleText'
 const pageSizeOptions = ['20', '50', '100', '200', '500']
+import 'ag-grid-enterprise'
 class ZGrid extends React.Component {
   constructor(props) {
     super(props)
@@ -256,7 +257,15 @@ class ZGrid extends React.Component {
     })
   }
   render() {
-    const {columnDefs, height, paged, className, gridOptions, children, pagesAlign} = this.props
+    const {
+  columnDefs,
+  height,
+  paged,
+  className,
+  gridOptions,
+  children,
+  pagesAlign
+} = this.props
     const rowData = this.state.rowData || this.props.rowData
     const CN = className ? `z-grid ${className}` : 'z-grid'
     const _gridOptions = Object.assign({
@@ -274,25 +283,14 @@ class ZGrid extends React.Component {
       <div className={CN} style={{height: height || 'auto'}}>
         <div className='grid-inner'>
           <div className='ag-fresh'>
-            <AgGridReact
-              gridOptions={_gridOptions}
-              containerStyle={{position: 'absolute', width: '100%'}}
-              onGridReady={this.onGridReady}
-              onColumnResized={this.agColumnResized}
-              onColumnMoved={this.agColumnMoved}
-              onColumnVisible={this.agColumnVisible}
-              columnDefs={columnDefs}
-              rowData={rowData}
-              rowHeight='32'
-            />
+            <AgGridReact gridOptions={_gridOptions} containerStyle={{position: 'absolute', width: '100%'}} onGridReady={this.onGridReady} onColumnResized={this.agColumnResized} onColumnMoved={this.agColumnMoved} onColumnVisible={this.agColumnVisible} columnDefs={columnDefs} rowData={rowData} rowHeight='32' />
           </div>
           <div className={footerCN}>
             <div className='op-l'>{children}</div>
             <div className='op-r'>
               {paged && (
                 <span>
-                  <Pagination size='small' current={this.state.current} pageSize={this.state.pageSize} onChange={this.handlePageChange} onShowSizeChange={this.handlePageShowSizeChange} total={this.state.total} showSizeChanger showQuickJumper pageSizeOptions={pageSizeOptions} showTotal={total => `共 ${total} 条`} />
-                  <a title='刷新容器' className='cur' onClick={this.refreshRowData}><Icon type='refresh' spin={false} /></a>
+                  <Pagination size='small' current={this.state.current} pageSize={this.state.pageSize} onChange={this.handlePageChange} onShowSizeChange={this.handlePageShowSizeChange} total={this.state.total} showSizeChanger showQuickJumper pageSizeOptions={pageSizeOptions} showTotal={total => `共 ${total} 条`} /><a title='刷新容器' className='cur' onClick={this.refreshRowData}><Icon type='refresh' spin={false} /></a>
                 </span>
               )}
               <a title='显示隐藏列名' className='cur' onClick={this.toggleColumnCheckedVisibe}><Icon type='eye-slash' /></a>
@@ -324,6 +322,10 @@ const GOD = {
   localeText: ZHCN,
   rowSelection: 'multiple',
   //suppressRowClickSelection: true,
-  enableColResize: true
+  enableColResize: true,
+  enableRangeSelection: true,
+  getContextMenuItems: function(params) {
+    return ['copy']
+  }
 }
 export default ZGrid

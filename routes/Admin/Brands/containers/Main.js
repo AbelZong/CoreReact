@@ -108,7 +108,7 @@ const OperatorsRender = React.createClass({
     return (
       <div className='operators'>
         <Iconfa type='edit' onClick={this.handleEditClick} title='编辑品牌' />
-        <Popconfirm title='确定要删除 我 吗？' onConfirm={this.handleDeleteClick}>
+        <Popconfirm title='确定要删除吗？' onConfirm={this.handleDeleteClick}>
           <Iconfa type='remove' title='删除' />
         </Popconfirm>
       </div>
@@ -160,9 +160,10 @@ const columnDefs = [
   }, {
     headerName: '启用',
     field: 'Enable',
-    width: 50,
+    width: 60,
     cellStyle: {textAlign: 'center'},
-    cellRenderer: reactCellRendererFactory(AbledRender)
+    cellRenderer: reactCellRendererFactory(AbledRender),
+    suppressSorting: true
   }, {
     headerName: '品牌官网',
     field: 'Link',

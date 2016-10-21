@@ -1,12 +1,22 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import {
+  connect
+} from 'react-redux'
 import styles from './Shop.scss'
 import ZGrid from 'components/Grid/index'
-import {Icon, Popconfirm, Checkbox} from 'antd'
-import {ZPost} from 'utils/Xfetch'
+import {
+  Icon,
+  Popconfirm,
+  Checkbox
+} from 'antd'
+import {
+  ZPost
+} from 'utils/Xfetch'
 import OperatorsRender from './OperatorsRender'
 import Wrapper from 'components/MainWrapper'
-import {reactCellRendererFactory} from 'ag-grid-react'
+import {
+  reactCellRendererFactory
+} from 'ag-grid-react'
 
 class UrlRenderer extends React.Component {
   render() {
@@ -245,9 +255,9 @@ const Main = React.createClass({
   render() {
     return (
       <div className={styles.main}>
-        <ZGrid className={styles.zgrid} onReady={this.handleGridReady}gridOptions={gridOptions} storeConfig={{ prefix: 'shop_list' }} columnDefs={defColumns} paged grid={this}>
+        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'shop_list' }} columnDefs={defColumns} paged grid={this}>
           批量：
-          <Popconfirm title='确定要删除 我 吗？' onConfirm={this.handleDelete}>
+          <Popconfirm title='确定要删除吗？' onConfirm={this.handleDelete}>
             <Icon type='delete' className='cur' />
           </Popconfirm>
         </ZGrid>
@@ -255,7 +265,6 @@ const Main = React.createClass({
     )
   }
 })
-
 export default connect(state => ({
   shopconditions: state.shop_list
 }))(Wrapper(Main))

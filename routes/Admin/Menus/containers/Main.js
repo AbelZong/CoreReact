@@ -1,12 +1,24 @@
 import React from 'react'
-import {connect} from 'react-redux'
-import {ZGet, ZPost} from 'utils/Xfetch'
+import {
+  connect
+} from 'react-redux'
+import {
+  ZGet,
+  ZPost
+} from 'utils/Xfetch'
 import ZGrid from 'components/Grid/index'
 import styles from './Menus.scss'
 import Wrapper from 'components/MainWrapper'
-import {Icon, Popconfirm} from 'antd'
-import {Icon as Iconfa} from 'components/Icon'
-import {reactCellRendererFactory} from 'ag-grid-react' //bad kid
+import {
+  Icon,
+  Popconfirm
+} from 'antd'
+import {
+  Icon as Iconfa
+} from 'components/Icon'
+import {
+  reactCellRendererFactory
+} from 'ag-grid-react'
 
 const Main = React.createClass({
   componentWillUnmount() {
@@ -134,7 +146,7 @@ const columnDefs = [{
   headerName: '排序',
   field: 'order',
   cellStyle: {textAlign: 'center'},
-  width: 50
+  width: 70
 }, {
   headerName: '操作',
   width: 80,
