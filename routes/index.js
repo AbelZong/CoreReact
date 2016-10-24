@@ -1,3 +1,30 @@
+//
+//                       _oo0oo_
+//                      o8888888o
+//                      88" . "88
+//                      (| -_- |)
+//                      0\  =  /0
+//                    ___/`---'\___
+//                  .' \\|     |// '.
+//                 / \\|||  :  |||// \
+//                / _||||| -:- |||||- \
+//               |   | \\\  -  /// |   |
+//               | \_|  ''\---/''  |_/ |
+//               \  .-\__  '-'  ___/-. /
+//             ___'. .'  /--.--\  `. .'___
+//          ."" '<  `.___\_<|>_/___.' >' "".
+//         | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+//         \  \ `_.   \_ __\ /__ _/   .-` /  /
+//     =====`-.____`.___ \_____/___.-`___.-'=====
+//                       `=---='
+//
+//
+//     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//               佛祖保佑         永无BUG
+//
+//
+//
 // We only need to import the modules necessary for initial render
 import WheatLayout from 'layouts/WheatLayout'
 import GoLayout from 'layouts/GoLayout'
@@ -18,6 +45,7 @@ import AdminAccessRoute from './Admin/Access'
 import PurchaseListRoute from './Purchase/List'
 import CompanyClientsRoute from './Company/Clients'
 import AdminWarehousesRoute from './Admin/Warehouses'
+import ProductCatesRoute from './Product/Cates'
 //import AdminCompanyRoute from './Admin/Company'
 // const QQ = require.context('./__ENTERIES__', false, /\.js$/)
 // console.dir(QQ)
@@ -70,6 +98,7 @@ export const createRoutes = (store) => ([
       PurchaseListRoute(store),
       CompanyClientsRoute(store),
       AdminWarehousesRoute(store),
+      ProductCatesRoute(store),
       NotFoundRoute
     ],
     ignoreScrollBehavior: true

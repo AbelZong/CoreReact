@@ -4,11 +4,15 @@ import {ZGet, ZPost} from 'utils/Xfetch'
 import ZGrid from 'components/Grid/index'
 import styles from './index.scss'
 import Wrapper from 'components/MainWrapper'
-import {Icon, Popconfirm, Checkbox, message} from 'antd'
+import {Icon, Popconfirm, Checkbox, message, Button} from 'antd'
 import {Icon as Iconfa} from 'components/Icon'
 import {reactCellRendererFactory} from 'ag-grid-react'
+const ButtonGroup = Button.Group
 
 const Main = React.createClass({
+  componentDidMount() {
+    this._firstBlood()
+  },
   componentWillReceiveProps(nextProps) {
     this._firstBlood(nextProps.conditions)
   },
@@ -24,11 +28,15 @@ const Main = React.createClass({
   modifyRowByID(id) {
     this.props.dispatch({type: 'ADMIN_BRAND_VIS_SET', payload: id})
   },
-  deleteRowByIDs(ids) {
-    if (!ids || !ids.length) {
-      return message.info('没有选中')
+  _getIDs() {
+    const ids = this.grid.api.getSelectedRows().map(x => x.ID)
+    if (ids.length) {
+      return ids
     }
-    this.grid.x0pCall(ZPost('XyComm/Brand/DeleteBrand', {IDLst: ids}, () => {
+    message.info('没有选中')
+  },
+  deleteRowByIDs(ids) {
+    this.grid.x0pCall(ZPost('XyComm/Customkind/DeleteSkuKind', {IDLst: ids}, () => {
       this.refreshDataCallback()
     }))
   },
@@ -36,24 +44,41 @@ const Main = React.createClass({
     this.grid = grid
   },
   handleDelete() {
-    const ids = this.grid.api.getSelectedRows().map(x => x.ID)
-    this.deleteRowByIDs(ids)
+    const ids = this._getIDs()
+    if (ids) {
+      this.deleteRowByIDs(ids)
+    }
+  },
+  handleEnable() {
+    const ids = this._getIDs()
+    if (ids) {
+      this.grid.x0pCall(ZPost('XyComm/Customkind/SkuKindEnable', {IDLst: ids, Enable: 'true'}, () => {
+        this.refreshDataCallback()
+      }))
+    }
+  },
+  handleDisable() {
+    const ids = this._getIDs()
+    if (ids) {
+      this.grid.x0pCall(ZPost('XyComm/Customkind/SkuKindEnable', {IDLst: ids, Enable: 'false'}, () => {
+        this.refreshDataCallback()
+      }))
+    }
   },
   _firstBlood(_conditions) {
     const conditions = Object.assign({}, this.props.conditions || {}, _conditions || {})
-    const uri = 'XyComm/Brand/BrandLst'
+    const uri = 'XyComm/Customkind/SkuKindLst'
     const data = Object.assign({
       PageSize: this.grid.getPageSize(),
-      PageIndex: 1
+      PageIndex: 1,
+      ParentID: 0
     }, conditions)
     this.grid.x0pCall(ZGet(uri, data, ({d}) => {
       if (this.ignore) {
         return
       }
       this.grid.setDatasource({
-        total: d.DataCount,
-        rowData: d.BrandLst,
-        page: 1,
+        rowData: d.Children,
         getRows: (params) => {
           if (params.page === 1) {
             this._firstBlood()
@@ -66,7 +91,7 @@ const Main = React.createClass({
               if (this.ignore) {
                 return
               }
-              params.success(d.BrandLst)
+              params.success(d.Children)
             }, ({m}) => {
               if (this.ignore) {
                 return
@@ -81,17 +106,27 @@ const Main = React.createClass({
   render() {
     return (
       <div className={styles.main}>
-        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'admin_brands' }} columnDefs={columnDefs} paged grid={this}>
-          批量：<Popconfirm title='确定要删除选中吗？' onConfirm={this.handleDelete}>
-            <Icon type='delete' className='cur' title='删除' />
+        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'admin_brands' }} columnDefs={columnDefs} grid={this}>
+          批量：
+          <Popconfirm title='确定要删除选中吗？' onConfirm={this.handleDelete}>
+            <Button type='ghost' size='small'>删除</Button>
           </Popconfirm>
+          <span className='ml10' />
+          <ButtonGroup>
+            <Popconfirm title='确定要启用吗？' onConfirm={this.handleEnable}>
+              <Button type='primary' size='small'>启用</Button>
+            </Popconfirm>
+            <Popconfirm title='确定要禁用吗？' onConfirm={this.handleDisable}>
+              <Button type='ghost' size='small'>禁用</Button>
+            </Popconfirm>
+          </ButtonGroup>
         </ZGrid>
       </div>
     )
   }
 })
 export default connect(state => ({
-  conditions: state.admin_brands_filter_conditions
+  conditions: state.product_cat_conditions
 }))(Wrapper(Main))
 const OperatorsRender = React.createClass({
   handleEditClick(e) {
@@ -103,9 +138,21 @@ const OperatorsRender = React.createClass({
     const Yyah = this.props.api.gridOptionsWrapper.gridOptions
     Yyah.grid.deleteRowByIDs([this.props.data.ID])
   },
+  handleGoto() {
+    this.props.api.gridOptionsWrapper.gridOptions.grid.props.dispatch({type: 'PRODUCT_CAT_BREADS_UPDATE', update: {
+      $push: [{
+        id: this.props.data.ID,
+        name: this.props.data.KindName
+      }]
+    }})
+    this.props.api.gridOptionsWrapper.gridOptions.grid.props.dispatch({type: 'PRODUCT_CAT_CONDITIONS_SET', payload: {
+      ParentID: this.props.data.ID
+    }})
+  },
   render() {
     return (
       <div className='operators'>
+        <Button type='ghost' size='small' className='mr5' onClick={this.handleGoto}>进入子类目</Button>
         <Iconfa type='edit' onClick={this.handleEditClick} title='编辑' />
         <Popconfirm title='确定要删除吗？' onConfirm={this.handleDeleteClick}>
           <Iconfa type='remove' title='删除' />
@@ -130,9 +177,6 @@ const AbledRender = React.createClass({
     return <Checkbox onChange={this.handleClick} checked={this.props.data.Enable} />
   }
 })
-const LinkRender = function(params) {
-  return params.value ? '<a href="' + params.value + '" target="_blank" title="跳转到 ' + params.value + '">' + params.value + '</a>' : ''
-}
 const columnDefs = [
   {
     headerName: '#',
@@ -140,59 +184,36 @@ const columnDefs = [
     checkboxSelection: true,
     cellStyle: {textAlign: 'center'},
     pinned: 'left',
-    suppressSorting: true
+    suppressSorting: true,
+    enableSorting: true
   }, {
     headerName: 'ID',
     field: 'ID',
     cellStyle: {textAlign: 'center'},
-    enableSorting: true,
-    width: 60
+    width: 80,
+    suppressMenu: true
   }, {
     headerName: '名称',
-    field: 'Name',
-    width: 150
-  }, {
-    headerName: '简介',
-    field: 'Intro',
+    field: 'KindName',
     width: 280,
-    suppressSorting: true
+    suppressMenu: true
+  }, {
+    headerName: '排序',
+    field: 'Order',
+    width: 70,
+    suppressMenu: true
   }, {
     headerName: '状态',
     field: 'Enable',
-    width: 60,
+    width: 70,
     cellStyle: {textAlign: 'center'},
     cellRenderer: reactCellRendererFactory(AbledRender),
-    suppressSorting: true
-  }, {
-    headerName: '品牌官网',
-    field: 'Link',
-    width: 180,
-    suppressSorting: true,
-    cellRenderer: LinkRender
-  }, {
-    headerName: '创建时间',
-    field: 'CreateDate',
-    width: 130
+    suppressMenu: true
   }, {
     headerName: '操作',
-    width: 120,
+    width: 180,
     cellRendererFramework: OperatorsRender,
-    suppressSorting: true
+    suppressMenu: true
   }]
 const gridOptions = {
-  enableSorting: true,
-  enableServerSideSorting: true,
-  onBeforeSortChanged: function(params) {
-    const sorter = this.api.getSortModel()[0]
-    const conditions = sorter ? {
-      SortField: sorter.colId,
-      SortDirection: sorter.sort.toUpperCase()
-    } : {
-      SortField: null,
-      SortDirection: null
-    }
-    this.grid.props.dispatch({type: 'ADMIN_BRANDS_FILTER_CONDITIONS_UPDATE', update: {
-      $merge: conditions
-    }})
-  }
 }

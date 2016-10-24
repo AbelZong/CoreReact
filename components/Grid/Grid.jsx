@@ -1,3 +1,30 @@
+//
+//                       _oo0oo_
+//                      o8888888o
+//                      88" . "88
+//                      (| -_- |)
+//                      0\  =  /0
+//                    ___/`---'\___
+//                  .' \\|     |// '.
+//                 / \\|||  :  |||// \
+//                / _||||| -:- |||||- \
+//               |   | \\\  -  /// |   |
+//               | \_|  ''\---/''  |_/ |
+//               \  .-\__  '-'  ___/-. /
+//             ___'. .'  /--.--\  `. .'___
+//          ."" '<  `.___\_<|>_/___.' >' "".
+//         | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+//         \  \ `_.   \_ __\ /__ _/   .-` /  /
+//     =====`-.____`.___ \_____/___.-`___.-'=====
+//                       `=---='
+//
+//
+//     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//               佛祖保佑         永无BUG
+//
+//
+//
 import React from 'react'
 import {AgGridReact} from 'ag-grid-react'
 import {Pagination, Popconfirm, message} from 'antd'
@@ -107,31 +134,34 @@ class ZGrid extends React.Component {
     }, cb)
   }
   setDatasource = (args) => {
-    //args = {total, getRows, page, rowData, pageSize}
-    const _typeRowData = typeof args.rowData
+    //args = {total, getRows, page, rowData, pageSize, firstBlood}
     if (this.props.paged) {
       const _states = {
-        total: args.total, current: args.page || 1
+        current: args.page || 1
       }
-      if (_typeRowData !== 'undefined' && args.rowData) {
-        _states.rowData = args.rowData
-      }
+      _states.rowData = (args.rowData && args.rowData instanceof Array) ? args.rowData : []
+      _states.total = typeof args.total === 'undefined' ? _states.rowData.length : Number(args.total)
       if (typeof args.pageSize !== 'undefined') {
-        _states.pageSize = args.pageSize * 1
+        _states.pageSize = Number(args.pageSize)
       }
       this.getRowsFunc = args.getRows
       this.setState(_states, () => {
-        if (!args.rowData) {
+        if (args.firstBlood) {
           this.getRows()
         }
       })
     } else {
-      if (_typeRowData !== 'object') {
-        args.rowData = []
+      const _states = {
+        current: 0
       }
-      this.setState({
-        rowData: args.rowData,
-        total: typeof args.total === 'undefined' ? args.rowData.length : args.total
+      _states.rowData = (args.rowData && args.rowData instanceof Array) ? args.rowData : []
+      _states.total = typeof args.total === 'undefined' ? _states.rowData.length : Number(args.total)
+      this.setState(_states, () => {
+        if (this.state.total < 1) {
+          requestAnimationFrame(() => {
+            this.api.showNoRowsOverlay()
+          })
+        }
       })
     }
   }

@@ -1,0 +1,57 @@
+.toolbars {
+  padding: 10px 5px 10px 10px;
+}
+.main {
+  padding-left:10px;
+  padding-right:5px;
+  flex: 1;
+  display: flex;
+  :global(.z-grid) {
+    :global(.ag-row:hover) {
+        background-color: #f5f5f5;
+    }
+    :global(.ag-group-value > div) {
+      display: inherit;
+    }
+  }
+}
+
+.ss {
+  li {
+    cursor: pointer;
+    width:100%;
+    display: block;
+    color:#666;
+    line-height: 28px;
+    padding-left: 8px;
+    &:hover {
+      background-color: #f5f5f5;
+    }
+  }
+  li.se {
+    background-color: #0094ff;
+    color: #fff;
+  }
+  :global {
+    .ant-col-6 {
+      overflow: auto;
+      height: 460px;
+    }
+  }
+}
+
+.conditionsForm {
+  .s1 {
+    display: inline-block;
+    width:240px;
+    vertical-align: middle;
+  }
+  .s2 {
+    display: inline-block;
+    width: 80px;
+    margin-left:10px;
+  }
+  .s3 {
+    margin-left: 10px;
+  }
+}
