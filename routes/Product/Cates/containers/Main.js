@@ -1,14 +1,28 @@
 import React from 'react'
-import {connect} from 'react-redux'
-import {ZGet, ZPost} from 'utils/Xfetch'
+import {
+  connect
+} from 'react-redux'
+import {
+  ZGet,
+  ZPost
+} from 'utils/Xfetch'
 import ZGrid from 'components/Grid/index'
 import styles from './index.scss'
 import Wrapper from 'components/MainWrapper'
-import {Icon, Popconfirm, Checkbox, message, Button} from 'antd'
-import {Icon as Iconfa} from 'components/Icon'
-import {reactCellRendererFactory} from 'ag-grid-react'
+import {
+  Popconfirm,
+  Checkbox,
+  message,
+  Button
+} from 'antd'
+import {
+  Icon as Iconfa
+} from 'components/Icon'
+import {
+  reactCellRendererFactory
+} from 'ag-grid-react'
 const ButtonGroup = Button.Group
-
+import ModifyModal from './ModifyModal'
 const Main = React.createClass({
   componentDidMount() {
     this._firstBlood()
@@ -26,7 +40,7 @@ const Main = React.createClass({
     this._firstBlood()
   },
   modifyRowByID(id) {
-    this.props.dispatch({type: 'ADMIN_BRAND_VIS_SET', payload: id})
+    this.props.dispatch({type: 'PRODUCT_CAT_VIS_SET', payload: id})
   },
   _getIDs() {
     const ids = this.grid.api.getSelectedRows().map(x => x.ID)
@@ -103,6 +117,17 @@ const Main = React.createClass({
       })
     }))
   },
+  modalCB1(ID, successCB, errorCB) {
+    ZPost('XyComm/Customkind/InsertStandardKind', {
+      ID,
+      ParentID: this.props.conditions.ParentID || 0
+    }, () => {
+      this.refreshDataCallback()
+      successCB()
+    }, () => {
+      errorCB()
+    })
+  },
   render() {
     return (
       <div className={styles.main}>
@@ -121,6 +146,7 @@ const Main = React.createClass({
             </Popconfirm>
           </ButtonGroup>
         </ZGrid>
+        <ModifyModal modalCB1={this.modalCB1} />
       </div>
     )
   }

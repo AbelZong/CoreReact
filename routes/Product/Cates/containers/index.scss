@@ -15,6 +15,26 @@
     }
   }
 }
+.smForm {
+  :global {
+    .ant-form-item {
+      margin-bottom: 0;
+    }
+  }
+}
+.propsSearch {
+  margin: 10px 5px 2px;
+  :global {
+    .ant-checkbox-group {
+      display: inline;
+    }
+  }
+}
+.fucker {
+  :global {
+    .ant-form-item-label {padding: 0;}
+  }
+}
 
 .ss {
   li {

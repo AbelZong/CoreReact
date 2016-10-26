@@ -130,44 +130,44 @@
 		cursor: se-resize;
 	}
 
-	[data-title] {
-		position: relative;
-		z-index: 2;
-		cursor: pointer;
-
-		&:after {
-			position: absolute;
-			transform: translate3d(0,0,0);
-			visibility: hidden;
-			opacity: 0;
-			z-index: 1000000;
-			pointer-events: none;
-			transition: 0.3s ease;
-			transition-delay: 0;
-		}
-
-		&:after {
-			content: attr(data-title);
-			background: #383838;
-			color: #fff;
-			padding: 8px 10px;
-			font-size: 12px;
-			line-height: 12px;
-			white-space: nowrap;
-			text-shadow: 0 -1px 0 #000;
-			box-shadow: 4px 4px 8px rgba(0,0,0,.3);
-		}
-
-		&:hover:after {
-			visibility: visible;
-			opacity: 1;
-		}
-
-		&[data-title-right]:after {
-			left: 100%;
-		}
-	}
-
+	// [data-title] {
+	// 	position: relative;
+	// 	z-index: 2;
+	// 	cursor: pointer;
+	//
+	// 	&:after {
+	// 		position: absolute;
+	// 		transform: translate3d(0,0,0);
+	// 		visibility: hidden;
+	// 		opacity: 0;
+	// 		z-index: 1000000;
+	// 		pointer-events: none;
+	// 		transition: 0.3s ease;
+	// 		transition-delay: 0;
+	// 	}
+	//
+	// 	&:after {
+	// 		content: attr(data-title);
+	// 		background: #383838;
+	// 		color: #fff;
+	// 		padding: 8px 10px;
+	// 		font-size: 12px;
+	// 		line-height: 12px;
+	// 		white-space: nowrap;
+	// 		text-shadow: 0 -1px 0 #000;
+	// 		box-shadow: 4px 4px 8px rgba(0,0,0,.3);
+	// 	}
+	//
+	// 	&:hover:after {
+	// 		visibility: visible;
+	// 		opacity: 1;
+	// 	}
+	//
+	// 	&[data-title-right]:after {
+	// 		left: 100%;
+	// 	}
+	// }
+	//
 	.ant-tooltip-inner {
 		min-height: auto;
 		padding: 3px 6px;
@@ -190,7 +190,7 @@
 
 		img {
 			transform-style: preserve-3d;
-			width: 64px;
+			width: 80px;
 			margin: 0 auto 10px;
 			overflow: hidden;
 			animation: loadTween 2s cubic-bezier(0.785, 0.135, 0.15, 0.86) infinite;
@@ -251,9 +251,14 @@
 		}
 	}
 
+  .gray {
+		color: #ECECEC;
+    text-shadow: 1px 1px 1px #FBFBFB;
+	}
+
 	.ant-form {
 		.hr {
-			margin: 5px 0 15px;
+			margin: 6px 0 13px;
 		}
 	}
 
@@ -321,7 +326,7 @@
 
 @keyframes:global(loadTween) {
 	0% {
-		transform: rotateY(0deg);
+		transform: rotateY(0);
 	}
 
 	50% {
@@ -329,7 +334,7 @@
 	}
 
 	100% {
-		transform: rotateX(-180deg);
+		transform: rotateY(0);
 	}
 }
 

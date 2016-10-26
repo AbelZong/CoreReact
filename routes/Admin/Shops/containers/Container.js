@@ -1,6 +1,10 @@
 import React from 'react'
-import {connect} from 'react-redux'
-import {endLoading} from 'utils'
+import {
+  connect
+} from 'react-redux'
+import {
+  endLoading
+} from 'utils'
 import styles from 'components/App.scss'
 import Wrapper from 'components/MainWrapper'
 import Toolbar from './Toolbar'

@@ -90,6 +90,16 @@
        box-shadow: none;
      }
     }
+    fieldset {
+      border: 1px solid #f5f5f5;
+      padding: 10px;
+    }
+    legend {
+      margin-bottom: 0;
+          border: 0;
+          padding: 0 8px;
+          width: auto;
+    }
   }
   .modalTop {
     .ant-modal {

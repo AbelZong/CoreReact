@@ -1,5 +1,7 @@
 import React from 'react'
-import {endLoading} from 'utils'
+import {
+  endLoading
+} from 'utils'
 import styles from 'components/App.scss'
 import Toolbar from './Toolbar'
 import Main from './Main'

@@ -1,7 +1,13 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import {
+  connect
+} from 'react-redux'
 import styles from './index.scss'
-import {Button, Breadcrumb, message} from 'antd'
+import {
+  Button,
+  Breadcrumb,
+  message
+} from 'antd'
 const ButtonGroup = Button.Group
 export default connect(state => ({
   breads: state.product_cat_breads
@@ -17,7 +23,7 @@ export default connect(state => ({
     if (index > -1) {
       if (index < this.props.breads.length) {
         this.props.dispatch({type: 'PRODUCT_CAT_BREADS_UPDATE', update: {
-          $splice: [[index + 1, 1]]
+          $splice: [[index + 1]]
         }})
       }
       this.props.dispatch({type: 'PRODUCT_CAT_CONDITIONS_SET', payload: {
