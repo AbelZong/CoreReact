@@ -5,6 +5,7 @@ import ZGrid from 'components/Grid/index'
 import styles from './index.scss'
 import Wrapper from 'components/MainWrapper'
 import {Icon, Popconfirm, Checkbox, message, Button} from 'antd'
+import Prompt from 'components/Modal/Prompt'
 
 const Main = React.createClass({
   componentWillReceiveProps(nextProps) {
@@ -46,7 +47,7 @@ const Main = React.createClass({
   render() {
     return (
       <div className={styles.main}>
-        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'goodgods.wx1' }} columnDefs={columnDefs} columnsFited />
+        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'goodgods.wx1' }} columnDefs={columnDefs} columnsFited grid={this} />
       </div>
     )
   }
@@ -60,34 +61,48 @@ const OperatorsRender = React.createClass({
     const Yyah = this.props.api.gridOptionsWrapper.gridOptions
     Yyah.grid.modifyRowByID(this.props.data.ID)
   },
-  handleDeleteClick() {
-    const Yyah = this.props.api.gridOptionsWrapper.gridOptions
-    Yyah.grid.deleteRowByIDs([this.props.data.ID])
+  handleModifyRemark() {
+    Prompt({
+      onPrompt: ({value}) => {
+        return new Promise((resolve, reject) => {
+          ZPost('Warehouse/editRemark', {
+            remark: value,
+            id: this.props.data.id
+          }, () => {
+            resolve()
+            this.props.data.myremark = value
+            this.props.refreshCell()
+            console.log(this.props)
+          }, reject)
+        })
+      }
+    })
   },
   render() {
     return (
       <div className='operators'>
-        <Button onClick={this.handlePartyStop}>终止合作</Button>
+        <a onClick={this.handleModifyRemark} className='mr5'>编辑备注</a>
+        <a onClick={this.handlePartyStop}>终止合作</a>
       </div>
     )
   }
 })
-const NoteRender = React.createClass({
-  handleClick(e) {
-    e.stopPropagation()
-    const checked = e.target.checked
-    this.props.api.gridOptionsWrapper.gridOptions.grid.grid.x0pCall(ZPost('XyComm/Brand/BrandEnable', {
-      IDLst: [this.props.data.ID],
-      Enable: checked
-    }, () => {
-      this.props.data.Enable = checked
-      this.props.refreshCell()
-    }))
-  },
-  render() {
-    return <Icon type='edit' onClick={this.handleClick} />
-  }
-})
+// const NoteRender = React.createClass({
+//   handleClick(e) {
+//     e.stopPropagation()
+//     const checked = e.target.checked
+//     this.props.api.gridOptionsWrapper.gridOptions.grid.grid.x0pCall(ZPost('XyComm/Brand/BrandEnable', {
+//       IDLst: [this.props.data.ID],
+//       Enable: checked
+//     }, () => {
+//       this.props.data.Enable = checked
+//       this.props.refreshCell()
+//     }))
+//   },
+//   render() {
+//     return <Icon type='edit' onClick={this.handleClick} />
+//   }
+// })
 const columnDefs = [
   {
     headerName: 'ID',
@@ -115,8 +130,8 @@ const columnDefs = [
     headerName: '我方备注',
     field: 'myremark',
     width: 180,
-    suppressSorting: true,
-    cellRendererFramework: NoteRender
+    suppressSorting: true
+    //cellRendererFramework: NoteRender
   }, {
     headerName: '对方备注',
     field: 'itremark',
