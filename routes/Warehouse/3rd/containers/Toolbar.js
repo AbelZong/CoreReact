@@ -11,7 +11,9 @@ const Toolbar = React.createClass({
   getInitialState: function() {
     return {
       contains: ['1', '2'],
-      status: ['1', '2']
+      status: ['1', '2'],
+      reSSNOed: false,
+      reSSNoing: false
     }
   },
   componentDidMount() {
@@ -41,19 +43,38 @@ const Toolbar = React.createClass({
       status: e
     }, this.handleSearch)
   },
+  handleReSSNO() {
+    this.setState({
+      reSSNoing: true
+    })
+    ZPost('Warehouse/serviceCodeRebuild', ({d}) => {
+      this.setState({
+        reSSNOed: true,
+        reSSNoing: false
+      }, () => {
+        this.props.dispatch({type: 'WAREHOUSE_SSNO_VIS_SET', payload: d.code})
+      }, () => {
+        this.setState({
+          reSSNoing: true
+        })
+      })
+    })
+  },
   render() {
     const {ssNO} = this.props
-    const confirm = () => {}
     return (
       <div className={styles.toolbars}>
         <div className={styles.conditionsForm}>
           <div className='pull-right'>
+            {this.state.reSSNOed ? <span title='新服务号' className={styles.ssno}>{ssNO}</span> : null}
             <Button.Group>
-              <Popconfirm placement='left' title={<div>
-                我的服务号是：<span style={{color: 'red', border: '1px dashed #f5f5f5', padding: '2px 5px'}}>{ssNO}</span>
-              </div>} onConfirm={confirm} okText='重新生成' cancelText='关闭'>
-                <Button type='dashed' size='small'>生成服务号</Button>
-              </Popconfirm>
+              {!this.state.reSSNOed ? (
+                <Popconfirm placement='left' title={<div>
+                  我的服务号是：<span style={{color: 'red', border: '1px dashed #f5f5f5', padding: '2px 5px'}}>{ssNO}</span>
+                </div>} onConfirm={this.handleReSSNO} okText='重新生成' cancelText='关闭'>
+                  <Button type='dashed' size='small' loading={this.state.reSSNoing}>生成服务号</Button>
+                </Popconfirm>
+              ) : null}
               <DB onClick={this.handleCreate} overlay={(<Menu onClick={this.handleCreate1}>
                 <Menu.Item key='2'>申请加入仓储服务</Menu.Item>
                 <Menu.Item key='1'>第三仓储服务设置</Menu.Item>
