@@ -44,9 +44,10 @@ import AdminCompanyRoute from './Admin/Company'
 import AdminAccessRoute from './Admin/Access'
 import PurchaseListRoute from './Purchase/List'
 import CompanyClientsRoute from './Company/Clients'
-import AdminWarehousesRoute from './Admin/Warehouses'
+import WarehouseSettingsRoute from './Warehouse/Settings'
 import BusinessSettingRoute from './Admin/BusinessSetting'
 import ProductCatesRoute from './Product/Cates'
+import Warehouse3rdRoute from './Warehouse/3rd'
 //import AdminCompanyRoute from './Admin/Company'
 // const QQ = require.context('./__ENTERIES__', false, /\.js$/)
 // console.dir(QQ)
@@ -98,7 +99,8 @@ export const createRoutes = (store) => ([
       AdminAccessRoute(store),
       PurchaseListRoute(store),
       CompanyClientsRoute(store),
-      AdminWarehousesRoute(store),
+      WarehouseSettingsRoute(store),
+      Warehouse3rdRoute(store),
       ProductCatesRoute(store),
       BusinessSettingRoute(store),
       NotFoundRoute

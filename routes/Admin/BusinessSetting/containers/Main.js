@@ -46,7 +46,7 @@ export default createForm()(Wrapper(React.createClass({
           confirmLoading: false
         })
       }
-    })
+    }).then(endLoading)
   },
   handleSubmit(e) {
     e.preventDefault()

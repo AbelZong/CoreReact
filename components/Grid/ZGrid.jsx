@@ -23,8 +23,7 @@
 //
 //               佛祖保佑         永无BUG
 //
-//
-//
+// author:(wx)goodgods lastUpdated: now
 import React from 'react'
 import {AgGridReact} from 'ag-grid-react'
 import {Pagination, Popconfirm, message} from 'antd'
@@ -186,7 +185,7 @@ class ZGrid extends React.Component {
       })
     } else {
       if (this.props.paged) {
-        const tips = this.props.setPleaseTip || '请先 setDatasource {total, getRows, [current], [rowData]}'
+        const tips = this.props.setPleaseTip || '开发者注意：请先 setDatasource {total, getRows, [current], [rowData]}'
         message.warn(tips)
       }
     }
@@ -320,11 +319,11 @@ class ZGrid extends React.Component {
             <div className='op-r'>
               {paged && (
                 <span>
-                  <Pagination size='small' current={this.state.current} pageSize={this.state.pageSize} onChange={this.handlePageChange} onShowSizeChange={this.handlePageShowSizeChange} total={this.state.total} showSizeChanger showQuickJumper pageSizeOptions={pageSizeOptions} showTotal={total => `共 ${total} 条`} /><a title='刷新容器' className='cur' onClick={this.refreshRowData}><Icon type='refresh' spin={false} /></a>
+                  <Pagination size='small' current={this.state.current} pageSize={this.state.pageSize} onChange={this.handlePageChange} onShowSizeChange={this.handlePageShowSizeChange} total={this.state.total} showSizeChanger showQuickJumper pageSizeOptions={pageSizeOptions} showTotal={total => `共 ${total} 条`} /><a title='刷新ZGrid容器' className='cur' onClick={this.refreshRowData}><Icon type='refresh' spin={false} /></a>
                 </span>
               )}
               <a title='显示隐藏列名' className='cur' onClick={this.toggleColumnCheckedVisibe}><Icon type='eye-slash' /></a>
-              <Popconfirm placement='leftBottom' title='确定要恢复容器默认设置吗？' onConfirm={this.removeCache}><a title='恢复容器默认设置' className='cur'><Icon type='eraser' /></a>
+              <Popconfirm placement='leftBottom' title='确定要恢复ZGrid容器默认设置吗？' onConfirm={this.removeCache}><a title='恢复容器默认设置' className='cur'><Icon type='eraser' /></a>
               </Popconfirm>
             </div>
           </div>

@@ -83,8 +83,6 @@ const Main = React.createClass({
     const conditions = Object.assign({}, this.props.conditions || {}, _conditions || {})
     const uri = 'XyComm/Customkind/SkuKindLst'
     const data = Object.assign({
-      PageSize: this.grid.getPageSize(),
-      PageIndex: 1,
       ParentID: 0
     }, conditions)
     this.grid.x0pCall(ZGet(uri, data, ({d}) => {
@@ -92,28 +90,7 @@ const Main = React.createClass({
         return
       }
       this.grid.setDatasource({
-        rowData: d.Children,
-        getRows: (params) => {
-          if (params.page === 1) {
-            this._firstBlood()
-          } else {
-            const qData = Object.assign({
-              PageSize: params.pageSize,
-              PageIndex: params.page
-            }, conditions)
-            ZGet(uri, qData, ({d}) => {
-              if (this.ignore) {
-                return
-              }
-              params.success(d.Children)
-            }, ({m}) => {
-              if (this.ignore) {
-                return
-              }
-              params.fail(m)
-            })
-          }
-        }
+        rowData: d.Children
       })
     }))
   },
@@ -128,10 +105,19 @@ const Main = React.createClass({
       errorCB()
     })
   },
+  modalCB2(data, successCB, errorCB) {
+    data.ParentID = this.props.conditions.ParentID || 0
+    ZPost('XyComm/Customkind/InsertSkuKind', data, () => {
+      this.refreshDataCallback()
+      successCB()
+    }, () => {
+      errorCB()
+    })
+  },
   render() {
     return (
       <div className={styles.main}>
-        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'admin_brands' }} columnDefs={columnDefs} grid={this}>
+        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'admin_cats' }} columnDefs={columnDefs} grid={this}>
           批量：
           <Popconfirm title='确定要删除选中吗？' onConfirm={this.handleDelete}>
             <Button type='ghost' size='small'>删除</Button>
@@ -146,7 +132,7 @@ const Main = React.createClass({
             </Popconfirm>
           </ButtonGroup>
         </ZGrid>
-        <ModifyModal modalCB1={this.modalCB1} />
+        <ModifyModal modalCB1={this.modalCB1} modalCB2={this.modalCB2} />
       </div>
     )
   }
@@ -191,7 +177,7 @@ const AbledRender = React.createClass({
   handleClick(e) {
     e.stopPropagation()
     const checked = e.target.checked
-    this.props.api.gridOptionsWrapper.gridOptions.grid.grid.x0pCall(ZPost('XyComm/Brand/BrandEnable', {
+    this.props.api.gridOptionsWrapper.gridOptions.grid.grid.x0pCall(ZPost('XyComm/Customkind/SkuKindEnable', {
       IDLst: [this.props.data.ID],
       Enable: checked
     }, () => {

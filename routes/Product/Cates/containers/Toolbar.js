@@ -6,8 +6,14 @@ import styles from './index.scss'
 import {
   Button,
   Breadcrumb,
-  message
+  message,
+  Popconfirm
 } from 'antd'
+import {
+  startLoading,
+  endLoading
+} from 'utils/index'
+import {ZPost} from 'utils/Xfetch'
 const ButtonGroup = Button.Group
 export default connect(state => ({
   breads: state.product_cat_breads
@@ -33,6 +39,14 @@ export default connect(state => ({
       message.error('error parent id')
     }
   },
+  handleImports() {
+    startLoading()
+    ZPost('XyComm/Customkind/InsertTmaoKind', () => {
+      this.props.dispatch({type: 'PRODUCT_CAT_CONDITIONS_SET', payload: {
+        ParentID: 0
+      }})
+    }).then(endLoading)
+  },
   render() {
     return (
       <div className={styles.toolbars}>
@@ -44,9 +58,11 @@ export default connect(state => ({
             <Button type='ghost' size='small' onClick={this.handleCreateNew2}>
               添加自定义类目
             </Button>
-            <Button size='small' className='hide'>
-              导入淘宝店铺类目
-            </Button>
+            <Popconfirm onConfirm={this.handleImports} title={<div style={{maxWidth: 290}}>导入的类目直接作为根类目存在。<br />如果是刚授权的店铺，可能需要一段时间（一般授权完30分钟内）待商品信息完全下来才能导入。<br />从线上拉取类目信息需要一定时间，请耐心等待。</div>}>
+              <Button size='small'>
+                导入淘宝店铺类目
+              </Button>
+            </Popconfirm>
           </ButtonGroup>
         </div>
         <Breadcrumb separator='>'>

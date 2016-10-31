@@ -2,8 +2,8 @@ import 'ag-grid-root/dist/styles/ag-grid.css'
 import 'styles/ag-grid.scss'
 //import 'ag-grid-enterprise'
 
-import Grid from './Grid'
+import ZGrid from './ZGrid'
 
 export {
-  Grid as default
+  ZGrid as default
 }
