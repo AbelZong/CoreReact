@@ -47,7 +47,7 @@ const Main = React.createClass({
   render() {
     return (
       <div className={styles.main}>
-        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'goodgods.wx1' }} columnDefs={columnDefs} columnsFited grid={this} />
+        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={{}} storeConfig={{ prefix: 'goodgods.wx1' }} columnDefs={columnDefs} columnsFited grid={this} />
       </div>
     )
   }
@@ -147,5 +147,3 @@ const columnDefs = [
     cellRendererFramework: OperatorsRender,
     suppressSorting: true
   }]
-const gridOptions = {
-}
