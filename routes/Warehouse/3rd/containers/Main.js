@@ -61,7 +61,7 @@ const OperatorsRender = React.createClass({
     const Yyah = this.props.api.gridOptionsWrapper.gridOptions
     Yyah.grid.modifyRowByID(this.props.data.ID)
   },
-  handleModifyRemark() {
+  handleMyRemark() {
     Prompt({
       onPrompt: ({value}) => {
         return new Promise((resolve, reject) => {
@@ -81,7 +81,7 @@ const OperatorsRender = React.createClass({
   render() {
     return (
       <div className='operators'>
-        <a onClick={this.handleModifyRemark} className='mr5'>编辑备注</a>
+        <a onClick={this.handleMyRemark} className='mr5'>备注</a>
         <a onClick={this.handlePartyStop}>终止合作</a>
       </div>
     )
