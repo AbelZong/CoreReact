@@ -23,7 +23,12 @@ const Toolbar = React.createClass({
     this.props.dispatch({type: 'WAREHOUSE_CREATE_VIS_SET', payload: 1})
   },
   handleCreate1(e) {
-    console.log(e.key)
+    switch (e.key) {
+      case '2': {
+        this.props.dispatch({type: 'WAREHOUSE_APPLY_VIS_SET', payload: 1})
+        break
+      }
+    }
   },
   handleSelect2(value) {
     this.setState({
@@ -97,6 +102,7 @@ const Toolbar = React.createClass({
           </div>
         </div>
         <Modal1 />
+        <Modal2 />
       </div>
     )
   }
@@ -195,6 +201,81 @@ const Modal1 = connect(state => ({
               ]
             })(
               <Input type='password' />
+            )}
+          </FormItem>
+        </Form>
+      </Modal>
+    )
+  }
+})))
+const Modal2 = connect(state => ({
+  vis: state.warehouse_apply_vis
+}))(createForm()(React.createClass({
+  getInitialState() {
+    return {
+      visible: false,
+      confirmLoading: false
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (this.props.vis !== nextProps.vis) {
+      if (nextProps.vis < 1) {
+        this.setState({
+          visible: false,
+          confirmLoading: false
+        })
+      } else {
+        this.setState({
+          visible: true,
+          confirmLoading: false
+        })
+      }
+    }
+  },
+  handleSubmit() {
+    this.props.form.validateFields((errors, values) => {
+      if (errors) {
+        return false
+      }
+      this.setState({
+        confirmLoading: true
+      })
+      ZPost('Warehouse/askFor', values, () => {
+        this.hideModal()
+        EE.triggerRefreshMain()
+      }, () => {
+        this.setState({
+          confirmLoading: false
+        })
+      })
+    })
+  },
+  hideModal() {
+    this.props.dispatch({ type: 'WAREHOUSE_APPLY_VIS_SET', payload: -1 })
+    this.props.form.resetFields()
+  },
+  render() {
+    const { getFieldDecorator } = this.props.form
+    const {visible, confirmLoading} = this.state
+    const formItemLayout = {
+      labelCol: { span: 6 },
+      wrapperCol: { span: 18 }
+    }
+    return (
+      <Modal title='申请加入仓储服务' visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={confirmLoading} width={480} maskClosable={false} closable={false}>
+        <Form horizontal className='pos-form'>
+          <FormItem {...formItemLayout} label='对方服务号'>
+            {getFieldDecorator('code', {
+              rules: [
+                { required: true, whitespace: true, message: '必填' }
+              ]
+            })(
+              <Input type='text' />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout} label='备注'>
+            {getFieldDecorator('otherRemark')(
+              <Input type='text' />
             )}
           </FormItem>
         </Form>

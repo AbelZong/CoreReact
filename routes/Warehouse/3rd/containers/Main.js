@@ -56,7 +56,7 @@ export default connect(state => ({
   conditions: state.warehouse_filter_conditions
 }))(Wrapper(Main))
 const OperatorsRender = React.createClass({
-  handleEditClick(e) {
+  handlePartyStop(e) {
     e.stopPropagation()
     const Yyah = this.props.api.gridOptionsWrapper.gridOptions
     Yyah.grid.modifyRowByID(this.props.data.ID)
@@ -71,8 +71,7 @@ const OperatorsRender = React.createClass({
           }, () => {
             resolve()
             this.props.data.myremark = value
-            this.props.refreshCell()
-            console.log(this.props)
+            this.props.api.refreshRows([this.props.node])
           }, reject)
         })
       }

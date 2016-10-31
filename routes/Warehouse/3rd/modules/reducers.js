@@ -10,7 +10,10 @@ const warehouse_filter_conditions = handleActions({
   WAREHOUSE_FILTER_CONDITIONS_SET: (state, action) => (action.payload),
   WAREHOUSE_FILTER_CONDITIONS_UPDATE: (state, action) => update(state, action.update)
 }, null)
+const warehouse_apply_vis = handleActions({
+  WAREHOUSE_APPLY_VIS_SET: (state, action) => action.payload
+}, -1)
 
 export default {
-  warehouse_create_vis, warehouse_filter_conditions, warehouse_ssNO_vis
+  warehouse_create_vis, warehouse_filter_conditions, warehouse_ssNO_vis, warehouse_apply_vis
 }
