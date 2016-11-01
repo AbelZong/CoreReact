@@ -47,6 +47,7 @@ import CompanyClientsRoute from './Company/Clients'
 import WarehouseSettingsRoute from './Warehouse/Settings'
 import BusinessSettingRoute from './Admin/BusinessSetting'
 import ProductCatesRoute from './Product/Cates'
+import ProductNormMappingRoute from './Product/NormMapping'
 import Warehouse3rdRoute from './Warehouse/3rd'
 //import AdminCompanyRoute from './Admin/Company'
 // const QQ = require.context('./__ENTERIES__', false, /\.js$/)
@@ -103,6 +104,7 @@ export const createRoutes = (store) => ([
       Warehouse3rdRoute(store),
       ProductCatesRoute(store),
       BusinessSettingRoute(store),
+      ProductNormMappingRoute(store),
       NotFoundRoute
     ],
     ignoreScrollBehavior: true

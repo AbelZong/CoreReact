@@ -24,8 +24,7 @@ export default createForm()(Wrapper(React.createClass({
   getInitialState: function() {
     return {
       s2_enabled: true,
-      s4_enabled: true,
-      confirmLoading: false
+      s4_enabled: true
     }
   },
   componentDidMount() {
@@ -39,9 +38,6 @@ export default createForm()(Wrapper(React.createClass({
   },
   refreshDataCallback() {
     startLoading()
-    this.setState({
-      confirmLoading: true
-    })
     ZGet('Warehouse/GetWarehouseList', ({d}) => {
       // const dd = d[0]
       // const p1 = Areas.filter(x => x.label === dd.logistics)[0]
@@ -67,12 +63,7 @@ export default createForm()(Wrapper(React.createClass({
         s9: d.area,
         s10: d.address
       })
-    }).then(() => {
-      endLoading()
-      this.setState({
-        confirmLoading: false
-      })
-    })
+    }).then(endLoading)
   },
   handleSwitch3(e) {
     this.setState({
@@ -91,9 +82,6 @@ export default createForm()(Wrapper(React.createClass({
         return
       }
       startLoading()
-      this.setState({
-        confirmLoading: true
-      })
       ZPost('Warehouse/UpdateWarehouse', {
         name1: values.s1,
         name3: values.s2,
@@ -103,12 +91,7 @@ export default createForm()(Wrapper(React.createClass({
         phone: values.s8,
         area: values.s9,
         address: values.s10
-      }).then(() => {
-        endLoading()
-        this.setState({
-          confirmLoading: false
-        })
-      })
+      }).then(endLoading)
     })
   },
   handleReset(e) {
@@ -254,7 +237,7 @@ export default createForm()(Wrapper(React.createClass({
             <Col span='7' offset='6'>
               <Button onClick={this.handleReset}>重置</Button>
               &nbsp;&nbsp;&nbsp;
-              <Button type='primary' onClick={this.handleSubmit} loading={this.state.confirmLoading}>保存设定</Button>
+              <Button type='primary' onClick={this.handleSubmit}>保存设定</Button>
             </Col>
           </FormItem>
         </Form>
