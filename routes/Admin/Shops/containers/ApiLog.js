@@ -6,7 +6,7 @@
 *
 * Author: JieChen
 * Date  :
-* Last Updated:
+* Last Updated: HuaZhang
 *
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
@@ -36,28 +36,25 @@ const defColumns = [
   //}, {
     headerName: 'ID',
     field: 'job_id',
-    cellStyle: {textAlign: 'center'},
-    width: 60
+    width: 80
   }, {
     headerName: '状态',
     field: 'enabled',
     cellStyle: {textAlign: 'center'},
-    width: 60
+    width: 70
   }, {
     headerName: '接口名称',
     field: 'api_name',
-    cellStyle: {textAlign: 'center'},
     width: 120
   }, {
     headerName: '接口',
     field: 'api_key',
-    cellStyle: {textAlign: 'center'},
     width: 120
   }, {
     headerName: '间隔（秒）',
     field: 'api_interval',
     cellStyle: {textAlign: 'center'},
-    width: 80
+    width: 100
   }, {
     headerName: '最近执行时间',
     field: 'run_eof',
@@ -67,22 +64,22 @@ const defColumns = [
     headerName: '耗时（秒）',
     field: 'run_times',
     cellStyle: {textAlign: 'center'},
-    width: 80
+    width: 100
   }, {
     headerName: '处理量',
     field: 'total',
     cellStyle: {textAlign: 'center'},
-    width: 80
+    width: 90
   }, {
     headerName: '成功（次）',
     field: 'run_total',
     cellStyle: {textAlign: 'center'},
-    width: 80
+    width: 100
   }, {
     headerName: '失败（次）',
     field: 'err_total',
     cellStyle: {textAlign: 'center'},
-    width: 80
+    width: 100
   }, {
     headerName: '最近出错时间',
     field: 'err_timestamp',
@@ -92,7 +89,7 @@ const defColumns = [
     headerName: '最近错误代码',
     field: 'err_message',
     cellStyle: {textAlign: 'center'},
-    width: 200,
+    width: 300,
     cellRendererFramework: LevelCellRenderer
   }]
 const ApiLog = React.createClass({

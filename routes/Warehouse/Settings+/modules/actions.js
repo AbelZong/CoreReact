@@ -5,23 +5,9 @@
 * Description:
 *
 * Author: HuaZhang <yahveh.zh@gmail.com>
-* Date  : 2016-09-28 17:09:18
+* Date  : 2016-11-04 AM
 * Last Updated:
 *
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
 */
-.wrapper {
-  display: flex;
-  height: 100%;
-}
-.center {
-  margin:auto;
-  h5 {
-    font-size:12px;
-  }
-  em {
-    font-size:20px;
-    line-height: 1;
-  }
-}

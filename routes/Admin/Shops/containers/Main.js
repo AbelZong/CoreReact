@@ -6,7 +6,7 @@
 *
 * Author: JieChen
 * Date  :
-* Last Updated:
+* Last Updated: HuaZhang
 *
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
@@ -135,7 +135,6 @@ const defColumns = [
   }, {
     headerName: '店铺名',
     field: 'ShopName',
-    cellStyle: {textAlign: 'center'},
     width: 130
   }, {
     headerName: '所属站点',
@@ -150,47 +149,47 @@ const defColumns = [
   }, {
     headerName: '网址',
     field: 'ShopUrl',
-    width: 200,
+    width: 180,
     cellRendererFramework: UrlRenderer
   }, {
-    headerName: '是否启用',
+    headerName: '状态',
     cellStyle: {textAlign: 'center'},
     field: 'Enable',
-    width: 40,
+    width: 60,
     cellRenderer: reactCellRendererFactory(EnableRender)
   }, {
     headerName: '上传库存',
     field: 'UpdateSku',
     cellStyle: {textAlign: 'center'},
-    width: 80,
+    width: 90,
     cellRenderer: reactCellRendererFactory(SkuRender)
   }, {
     headerName: '下载商品',
     field: 'DownGoods',
     cellStyle: {textAlign: 'center'},
-    width: 80,
+    width: 90,
     cellRenderer: reactCellRendererFactory(GoodsRender)
   }, {
     headerName: '下载快递单',
     field: 'Updatewaybill',
     cellStyle: {textAlign: 'center'},
-    width: 80,
+    width: 100,
     cellRenderer: reactCellRendererFactory(WaybillRender)
   }, {
     headerName: '联系电话',
     field: 'TelPhone',
     cellStyle: {textAlign: 'center'},
-    width: 100
+    width: 120
   }, {
     headerName: '发货地址',
     field: 'SendAddress',
     cellStyle: {textAlign: 'center'},
-    width: 150
+    width: 200
   }, {
     headerName: '退货地址',
     field: 'ReturnAddress',
     cellStyle: {textAlign: 'center'},
-    width: 150
+    width: 200
   }, {
     headerName: '创店时间',
     field: 'ShopBegin',
