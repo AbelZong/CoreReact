@@ -1,20 +1,22 @@
+/**
+* This file is part of the <智鼠> application.
+*
+* Version: 0.0.1
+* Description:
+*
+* Author: HuaZhang <yahveh.zh@gmail.com>
+* Date  : 2016-11-01 13:44:10
+* Last Updated:
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 import React from 'react'
-import {Spin, Modal, Tree, Button} from 'antd'
+import {Spin, Modal, Radio, Button} from 'antd'
 import ScrollerBar from 'components/Scrollbars/index'
 import styles from './index.scss'
-import {listToTree} from 'utils/index'
 import {ZGet} from 'utils/Xfetch'
-const TreeNode = Tree.TreeNode
-const loop = data => data.map((item) => {
-  if (item.children && item.children instanceof Array && item.children.length) {
-    return (
-      <TreeNode key={item.id} title={item.warehousename}>
-        {loop(item.children)}
-      </TreeNode>
-    )
-  }
-  return <TreeNode key={item.id} title={item.warehousename} />
-})
+const RadioGroup = Radio.Group
 export default React.createClass({
   getInitialState: function() {
     return {
@@ -31,13 +33,11 @@ export default React.createClass({
         dataList: []
       })
       ZGet({
-        uri: 'Common/GetWarehouseAll',
+        uri: 'Warehouse/wareLst',
         success: ({d}) => {
           this.setState({
             spinning: false,
-            dataList: listToTree(d, {
-              parentKey: 'parentid'
-            }),
+            dataList: d.Lst,
             value: nextProps.value
           })
         }
@@ -70,29 +70,27 @@ export default React.createClass({
       </div>
     )
   },
-  handleRadio(e, d) {
+  handleRadio(e) {
     this.setState({
-      value: e[0],
-      valueName: d.selectedNodes[0].props.title
+      value: e.target.value,
+      valueName: this.state.dataList.filter(x => x.id === e.target.value)[0].warename
     })
   },
   render() {
     return (
-      <Modal title='选择第三方物流或分仓' visible={this.props.visible} onCancel={this.props.onCancel} footer={this.renderFooter()} width={420}>
+      <Modal title='选择第三方物流或分仓' visible={this.props.visible} onCancel={this.props.onCancel} footer={this.renderFooter()} width={320}>
         <div className={styles.hua}>
           <Spin size='large' spinning={this.state.spinning} />
           {this.state.dataList.length > 0 ? (
             <div className={styles.dataList}>
               <ScrollerBar autoHide>
-                <Tree defaultExpandAll multiple={false} onSelect={this.handleRadio} selectedKeys={[this.state.value]}>
-                  {loop(this.state.dataList)}
-                </Tree>
+                <RadioGroup onChange={this.handleRadio} value={this.state.value}>
+                  {this.state.dataList.map(x => <Radio key={x.id} value={x.id}>{x.warename}</Radio>)}
+                </RadioGroup>
               </ScrollerBar>
             </div>
           ) : (
-            <div>
-              NULL
-            </div>
+            <div />
           )}
         </div>
       </Modal>

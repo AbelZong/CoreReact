@@ -1,8 +1,36 @@
+/**
+* This file is part of the <智鼠> application.
+*
+* Version: 0.0.1
+* Description:
+*
+* Author: JieChen
+* Date  :
+* Last Updated:
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 import React from 'react'
-import { Form, Input, Modal, Row, Col, DatePicker, Switch } from 'antd'
-import {connect} from 'react-redux'
-import {ZPost} from 'utils/Xfetch'
-import {startLoading, endLoading} from 'utils'
+import {
+  Form,
+  Input,
+  Modal,
+  Row,
+  Col,
+  DatePicker,
+  Switch
+} from 'antd'
+import {
+  connect
+} from 'react-redux'
+import {
+  ZPost
+} from 'utils/Xfetch'
+import {
+  startLoading,
+  endLoading
+} from 'utils'
 import EE from 'utils/EE'
 const createForm = Form.create
 const FormItem = Form.Item

@@ -1,3 +1,16 @@
+/**
+* This file is part of the <智鼠> application.
+*
+* Version: 0.0.1
+* Description:
+*
+* Author: HuaZhang <yahveh.zh@gmail.com>
+* Date  : 2016-10-15 17:38:12
+* Last Updated:
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 import { ZPost } from 'utils/Xfetch'
 import { message } from 'antd'
 import { getLodop } from '3rd/Lodop'

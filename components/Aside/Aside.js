@@ -1,3 +1,16 @@
+/**
+* This file is part of the <智鼠> application.
+*
+* Version: 0.0.1
+* Description:
+*
+* Author: HuaZhang <yahveh.zh@gmail.com>
+* Date  : 2016-09-21 10:42:44
+* Last Updated:
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 import React from 'react'
 import styles from './Aside.scss'
 import Menus2 from './Menus2'

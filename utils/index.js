@@ -1,3 +1,16 @@
+/**
+* This file is part of the <智鼠> application.
+*
+* Version: 0.0.1
+* Description:
+*
+* Author: HuaZhang <yahveh.zh@gmail.com>
+* Date  : 2016-11-02 15:21:40
+* Last Updated:
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 // export function exportCSV(filename, fields, data) {
 //   //http://stackoverflow.com/questions/3665115/create-a-file-in-memory-for-user-to-download-not-through-server
 //   //用这个来判断是否支持，不支持的话后端推送下载
@@ -135,4 +148,12 @@ export function transitionEnd(element, callback, flag) {
   } else {
     element.addEventListener(whichTransitionEvent, callback, false)
   }
+}
+
+export function preZeroFill(num, size) {
+  if (num >= Math.pow(10, size)) {
+    return num.toString()
+  }
+  const _str = Array(size + 1).join('0') + num
+  return _str.slice(_str.length - size)
 }

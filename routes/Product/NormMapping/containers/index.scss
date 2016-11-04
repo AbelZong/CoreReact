@@ -5,3 +5,109 @@
   display: flex;
   flex-direction: column;
 }
+
+.leftCol {
+  flex: 2;
+  display: flex;
+  overflow: auto;
+  flex-direction: column;
+}
+.rightCol {
+  flex: 1;
+  display:flex;
+}
+
+.item {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  .left {
+    flex: 1;
+    vertical-align: top;
+    padding: 0 5px;
+    h3 {
+      font-weight: normal;
+      margin:0;
+    }
+    div {
+      color: #999;
+      margin-top:5px;
+    }
+  }
+  .right {
+    flex: 3;
+    vertical-align: top;
+    padding-left:10px;
+    .damnit {
+      margin-bottom: 1px;
+      border: 1px solid transparent;
+      &:hover {
+        background-color:#fff;
+        border-color: #d9d9d9;
+        input {
+          border-color: #f5f5f5;
+          transition: border 0;
+        }
+      }
+    }
+    :global {
+      .ant-input {
+        padding: 2px 5px;
+      }
+    }
+    .zhang {
+      max-width: 350px;
+      margin: 0 auto;
+    }
+    .chun {
+      max-width: 350px;
+      margin: 0 auto;
+      border: 1px solid #eee;
+      padding:5px;
+      background-color:#f9f9f9;
+      border-radius: 1px;
+      .op3 {
+        font-size:12px;
+      }
+    }
+    .hua {
+      max-width: 350px;
+      margin: 0 auto;
+    }
+    .op1 {
+      width: 35%;
+      display: inline-block;
+    }
+    .op2 {
+      width: 50%;
+      display: inline-block;
+    }
+    .op3 {
+      width: 10%;
+      display: inline-block;
+      text-align: center;
+    }
+    .zhang {
+      border:1px solid #eee;
+      padding:5px 0;
+      text-align: center;
+      margin-bottom: 2px;
+      border-radius: 1px;
+    }
+    .hua {
+      margin-top:8px;
+    }
+  }
+}
+:global {
+  .pos-form .ant-form-item {
+    margin-bottom:0;
+    margin-right:1px;
+    .ant-form-item-control {
+      line-height:28px;
+    }
+  }
+  .pos-form .has-error .ant-form-explain {
+    top: 4px;
+  }
+}

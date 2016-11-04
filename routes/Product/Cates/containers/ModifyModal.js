@@ -1,3 +1,16 @@
+/**
+* This file is part of the <智鼠> application.
+*
+* Version: 0.0.1
+* Description:
+*
+* Author: HuaZhang <yahveh.zh@gmail.com>
+* Date  : 2016-11-03 15:51:14
+* Last Updated:
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 //
 //                       _oo0oo_
 //                      o8888888o
@@ -198,7 +211,6 @@ export default connect(state => ({
       if (errors) {
         return false
       }
-      console.log(values)
       this.setState({
         confirmLoading: true
       })
@@ -206,10 +218,10 @@ export default connect(state => ({
         KindName: values.s1,
         Order: values.s2,
         Enable: 'true',
-        type: values.s3
+        mode: values.s3
       }
       if (values.s3 === '2') {
-        data.norms = values.s4 ? values.s4.split(/,|，/) : []
+        data.NormLst = values.s4 ? values.s4.split(/,|，/) : []
       }
       this.props.modalCB2(data, () => {
         this.hideModal()

@@ -1,3 +1,16 @@
+/**
+* This file is part of the <智鼠> application.
+*
+* Version: 0.0.1
+* Description:
+*
+* Author: HuaZhang <yahveh.zh@gmail.com>
+* Date  : 2016-09-23 09:55:38
+* Last Updated:
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 import React, { Component, PropTypes } from 'react'
 import { Entity, AtomicBlockUtils } from 'draft-js'
 import classNames from 'classnames'

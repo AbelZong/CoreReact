@@ -1,8 +1,28 @@
+/**
+* This file is part of the <智鼠> application.
+*
+* Version: 0.0.1
+* Description:
+*
+* Author: HuaZhang <yahveh.zh@gmail.com>
+* Date  : 2016-11-01 08:46:10
+* Last Updated:
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 import React from 'react'
-import { Modal, Icon } from 'antd'
-import {connect} from 'react-redux'
+import {
+  Modal,
+  Icon
+} from 'antd'
+import {
+  connect
+} from 'react-redux'
 import styles from './Modal.scss'
-import {ZGet} from 'utils/Xfetch'
+import {
+  ZGet
+} from 'utils/Xfetch'
 
 const FFTuan = React.createClass({
   getInitialState() {

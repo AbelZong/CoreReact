@@ -840,4 +840,28 @@
       background-color: transparent;
     }
   }
+
+  .ag-fresh.dark,
+  .ag-fresh .darkRow {
+      .ag-cell {
+        border: 1px solid #293038;
+        background-color:#293038;
+        color: #C5C5C5;
+      }
+      .ag-cell-focus,
+      .ag-cell-focus {
+        border: 1px solid #000;
+        background-color:#000;
+        color: #fff;
+      }
+      .ag-cell-range-selected-1:not(.ag-cell-focus) {
+      background-color:#000;
+      }
+    &.ag-row-selected {
+      .ag-cell {
+        background-color:#000;
+        border: 1px solid #000;
+      }
+    }
+  }
 }

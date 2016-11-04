@@ -1,3 +1,16 @@
+/**
+* This file is part of the <智鼠> application.
+*
+* Version: 0.0.1
+* Description:
+*
+* Author: HuaZhang <yahveh.zh@gmail.com>
+* Date  : 2016-09-28 17:09:18
+* Last Updated:
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 const strHtmInstall = '打印控件未安装！<a href="install_lodop32.exe" target="_self">点我执行安装</a>，安装成功后请刷新页面或重新进入。'
 const strHtmUpdate = '打印控件需要升级！<a href="install_lodop32.exe" target="_self">点我执行升级</a>，升级后请重新进入。'
 const strHtm64_Install = '打印控件未安装！<a href="install_lodop64.exe" target="_self">点我执行安装</a>，安装成功后请刷新页面或重新进入。'

@@ -1,3 +1,16 @@
+/**
+* This file is part of the <智鼠> application.
+*
+* Version: 0.0.1
+* Description:
+*
+* Author: HuaZhang <yahveh.zh@gmail.com>
+* Date  : 2016-11-01 13:45:14
+* Last Updated:
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 import React from 'react'
 import {Input} from 'antd'
 import Modal from './Modal'
@@ -56,13 +69,13 @@ export default React.createClass({
     const styler = style ? {width: this.props.width || 135, ...style} : {width: this.props.width || 135}
     return (
       <div className={CN} style={styler}>
+        <Modal visible={this.state.visible} onOk={this.handleModalOk} onCancel={this.handleModalCancel} value={this.state.value} />
         <div className={styles.inputArea} onClick={this.handleSelect}>
           <Input value={this.state.name} placeholder='第三方物流或分仓' size={this.props.size || 'default'} className={styles.input} />
           <span className={styles.operator}>
             {this.state.name !== '' ? <Icon type='minus' onClick={this.handleRemove} title='点击移除' /> : <Icon type='ellipsis-h' title='点击选择' />}
           </span>
         </div>
-        <Modal visible={this.state.visible} onOk={this.handleModalOk} onCancel={this.handleModalCancel} value={this.state.value} />
       </div>
     )
   }

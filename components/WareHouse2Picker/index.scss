@@ -35,11 +35,9 @@
     }
     .ant-radio-wrapper {
       margin-right:0;
-      display: inline-block;
+      display: block;
       height: 24px;
-      width: 32%;
       line-height: 24px;
-      float: left;
       &:hover {
         .ant-radio-inner {
           border-color: #2db7f5;
