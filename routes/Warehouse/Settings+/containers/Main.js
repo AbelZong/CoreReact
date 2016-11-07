@@ -55,16 +55,9 @@ export default createForm()(Wrapper(React.createClass({
     this.setState({
       confirmLoading: true
     })
-    ZGet('Warehouse/GetWarehouseList', ({d}) => {
+    ZGet('Warehouse/wareSettingGet', ({d}) => {
+      console.log(d)
       this.props.form.setFieldsValue({
-        s1: d.name1,
-        s2: d.name3,
-        s4: d.name4,
-        s6: d.name5,
-        s7: d.contract,
-        s8: d.phone,
-        s9: d.area,
-        s10: d.address
       })
     }).then(() => {
       endLoading()
@@ -94,14 +87,6 @@ export default createForm()(Wrapper(React.createClass({
         confirmLoading: true
       })
       ZPost('Warehouse/UpdateWarehouse', {
-        name1: values.s1,
-        name3: values.s2,
-        name4: values.s4,
-        name5: values.s6,
-        contract: values.s7,
-        phone: values.s8,
-        area: values.s9,
-        address: values.s10
       }).then(() => {
         endLoading()
         this.setState({

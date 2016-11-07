@@ -95,8 +95,6 @@ const Toolbar = React.createClass({
               ) : null}
               <DB onClick={this.handleCreate} overlay={(<Menu onClick={this.handleCreate1}>
                 <Menu.Item key='2'>申请加入仓储服务</Menu.Item>
-                <Menu.Item key='1'>第三仓储服务设置</Menu.Item>
-                <Menu.Item key='3'>订单分配策略</Menu.Item>
               </Menu>)} type='ghost' size='small'>
                 开通分仓
               </DB>

@@ -27,13 +27,27 @@ export default React.createClass({
     }
   },
   componentWillReceiveProps(nextProps) {
-    if (typeof nextProps.value === 'undefined') {
-      if (this.state.value !== nextProps.value) {
-        this._setValue(null, '')
+    //console.log(this.state, nextProps.value)
+    if (typeof nextProps.value === 'undefined' || nextProps.value === null) {
+      if (this.state.value !== null) {
+        this.__setValue(null, '')
+      } else {
+        this.setState({
+          visible: false
+        })
       }
     } else {
       if (this.state.value !== nextProps.value.id) {
-        this._setValue(nextProps.value.id, nextProps.value.name)
+        const id = Number(nextProps.value.id)
+        if (isNaN(id)) {
+          this.__setValue(null, '')
+        } else {
+          this.__setValue(id, nextProps.value.name)
+        }
+      } else {
+        this.setState({
+          visible: false
+        })
       }
     }
   },
@@ -52,26 +66,37 @@ export default React.createClass({
   },
   handleRemove(e) {
     e.stopPropagation()
-    this._setValue('', null)
+    this._setValue(null, '')
   },
   _setValue(value, name) {
+    const {onChange} = this.props
+    //console.log('change:', value, ':', name)
+    if (onChange) {
+      if (value === null) {
+        onChange(null)
+      } else {
+        onChange({id: value, name})
+      }
+    } else {
+      this.__setValue(value, name)
+    }
+  },
+  __setValue(value, name) {
     this.setState({
       visible: false,
       value,
       name
-    }, () => {
-      this.props.onChange && this.props.onChange({id: value, name})
     })
   },
   render() {
-    const {style, className} = this.props
+    const {style, className, placeholder} = this.props
     const CN = className ? `${styles.zhang} ${className}` : styles.zhang
     const styler = style ? {width: this.props.width || 135, ...style} : {width: this.props.width || 135}
     return (
       <div className={CN} style={styler}>
-        <Modal visible={this.state.visible} onOk={this.handleModalOk} onCancel={this.handleModalCancel} value={this.state.value} />
+        <Modal visible={this.state.visible} onOk={this.handleModalOk} onCancel={this.handleModalCancel} value={this.state.value} withLocal={this.props.withLocal} />
         <div className={styles.inputArea} onClick={this.handleSelect}>
-          <Input value={this.state.name} placeholder='第三方物流或分仓' size={this.props.size || 'default'} className={styles.input} />
+          <Input value={this.state.name} placeholder={placeholder || '第三方物流或分仓'} size={this.props.size || 'default'} className={styles.input} />
           <span className={styles.operator}>
             {this.state.name !== '' ? <Icon type='minus' onClick={this.handleRemove} title='点击移除' /> : <Icon type='ellipsis-h' title='点击选择' />}
           </span>

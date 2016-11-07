@@ -59,6 +59,7 @@ import PurchaseListRoute from './Purchase/List'
 import CompanyClientsRoute from './Company/Clients'
 import WarehouseSettingsRoute from './Warehouse/Settings'
 import WarehouseSettingsPlusRoute from './Warehouse/Settings+'
+import WarehouseOrderulesRoute from './Warehouse/Orderules'
 import BusinessSettingRoute from './Admin/BusinessSetting'
 import ProductCatesRoute from './Product/Cates'
 import ProductNormMappingRoute from './Product/NormMapping'
@@ -116,6 +117,7 @@ export const createRoutes = (store) => ([
       CompanyClientsRoute(store),
       WarehouseSettingsRoute(store),
       WarehouseSettingsPlusRoute(store),
+      WarehouseOrderulesRoute(store),
       Warehouse3rdRoute(store),
       ProductCatesRoute(store),
       BusinessSettingRoute(store),

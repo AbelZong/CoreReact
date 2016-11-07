@@ -27,7 +27,7 @@ export default React.createClass({
     }
   },
   componentWillReceiveProps(nextProps) {
-    if (nextProps.visible) {
+    if (nextProps.visible && this.props.visible !== nextProps.visible) {
       this.setState({
         spinning: true,
         dataList: []
@@ -35,9 +35,18 @@ export default React.createClass({
       ZGet({
         uri: 'Warehouse/wareLst',
         success: ({d}) => {
+          const lst = d.Lst && d.Lst instanceof Array ? d.Lst : []
+          if (this.props.withLocal) {
+            lst.unshift({
+              id: 0,
+              coid: 0,
+              warename: '本仓'
+              //warename: <span style={{color: 'green'}}>{`{本仓}`}</span>
+            })
+          }
           this.setState({
             spinning: false,
-            dataList: d.Lst,
+            dataList: lst,
             value: nextProps.value
           })
         }
