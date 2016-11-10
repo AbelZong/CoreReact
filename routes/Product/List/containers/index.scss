@@ -1,0 +1,36 @@
+/**
+* This file is part of the <智鼠> application.
+*
+* Version: 0.0.1
+* Description:
+*
+* Author: HuaZhang <yahveh.zh@gmail.com>
+* Date  : 2016-11-09 PM
+* Last Updated:
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
+.toolbars {
+  padding: 10px 5px 10px 10px;
+}
+.main {
+  padding-left:10px;
+  padding-right:5px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.topOperators {
+  display: flex;
+  flex-direction: row;
+  padding-bottom: 4px;
+  .Hleft {
+    flex: 1;
+  }
+  .Hright {
+    flex-basis: 150px;
+    text-align: right;
+  }
+}

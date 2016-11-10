@@ -62,6 +62,8 @@ import WarehouseSettingsPlusRoute from './Warehouse/Settings+'
 import WarehouseOrderulesRoute from './Warehouse/Orderules'
 import BusinessSettingRoute from './Admin/BusinessSetting'
 import ProductCatesRoute from './Product/Cates'
+import ProductListRoute from './Product/List'
+import ProductList2Route from './Product/List2'
 import ProductNormMappingRoute from './Product/NormMapping'
 import Warehouse3rdRoute from './Warehouse/3rd'
 //import AdminCompanyRoute from './Admin/Company'
@@ -120,6 +122,8 @@ export const createRoutes = (store) => ([
       WarehouseOrderulesRoute(store),
       Warehouse3rdRoute(store),
       ProductCatesRoute(store),
+      ProductListRoute(store),
+      ProductList2Route(store),
       BusinessSettingRoute(store),
       ProductNormMappingRoute(store),
       NotFoundRoute

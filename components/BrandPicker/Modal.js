@@ -89,7 +89,7 @@ export default React.createClass({
     const {fKey} = this.state
     const dataList = fKey === null ? this.state.dataList : this.state.dataList.filter(x => x.Name.indexOf(fKey) !== -1)
     return (
-      <Modal title='选择品牌' visible={this.props.visible} onCancel={this.props.onCancel} footer={this.renderFooter()} width={780}>
+      <Modal title='选择品牌' visible={this.props.visible} onCancel={this.props.onCancel} footer={this.renderFooter()} width={495}>
         <div className={styles.hua}>
           <Spin size='large' spinning={this.state.spinning} />
           {dataList.length > 0 ? (
@@ -100,11 +100,7 @@ export default React.createClass({
                 </RadioGroup>
               </ScrollerBar>
             </div>
-          ) : (
-            <div>
-              NULL
-            </div>
-          )}
+          ) : null}
         </div>
       </Modal>
     )

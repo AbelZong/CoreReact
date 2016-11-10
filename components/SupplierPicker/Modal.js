@@ -89,7 +89,7 @@ export default React.createClass({
     const {fKey} = this.state
     const dataList = fKey === null ? this.state.dataList : this.state.dataList.filter(x => x.sconame.indexOf(fKey) !== -1)
     return (
-      <Modal title='选择供应商' visible={this.props.visible} onCancel={this.props.onCancel} footer={this.renderFooter()} width={780}>
+      <Modal title='选择供应商' visible={this.props.visible} onCancel={this.props.onCancel} footer={this.renderFooter()} width={700}>
         <div className={styles.hua}>
           <Spin size='large' spinning={this.state.spinning} />
           {dataList.length > 0 ? (

@@ -5,7 +5,7 @@
 * Description:
 *
 * Author: HuaZhang <yahveh.zh@gmail.com>
-* Date  : 2016-11-03 10:07:44
+* Date  : 2016-11-09 PM
 * Last Updated:
 *
 * For the full copyright and license information, please view the LICENSE
@@ -16,13 +16,13 @@ import {
 } from 'store/reducers'
 
 export default (store) => ({
-  path: 'product/item1',
+  path: 'product/list2',
   getComponent(nextState, cb) {
     require.ensure([], (require) => {
       const container = require('./containers/Container').default
       const reducers = require('./modules/reducers').default
       injectReducers(store, reducers)
       cb(null, container)
-    }, 'productItem1')
+    }, 'productList2')
   }
 })
