@@ -24,21 +24,22 @@ import {
   ZGet
 } from 'utils/Xfetch'
 
+const DEFAULT_T = { title: '', content: '', date: '', loading: false }
 const FFTuan = React.createClass({
   getInitialState() {
-    return { title: '', content: '', date: '', loading: false }
+    return DEFAULT_T
   },
   componentWillReceiveProps(nextProps) {
     const {mod, query, visible} = nextProps.zhModUnq
     this.ignoreCase = false
     if (visible) {
-      this.setState({loading: true})
+      this.setState(Object.assign({}, DEFAULT_T, {loading: true}))
       ZGet(mod, query, ({d}) => {
         if (this.ignoreCase) { return }
         this.setState({ ...d, loading: false })
       })
     } else {
-      this.setState({ title: '', content: nextProps.zhModUnq.visible ? 'loading' : '', loading: false })
+      //this.setState({ title: '', content: nextProps.zhModUnq.visible ? 'loading' : '', loading: false })
     }
   },
   hideModal() {
@@ -47,10 +48,10 @@ const FFTuan = React.createClass({
   },
 
   render() {
-    const {title, content, date, loading} = this.state
+    const {Title, Content, Date, loading} = this.state
     const {visible} = this.props.zhModUnq
     return (
-      <Modal wrapClassName={styles.modalFFtuan} title={title} visible={visible} footer='' onCancel={this.hideModal}>
+      <Modal wrapClassName={styles.modalFFtuan} title={Title} visible={visible} footer='' onCancel={this.hideModal} width={800}>
         {loading ? (
           <div className={styles.loading}>
             <Icon type='loading' />
@@ -58,9 +59,9 @@ const FFTuan = React.createClass({
         ) : (
           <div>
             <div className={styles.hua}>
-              <Icon type='clock-circle-o' />&nbsp;<time>{date}</time>
+              <Icon type='clock-circle-o' />&nbsp;<time>{Date}</time>
             </div>
-            <div className={styles.content} dangerouslySetInnerHTML={{__html: content}} />
+            <div className={styles.content} dangerouslySetInnerHTML={{__html: Content}} />
           </div>
         )}
       </Modal>

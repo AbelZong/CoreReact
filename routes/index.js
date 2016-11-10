@@ -5,7 +5,7 @@
 * Description:
 *
 * Author: HuaZhang <yahveh.zh@gmail.com>
-* Date  : 2016-10-31 16:04:50
+* Date  : 2016-10-31
 * Last Updated:
 *
 * For the full copyright and license information, please view the LICENSE
@@ -66,6 +66,7 @@ import ProductListRoute from './Product/List'
 import ProductList2Route from './Product/List2'
 import ProductNormMappingRoute from './Product/NormMapping'
 import Warehouse3rdRoute from './Warehouse/3rd'
+import SuperAnnounceRoute from './Super/Announce'
 //import AdminCompanyRoute from './Admin/Company'
 // const QQ = require.context('./__ENTERIES__', false, /\.js$/)
 // console.dir(QQ)
@@ -126,6 +127,7 @@ export const createRoutes = (store) => ([
       ProductList2Route(store),
       BusinessSettingRoute(store),
       ProductNormMappingRoute(store),
+	  SuperAnnounceRoute(store),
       NotFoundRoute
     ],
     ignoreScrollBehavior: true

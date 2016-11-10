@@ -18,7 +18,7 @@ import styles from './DB.scss'
 import Wrapper from 'components/MainWrapper'
 import {COMPANY, VERSION} from 'constants/config'
 import {startLoading, endLoading} from 'utils'
-
+import {ZGet} from 'utils/Xfetch'
 import echarts from 'echarts'
 import echartsChinaMap from 'echarts/map/json/china'
 echarts.registerMap('china', echartsChinaMap)
@@ -31,7 +31,8 @@ import 'echarts/theme/shine'
   //todo cache last data, able to change router with no refresh fetching again
 class Main extends React.Component {
   state = {
-    data: null
+    data: null,
+    notice: 'loading...'
   }
   componentWillMount() {
     this.refreshDataCallback()
@@ -47,6 +48,12 @@ class Main extends React.Component {
 
   refreshDataCallback = () => {
     startLoading()
+    ZGet('profile/index', ({d}) => {
+      console.log(d)
+      this.setState({
+        notice: d.notice.intro
+      })
+    })
     //ZGet('router', params, () => { ...
     setTimeout(() => { //模拟 ZGet，对接时替换
       //const {data, sysLogs, divFS, divSS, divAreas} = d
@@ -441,7 +448,7 @@ class Main extends React.Component {
   }
   handleReadNotice = () => {
     this.props.dispatch({ type: 'ZHMODUNQ_SET', payload: {
-      mod: 'test', query: null, visible: true
+      mod: 'XyUser/Notice/NoticeGet', query: null, visible: true
     } })
   }
   openLogById = (id) => {
@@ -499,9 +506,9 @@ class Main extends React.Component {
           </Col>
           <Col span='8'>
             <div className={`${styles['col-a']} ${styles['col-danger']}`}>
-              <div className={styles.box}>
-                <div className='cur' onClick={this.handleReadNotice}>
-                  【CCAI大咖秀】崔鹏：物理模型结合大数据建模，弃用深度学习
+              <div className={`cur ${styles.box}`} onClick={this.handleReadNotice}>
+                <div>
+                  {this.state.notice}
                 </div>
               </div>
               <footer>
@@ -656,5 +663,4 @@ class Main extends React.Component {
     )
   }
 }
-
 export default connect()(Wrapper(Main))
