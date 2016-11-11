@@ -127,7 +127,7 @@ export const createRoutes = (store) => ([
       ProductList2Route(store),
       BusinessSettingRoute(store),
       ProductNormMappingRoute(store),
-	  SuperAnnounceRoute(store),
+      SuperAnnounceRoute(store),
       NotFoundRoute
     ],
     ignoreScrollBehavior: true
