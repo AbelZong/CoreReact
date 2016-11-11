@@ -28,6 +28,7 @@ import {
   startLoading,
   endLoading
 } from 'utils/index'
+import WheatEditor from 'components/Editor'
 const createForm = Form.create
 const FormItem = Form.Item
 export default createForm()(Wrapper(React.createClass({
@@ -50,32 +51,13 @@ export default createForm()(Wrapper(React.createClass({
     this.setState({
       confirmLoading: true
     })
-    ZGet('Warehouse/GetWarehouseList', ({d}) => {
-      this.props.form.setFieldsValue({
-        s1: d.name1,
-        s2: d.name3,
-        s4: d.name4,
-        s6: d.name5,
-        s7: d.contract,
-        s8: d.phone,
-        s9: d.area,
-        s10: d.address
-      })
+    ZGet('XyUser/Notice/NoticeGet', ({d}) => {
+      this.props.form.setFieldsValue(d)
     }).then(() => {
       endLoading()
       this.setState({
         confirmLoading: false
       })
-    })
-  },
-  handleSwitch3(e) {
-    this.setState({
-      s2_enabled: e
-    })
-  },
-  handleSwitch5(e) {
-    this.setState({
-      s4_enabled: e
     })
   },
   handleSubmit(e) {
@@ -88,16 +70,7 @@ export default createForm()(Wrapper(React.createClass({
       this.setState({
         confirmLoading: true
       })
-      ZPost('Warehouse/UpdateWarehouse', {
-        name1: values.s1,
-        name3: values.s2,
-        name4: values.s4,
-        name5: values.s6,
-        contract: values.s7,
-        phone: values.s8,
-        area: values.s9,
-        address: values.s10
-      }).then(() => {
+      ZPost('XyUser/Notice/InsertNotice', values).then(() => {
         endLoading()
         this.setState({
           confirmLoading: false
@@ -111,36 +84,32 @@ export default createForm()(Wrapper(React.createClass({
   },
   render() {
     const { getFieldDecorator } = this.props.form
-    const formItemLayout = {
-      labelCol: { span: 6 },
-      wrapperCol: { span: 18 }
-    }
     return (
       <div className={styles.main}>
         <div style={{marginTop: '2em'}} />
-        <Form horizontal className='pos-form'>
-          <FormItem {...formItemLayout} label='销售主仓库名称'>
-            <Col span='6'>
-              <FormItem>
-                {getFieldDecorator('s1', {
-                  rules: [
-                    { required: true, whitespace: true, message: '必填' }
-                  ]
-                })(
-                  <Input type='text' />
-                )}
-              </FormItem>
-            </Col>
-            <Col span='18'>
-              <span className='ml10 hide'>设定主仓仓位</span>
-            </Col>
+        <Form vertical className='pos-form'>
+          <FormItem label='公告简述'>
+            {getFieldDecorator('Title', {
+              rules: [
+                { required: true, whitespace: true, message: '必填' }
+              ]
+            })(
+              <Input type='textarea' />
+            )}
+          </FormItem>
+          <FormItem label='公告详情'>
+            {getFieldDecorator('Content', {
+              rules: [
+                { required: true, whitespace: true, message: '必填' }
+              ]
+            })(
+              <WheatEditor />
+            )}
           </FormItem>
           <div style={{marginBottom: '1em'}} className='clearfix' />
           <FormItem>
             <Col span='7' offset='6'>
-              <Button onClick={this.handleReset}>重置</Button>
-              &nbsp;&nbsp;&nbsp;
-              <Button type='primary' onClick={this.handleSubmit} loading={this.state.confirmLoading}>保存设定</Button>
+              <Button type='primary' onClick={this.handleSubmit} loading={this.state.confirmLoading}>保存发布</Button>
             </Col>
           </FormItem>
         </Form>

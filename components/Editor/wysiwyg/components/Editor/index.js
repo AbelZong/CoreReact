@@ -15,13 +15,11 @@ import React, { Component, PropTypes } from 'react'
 import {
   Editor,
   EditorState,
-  ContentState,
   RichUtils,
-  convertFromRaw,
-  convertToRaw,
   CompositeDecorator,
   DefaultDraftBlockRenderMap
 } from 'draft-js'
+import {convertFromHTML, convertToHTML} from 'draft-convert'
 import {
   changeDepth,
   handleNewLine,
@@ -46,7 +44,7 @@ class WysiwygEditor extends Component {
 
   static propTypes = {
     onChange: PropTypes.func,
-    rawContent: PropTypes.object,
+    rawContent: PropTypes.any,
     toolbarAlwaysVisible: PropTypes.bool,
     toolbarClassName: PropTypes.string,
     editorClassName: PropTypes.string,
@@ -68,11 +66,16 @@ class WysiwygEditor extends Component {
   }
 
   componentWillMount(): void {
+    this.setContent(this.props.rawContent)
+  }
+
+  setContent(content): void {
     let editorState
     const decorator = new CompositeDecorator([LinkDecorator])
-    if (this.props.rawContent) {
-      editorState = EditorState.createWithContent(
-        ContentState.createFromBlockArray(convertFromRaw(this.props.rawContent), decorator))
+    if (content) {
+      //editorState = EditorState.createWithContent(
+      //  ContentState.createFromBlockArray(convertFromRaw(this.props.rawContent), decorator))
+      editorState = EditorState.createWithContent(typeof content === 'string' ? convertFromHTML(content) : content, decorator)
     } else {
       editorState = EditorState.createEmpty(decorator)
     }
@@ -101,8 +104,9 @@ class WysiwygEditor extends Component {
         this._focusEditor()
       }
       if (this.props.onChange) {
-        const editorContent = convertToRaw(this.state.editorState.getCurrentContent())
-        this.props.onChange(editorContent)
+        //const editorContent = convertToRaw(this.state.editorState.getCurrentContent())
+        const editorContent = convertToHTML(this.state.editorState.getCurrentContent())
+        this.props.onChange(editorContent, this.state.editorState)
       }
     })
   };
@@ -151,11 +155,11 @@ class WysiwygEditor extends Component {
   };
 
   _focusEditor: Function = (): void => {
-    console.log('this.editor.................', this.editor)
-    setTimeout(() => {
+    //console.log('this.editor.................', this.editor)
+    //setTimeout(() => {
       //todo
       // this.editor.focus();
-    })
+    //})
   };
 
   _handleKeyCommand: Function = (command: Object): boolean => {

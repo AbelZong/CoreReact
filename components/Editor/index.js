@@ -12,17 +12,41 @@
 * file that was distributed with this source code.
 */
 //import Editor from './Editor'
-import {Editor} from './wysiwyg/index'
-// import React, {Component} from 'react'
-//
-// console.log(aa)
-//
-// class Editor extends Component {
-//   render() {
-//     return (
-//       <div>123</div>
-//     )
-//   }
-// }
+//import Editor from './Wheat/index'
+//export default Editor
 
-export default Editor
+//todo optimization damnit
+import React from 'react'
+import {Editor} from './wysiwyg/index'
+import './wysiwyg.scss'
+export default React.createClass({
+  componentWillReceiveProps(nextProps) {
+    if (this.props.value !== nextProps.value) {
+      this.refs.wheat.setContent(nextProps.value)
+    }
+  },
+  handleChange(html, editorState) {
+    this.props.onChange && this.props.onChange(html)
+  },
+  render() {
+    return <Editor toolbarAlwaysVisible onChange={this.handleChange} ref='wheat' />
+  }
+})
+// import React from 'react'
+// import { Editor } from 'react-draft-wysiwyg'
+// import {convertFromHTML, convertToHTML} from 'draft-convert'
+// import './wysiwyg.scss'
+// export default React.createClass({
+//   componentWillReceiveProps(nextProps) {
+//     if (this.props.value !== nextProps.value) {
+//       console.log(nextProps)
+//     }
+//   },
+//   handleChange(editorState) {
+//     console.log(editorState)
+//     this.props.onChange && this.props.onChange(convertToHTML(editorState))
+//   },
+//   render() {
+//     return <Editor toolbarAlwaysVisible onChange={this.handleChange} />
+//   }
+// })

@@ -18,7 +18,7 @@ import { Dropdown, DropdownOption } from '../Dropdown'
 import { getSelectionInlineStyle } from 'draftjs-utils'
 import Icon from 'components/Icon/index'
 
-//import styles from './styles.scss'
+import './styles.scss'
 
 class InlineControl extends Component {
 
