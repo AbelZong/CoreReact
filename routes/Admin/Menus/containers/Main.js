@@ -70,7 +70,7 @@ const Main = React.createClass({
   render() {
     return (
       <div className={styles.main}>
-        <ZGrid setPleaseTip='请先选择左侧【模板类型】' className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'print_user' }} columnDefs={columnDefs} grid={this} />
+        <ZGrid setPleaseTip='请先选择左侧【模板类型】' className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'admin_menus' }} columnDefs={columnDefs} grid={this} />
       </div>
     )
   }
