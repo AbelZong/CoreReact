@@ -306,7 +306,8 @@ class ZGrid extends React.Component {
   className,
   gridOptions,
   children,
-  pagesAlign
+  pagesAlign,
+  rowHeight
 } = this.props
     const rowData = this.state.rowData || this.props.rowData
     const CN = className ? `z-grid ${className}` : 'z-grid'
@@ -325,7 +326,7 @@ class ZGrid extends React.Component {
       <div className={CN} style={{height: height || 'auto'}}>
         <div className='grid-inner'>
           <div className='ag-fresh'>
-            <AgGridReact gridOptions={_gridOptions} containerStyle={{position: 'absolute', width: '100%'}} onGridReady={this.onGridReady} onColumnResized={this.agColumnResized} onColumnMoved={this.agColumnMoved} onColumnVisible={this.agColumnVisible} columnDefs={columnDefs} rowData={rowData} rowHeight='32' />
+            <AgGridReact gridOptions={_gridOptions} containerStyle={{position: 'absolute', width: '100%'}} onGridReady={this.onGridReady} onColumnResized={this.agColumnResized} onColumnMoved={this.agColumnMoved} onColumnVisible={this.agColumnVisible} columnDefs={columnDefs} rowData={rowData} rowHeight={rowHeight || 32} />
           </div>
           <div className={footerCN}>
             <div className='op-l'>{children}</div>

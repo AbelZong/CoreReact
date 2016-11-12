@@ -17,7 +17,11 @@ const order_list_collapse = handleActions({
   ORDER_LIST_COLLAPSE_SET: (state, action) => action.payload,
   ORDER_LIST_COLLAPSE_REVER: (state, action) => !state
 }, false)
+const order_list_conditions = handleActions({
+  ORDER_LIST_CONDITIONS_SET: (state, action) => action.payload,
+  ORDER_LIST_CONDITIONS_UPDATE: (state, action) => update(state, action.update)
+}, {})
 
 export default {
-  order_list_collapse
+  order_list_collapse, order_list_conditions
 }

@@ -13,7 +13,45 @@
 */
 .aside {
   padding:0 5px 10px;
+  .pen {
+  }
   .box {
-    
+    .tt {
+      position: relative;
+      padding-left: 25px;
+      line-height:30px;
+      .arrow {
+        position: absolute;
+        left:5px;
+        top:0;
+        width: 18px;
+height: 100%;
+        &:before {
+          position: absolute;
+          left:5px;
+          top:0;
+          font-family: anticon!important;
+          content: "\E606";
+          color: #666;
+          transform: scale(.58333333);
+        }
+      }
+    }
+    .dd {
+      padding-left:5px;
+      overflow: hidden;
+    }
+    &.closed {
+      .tt {
+        .arrow {
+          &:before {
+            transform: scale(.58333333) rotate(-90deg);
+          }
+        }
+      }
+      .dd {
+        display: none;
+      }
+    }
   }
 }

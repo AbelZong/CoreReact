@@ -13,15 +13,18 @@
 */
 import React from 'react'
 import {connect} from 'react-redux'
-import {Button, message} from 'antd'
+import {
+  Button,
+  message,
+  Dropdown,
+  Menu
+} from 'antd'
 import appStyles from 'components/App.scss'
 import CollapseBtn from './CollapseBtn'
+import Iconfa from 'components/Icon'
 import Table from './Table'
 
-class AdminPanel extends React.Component {
-  state = {
-    data: null
-  }
+class Main extends React.Component {
   handleCreateNew = () => {
   }
   render() {
@@ -31,9 +34,19 @@ class AdminPanel extends React.Component {
           <div className='flex-row'>
             <CollapseBtn />
             <div className={appStyles.tools}>
-              <div className='pull-right'>
-                <Button type='ghost' size='small' icon='plus' onClick={this.handleCreateNew}>新增预设</Button>
-              </div>
+              <Dropdown overlay={<Menu onClick={this.handleNewEvent}>
+                <Menu.Item key='1' title='一般用于手工添加线下订单'><Iconfa type='plus' style={{color: 'red'}} />&nbsp;&nbsp;手工下单</Menu.Item>
+                <Menu.Item key='2'><Iconfa type='upload' />&nbsp;&nbsp;导入订单</Menu.Item>
+                <Menu.Divider />
+                <Menu.Item key='3' title='授权店铺订单接口会自动下载到系统,不需要手工操作`个别情况需要手工操作`可重复下载'>&nbsp;&nbsp;手工下载授权店铺订单[按单号]</Menu.Item>
+                <Menu.Item key='4' title='授权店铺订单接口会自动下载到系统,不需要手工操作`个别情况需要手工操作`可重复下载'>&nbsp;&nbsp;手工下载授权店铺订单[按时间]</Menu.Item>
+                <Menu.Divider />
+                <Menu.Item key='5' disabled>&nbsp;&nbsp;授权店铺订单自动下载到系统，无须操作</Menu.Item>
+              </Menu>}>
+                <Button type='ghost' size='small'>
+                  <Iconfa type='plus' style={{color: 'red'}} />&nbsp;新增订单&nbsp;&nbsp;<Iconfa type='caret-down' />
+                </Button>
+              </Dropdown>
             </div>
           </div>
         </div>
@@ -42,6 +55,4 @@ class AdminPanel extends React.Component {
     )
   }
 }
-export default connect(state => ({
-  activeTypeID: state.print_admin_type_active
-}))(AdminPanel)
+export default connect()(Main)

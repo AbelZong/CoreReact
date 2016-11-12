@@ -11,16 +11,25 @@
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
 */
-import React, {createClass} from 'react'
-import {connect} from 'react-redux'
+import React, {
+  createClass
+} from 'react'
+import {
+  connect
+} from 'react-redux'
 import styles from 'components/App.scss'
 import classNames from 'classnames'
 import Side from './Side'
 import Main from './Main'
-
+import {
+  endLoading
+} from 'utils/index'
 export default connect(state => ({
   collapse: state.order_list_collapse
 }))(createClass({
+  componentDidMount() {
+    endLoading()
+  },
   render() {
     const collapse = this.props.collapse
     const CN = classNames(styles.content, 'flex-row', {
