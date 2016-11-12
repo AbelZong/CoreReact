@@ -34,3 +34,20 @@
     text-align: right;
   }
 }
+
+.item{
+  background: #f5f5f5;
+  .itemSelect{
+    margin-top: 5px;
+    margin-bottom: 0px;
+  }
+}
+
+.chk{
+  position:relative;
+  .input{
+//    display: none
+  }
+}
+
+

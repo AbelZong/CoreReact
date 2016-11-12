@@ -29,7 +29,7 @@ const FormItem = Form.Item
 import Wrapper from 'components/MainWrapper'
 export default connect()(createForm()(Wrapper(React.createClass({
   componentDidMount() {
-    this.refreshDataCallback()
+    //this.refreshDataCallback()
   },
   handleSearch(e) {
     e.preventDefault()

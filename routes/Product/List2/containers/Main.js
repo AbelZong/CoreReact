@@ -7,7 +7,7 @@
 * Author: HuaZhang <yahveh.zh@gmail.com>
 * Date  : 2016-11-09 PM
 * Last Updated:
-*
+*          2016-11-11 AM chenjie <827869959@qq.com>
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
 */
@@ -24,6 +24,7 @@ import ZGrid from 'components/Grid/index'
 import styles from './index.scss'
 import Wrapper from 'components/MainWrapper'
 import SupplierPicker from 'components/SupplierPicker'
+import BrandPicker from 'components/BrandPicker'
 import ItemCatPicker from 'components/ItemCatPicker'
 import {
   Popconfirm,
@@ -33,6 +34,7 @@ import {
   Form,
   Input,
   Modal,
+  Checkbox,
   Radio
 } from 'antd'
 import {
@@ -47,6 +49,7 @@ const FormItem = Form.Item
 const ButtonGroup = Button.Group
 const RadioGroup = Radio.Group
 const Option = Select.Option
+const CheckboxGroup = Checkbox.Group
 const Main = React.createClass({
   componentDidMount() {
     this._firstBlood()
@@ -104,6 +107,7 @@ const Main = React.createClass({
     }
   },
   _firstBlood(_conditions) {
+    console.log(_conditions)
     const conditions = Object.assign({}, this.props.conditions || {}, _conditions || {})
     const uri = 'XyCore/CoreSku/GoodsQueryLst'
     const data = Object.assign({
@@ -178,13 +182,17 @@ const Main = React.createClass({
 })
 const DEFAULT_TITLE = '创建新商品'
 const ModifyModal = connect(state => ({
-  doge: state.product_list_modify_vis
+  doge: state.product_list2_modify_vis
 }))(createForm()(React.createClass({
   getInitialState() {
     return {
       visible: false,
       confirmLoading: false,
-      title: DEFAULT_TITLE
+      title: DEFAULT_TITLE,
+      shops: [],
+      itemprops: [],
+      skuprops: [],
+      kindid: 0
     }
   },
   componentWillReceiveProps(nextProps) {
@@ -199,6 +207,11 @@ const ModifyModal = connect(state => ({
           visible: true,
           title: DEFAULT_TITLE,
           confirmLoading: false
+        })
+        ZGet('Shop/getShopEnum', ({d}) => {
+          this.setState({
+            shops: d
+          })
         })
       } else {
         startLoading()
@@ -222,7 +235,7 @@ const ModifyModal = connect(state => ({
     }
   },
   handleSubmit() {
-    this.props.form.validateFields((errors, vs) => {
+    this.props.form.validateFields((errors, v) => {
       const wtf = !!errors
       if (wtf) {
         return false
@@ -230,32 +243,103 @@ const ModifyModal = connect(state => ({
       this.setState({
         confirmLoading: true
       })
-      const {doge} = this.props
-      let uri = ''
-      const data = {}
-      if (doge === 0) {
-        uri = 'Purchase/InsertPur'
-        data.id = 0
-      } else {
-        uri = 'Purchase/UpdatePur'
-        data.id = doge
-      }
-      ZPost(uri, {
-        Pur: data
-      }, () => {
-        this.hideModal()
-        EE.triggerRefreshMain()
-      }, () => {
-        this.setState({
-          confirmLoading: false
-        })
-      })
+      //const {doge} = this.props
+      v.KindID = (v.KindID && v.KindID.id) ? v.KindID.id : ''
+      v.Brand = (v.Brand && v.Brand.id) ? v.Brand.id : ''
+      v.Supplier = (v.Supplier && v.Supplier.id) ? v.Supplier.id : ''
+      console.log(v)
+      // let uri = ''
+      // const data = {}
+      // if (doge === 0) {
+      //   uri = 'Purchase/InsertPur'
+      //   data.id = 0
+      // } else {
+      //   uri = 'Purchase/UpdatePur'
+      //   data.id = doge
+      // }
+      // ZPost(uri, {
+      //   Pur: data
+      // }, () => {
+      //   this.hideModal()
+      //   EE.triggerRefreshMain()
+      // }, () => {
+      //   this.setState({
+      //     confirmLoading: false
+      //   })
+      // })
     })
   },
-
+  handleKind(e) {
+    let kindid = this.state.kindid
+    if (kindid !== e.id) {
+      this.setState({
+        kindid: e.id
+      })
+      ZGet({
+        uri: 'XyComm/Customkind/SkuKindProps',
+        data: {
+          ID: 365,
+          Enable: true
+        },
+        success: ({d}) => {
+          this.setState({
+            itemprops: d
+          })
+          //console.log(JSON.parse(d[2].values).prop_value)
+        }
+      }).then(endLoading)
+      ZGet({
+        uri: 'XyComm/CustomKindSkuProps/SkuPropsByKind',
+        data: {
+          KindID: 365
+        },
+        success: ({d}) => {
+          this.setState({
+            skuprops: d
+          })
+        }
+      }).then(endLoading)
+    }
+  },
   hideModal() {
-    this.props.dispatch({ type: 'PRODUCT_LIST_MODIFY_VIS_SET', payload: -1 })
+    this.props.dispatch({ type: 'PRODUCT_LIST2_MODIFY_VIS_SET', payload: -1 })
     requestAnimationFrame(() => this.props.form.resetFields())
+  },
+  commAttrs(vs) {
+    return vs.map(x => {
+      return (
+        <div key={x.id}>
+          <FormItem className={styles.itemSelect} style={{ margin: '5px 0 0 0' }}>
+            {this.props.form.getFieldDecorator(`attr-${x.id}`)(
+              <Select placeholder={`-选择${x.name}-`} style={{ width: 200 }}>
+                {x.values != null ? (JSON.parse(x.values).prop_value.map(y => <Option value={`${y.vid}`} key={y.vid}>{y.name}</Option>)) : <Option key={0} />}
+              </Select>
+            )}
+          </FormItem>
+        </div>
+      )
+    })
+  },
+  skuChange(e) {
+    console.log(e.target.id)
+  },
+  commSkus(vs) {
+    return vs.map(x => {
+      return (
+        <div key={x.pid}>
+          <FormItem label={`${x.name}`} style={{ margin: '5px 0 0 0' }}>
+            {
+                x.skuprops_values != null ? (x.skuprops_values.map(y => this.props.form.getFieldDecorator(`sku-${y.id}`)(<Checkbox key={y.id} label={`${y.name}`} className={styles.chk} onChange={this.skuChange}>
+                  {y.name}
+                  <Input style={{display: 'none'}} className={styles.input} value={`${y.name}`} />
+                </Checkbox>)
+                )
+                ) : <Checkbox />
+              }
+          </FormItem>
+        </div>
+      )
+    })
   },
   render() {
     const { getFieldDecorator } = this.props.form
@@ -264,49 +348,94 @@ const ModifyModal = connect(state => ({
       labelCol: { span: 4 },
       wrapperCol: { span: 20 }
     }
+    const formItemLayout2 = {
+      labelCol: { span: 4 },
+      wrapperCol: { span: 12 }
+    }
     return (
       <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={confirmLoading} width={680} maskClosable={false} closable={false}>
         <Form horizontal className='pos-form'>
-          <FormItem>
-            <ItemCatPicker />
-          </FormItem>
-          <FormItem {...formItemLayout} label='商品类型'>
-            {getFieldDecorator('s2', {
-              initialValue: '0'
+
+          <FormItem {...formItemLayout2} label='款式编码(货号)'>
+            {getFieldDecorator('GoodsCode', {
+              rules: [{ required: true, message: '必填' }]
             })(
-              <RadioGroup>
-                <Radio key='0' value='0'>成品</Radio>
-                <Radio key='1' value='1'>组合商品</Radio>
-                <Radio key='3' value='3'>非成品</Radio>
-                <Radio key='2' value='2'>原物料</Radio>
-              </RadioGroup>
+              <Input />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout} label='品牌'>
+            {getFieldDecorator('Brand')(
+              <BrandPicker />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout2} label='商品名称'>
+            {getFieldDecorator('GoodsName', {
+              rules: [{ required: true, message: '必填' }]
+            })(
+              <Input />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout2} label='商品分类'>
+            {getFieldDecorator('KindID')(
+              <ItemCatPicker onChange={this.handleKind} />
             )}
           </FormItem>
           <FormItem {...formItemLayout} label='供应商'>
-            {getFieldDecorator('s3', {
+            {getFieldDecorator('Supplier', {
               rules: [
                 { required: true, type: 'object', message: '必选' }
               ]
             })(
-              <SupplierPicker size='small' />
+              <SupplierPicker />
             )}
           </FormItem>
-          <FormItem {...formItemLayout} label='合同条款'>
-            {getFieldDecorator('s6')(
-              <Input type='textarea' autosize={{minRows: 3, maxRows: 6}} />
+          <FormItem {...formItemLayout2} label='供应商货号'>
+            {getFieldDecorator('SupplierCode')(
+              <Input />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout2} label='市场|吊牌价'>
+            {getFieldDecorator('MarketPrice')(
+              <Input />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout2} label='一口价'>
+            {getFieldDecorator('SalePrice')(
+              <Input />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout2} label='成本价(采购价)'>
+            {getFieldDecorator('PurPrice')(
+              <Input />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout2} label='重量(KG)'>
+            {getFieldDecorator('Weight')(
+              <Input />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout2} label='淘宝模板店铺'>
+            {getFieldDecorator('TempShopID')(
+              <Select placeholder='-选择店铺-' style={{ width: 200 }}>
+                {this.state.shops.map(x => <Option value={`${x.value}`} key={x.value}>{x.label}</Option>)}
+              </Select>
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout2} label='淘宝宝贝编号'>
+            {getFieldDecorator('TempID')(
+              <Input />
             )}
           </FormItem>
           <FormItem {...formItemLayout} label='备注'>
-            {getFieldDecorator('s7')(
+            {getFieldDecorator('Remark')(
               <Input type='textarea' autosize={{minRows: 1, maxRows: 3}} />
             )}
           </FormItem>
-          <FormItem {...formItemLayout} label='详细地址'>
-            {getFieldDecorator('s9', {
-              rules: [{ required: true, message: '必填' }]
-            })(
-              <Input placeholder='小区、街道、楼门牌号等' />
-            )}
+          <FormItem {...formItemLayout} label='商品属性' className={styles.item}>
+            {this.commAttrs(this.state.itemprops)}
+          </FormItem>
+          <FormItem {...formItemLayout} label='商品规格' className={styles.item}>
+            {this.commSkus(this.state.skuprops)}
           </FormItem>
         </Form>
       </Modal>
