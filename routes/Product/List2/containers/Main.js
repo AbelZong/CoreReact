@@ -519,3 +519,54 @@ const columnDefs = [
   }]
 const gridOptions = {
 }
+
+// <div>
+//   {getFieldDecorator('name', {
+//     initialValue: {
+//       checked: false,
+//       value: ''
+//     }
+//   })(
+//     <SkuCC />
+//   )}
+// </div>
+const SkuCC = React.createClass({
+  // getInitialState() {
+  //   return {
+  //     checked: !!this.props.checked,
+  //     value: this.props.value
+  //   }
+  // },
+  // componentWillReceiveProps(nextProps) {
+  //   if (nextProps.checked !== this.props.checked || nextProps.value !== this.props.value) {
+  //     this.setState(nextProps)
+  //   }
+  // },
+  handleCheck(e) {
+    this.props.onChange && this.props.onChange({
+      checked: e.target.checked,
+      value: this.props.value
+    })
+  },
+  handleChange(e) {
+    this.props.onChange && this.props.onChange({
+      checked: this.props.checked,
+      value: e
+    })
+  },
+  render() {
+    if (this.props.value.checked) {
+      return (
+        <div className='not-checked'>
+          <Checkbox checked={this.props.value.checked} onChange={this.handleCheck} />
+        </div>
+      )
+    }
+    return (
+      <div className='checked'>
+        <Checkbox checked={this.props.value.checked} onChange={this.handleCheck} />
+        <Input size='small' value={this.props.value.value} onChange={this.handleChange} />
+      </div>
+    )
+  }
+})
