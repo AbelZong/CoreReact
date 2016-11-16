@@ -33,7 +33,7 @@ export default React.createClass({
   handleOK() {
     const selecter = this.grid.api.getSelectedRows()[0]
     if (selecter) {
-      this.props.onOk(selecter.ID, selecter.SkuName)
+      this.props.onOk(selecter)
     } else {
       this.props.onCancel()
     }
@@ -43,7 +43,7 @@ export default React.createClass({
       value: null,
       valueName: ''
     }, () => {
-      this.props.onOk(null, '')
+      this.props.onOk(null)
     })
   },
   handleok() {

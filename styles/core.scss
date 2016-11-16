@@ -11,8 +11,7 @@
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
 */
-@import "antdExtend.scss";
-//
+@import "antdExtend.scss"; //
 //                       _oo0oo_
 //                      o8888888o
 //                      88" . "88
@@ -39,6 +38,7 @@
 //
 //
 //
+
 :global {
 	.ant-modal-wrap::-webkit-scrollbar,
 	.h-scroller::-webkit-scrollbar,
@@ -142,7 +142,6 @@
 		box-sizing: border-box;
 		cursor: se-resize;
 	}
-
 	// [data-title] {
 	// 	position: relative;
 	// 	z-index: 2;
@@ -264,9 +263,9 @@
 		}
 	}
 
-  .gray {
+	.gray {
 		color: #ECECEC;
-    text-shadow: 1px 1px 1px #FBFBFB;
+		text-shadow: 1px 1px 1px #FBFBFB;
 	}
 
 	.ant-form {
@@ -291,6 +290,10 @@
 		text-align: center;
 	}
 
+	.red {
+		color: #red;
+	}
+
 	.mt5 {
 		margin-top: 5px;
 	}
@@ -305,6 +308,14 @@
 
 	.ml10 {
 		margin-left: 10px;
+	}
+
+	.ml15 {
+		margin-left: 15px;
+	}
+
+	.ml20 {
+		margin-left: 20px;
 	}
 
 	.mr5 {
@@ -323,24 +334,30 @@
 		margin-bottom: 10px;
 	}
 
-		.mt15 {
-			margin-top:15px;
-		}
-			.mt20 {
-				margin-top:20px;
-			}
-				.mt25 {
-					margin-top:25px;
-				}
-					.mb15 {
-						margin-bottom:15px;
-					}
-						.mb20 {
-							margin-bottom:20px;
-						}
-							.mb25 {
-								margin-bottom:25px;
-							}
+	.mt15 {
+		margin-top: 15px;
+	}
+
+	.mt20 {
+		margin-top: 20px;
+	}
+
+	.mt25 {
+		margin-top: 25px;
+	}
+
+	.mb15 {
+		margin-bottom: 15px;
+	}
+
+	.mb20 {
+		margin-bottom: 20px;
+	}
+
+	.mb25 {
+		margin-bottom: 25px;
+	}
+
 	.dib {
 		display: inline-block;
 	}
@@ -524,10 +541,7 @@
 @font-face {
 	font-family: "WHEAT NUMBER";
 	src: url("/fonts/number1.eot");
-	src:url("/fonts/number1.eot?#iefix") format("embedded-opentype"),
-	url("/fonts/number1.woff") format("woff"),
-	url("/fonts/number1.ttf") format("truetype"),
-	url( "/fonts/number1.svg#DISPLAY FREE TFB") format("svg");
+	src: url("/fonts/number1.eot?#iefix") format("embedded-opentype"), url("/fonts/number1.woff") format("woff"), url("/fonts/number1.ttf") format("truetype"), url("/fonts/number1.svg#DISPLAY FREE TFB") format("svg");
 	font-style: normal;
 	font-weight: normal;
 }

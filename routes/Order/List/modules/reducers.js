@@ -21,6 +21,9 @@ const order_list_conditions = handleActions({
   ORDER_LIST_CONDITIONS_SET: (state, action) => action.payload,
   ORDER_LIST_CONDITIONS_UPDATE: (state, action) => update(state, action.update)
 }, {})
+// const item_sku_wrapper_data = handleActions({
+//   ITEM_SKU_WRAPPER_DATA_SET: (state, action) => action.payload
+// }, {})
 
 export default {
   order_list_collapse, order_list_conditions

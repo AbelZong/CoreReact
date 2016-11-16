@@ -44,7 +44,7 @@ export default React.createClass({
     })
   },
   render() {
-    const {style, className, size, text} = this.props
+    const {style, className, size, children, type} = this.props
     let CN = className ? `${styles.zhang} ${className}` : styles.zhang
     switch (size) {
       case 'small': {
@@ -53,9 +53,10 @@ export default React.createClass({
       }
       default: {}
     }
+    //<Icon type='plus' style={{color: 'red'}} /> {text || '添加新的商品'}
     return (
       <div className={CN} style={{width: this.props.width, ...style}}>
-        <Button size={size} type='ghost' onClick={this.handleSelect}><Icon type='plus' style={{color: 'red'}} /> {text || '添加新的商品'}</Button>
+        <Button size={size} type={type || 'ghost'} onClick={this.handleSelect}>{children || '添加新的商品'}</Button>
         <Modal doge={this.state.visible} onOk={this.handleModalOk} onCancel={this.handleModalCancel} />
       </div>
     )

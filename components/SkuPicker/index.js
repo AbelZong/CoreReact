@@ -29,11 +29,19 @@ export default React.createClass({
   componentWillReceiveProps(nextProps) {
     if (typeof nextProps.value === 'undefined') {
       if (this.state.value !== nextProps.value) {
-        this._setValue(null, '')
+        //this._setValue(null, '')
+        this.setState({
+          value: null,
+          name: ''
+        })
       }
     } else {
       if (this.state.value !== nextProps.value.id) {
-        this._setValue(nextProps.value.id, nextProps.value.name)
+        //this._setValue(nextProps.value.id, nextProps.value.name)
+        this.setState({
+          value: nextProps.value.id,
+          name: nextProps.value.name
+        })
       }
     }
   },
@@ -47,16 +55,24 @@ export default React.createClass({
       visible: '0'
     })
   },
-  handleModalOk(value, name) {
-    this._setValue(value, name, '0')
+  handleModalOk(data) {
+    if (data) {
+      //sbc
+      const name = this.props.nameField ? data[this.props.nameField] : data.SkuName
+      const value = this.props.valueField ? data[this.props.valueField] : data.ID
+      //console.log(data, name, value)
+      this._setValue(value, name, '0', data)
+    } else {
+      this._setValue(null, '', '0', data)
+    }
   },
-  _setValue(value, name, visible) {
+  _setValue(value, name, visible, data) {
     const states = { value, name }
     if (typeof visible !== 'undefined') {
       states.visible = visible
     }
     this.setState(states, () => {
-      this.props.onChange && this.props.onChange({id: value, name})
+      this.props.onChange && this.props.onChange({id: value, name, data})
     })
   },
   handleRemove(e) {
@@ -89,7 +105,7 @@ export default React.createClass({
     return (
       <div className={CN} style={styler}>
         <div className={styles.inputArea}>
-          <Input onClick={this.handleSelect} value={this.state.name} placeholder='包含商品' size={this.props.size || 'default'} className={styles.input} title={this.state.name || '点击选择商品'} />
+          <Input onClick={this.handleSelect} value={this.state.name} placeholder={this.props.placeholder || '包含商品'} size={this.props.size || 'default'} className={styles.input} title={this.state.name || '点击选择商品'} />
           <span className={styles.operator}>
             {this.state.name !== '' ? <Icon type='minus' onClick={this.handleRemove} title='点击移除' /> : <Icon type='ellipsis-h' title='点击选择' />}
           </span>

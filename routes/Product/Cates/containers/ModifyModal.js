@@ -46,8 +46,8 @@ import {ZGet, ZPost} from 'utils/Xfetch'
 import EE from 'utils/EE'
 import {startLoading, endLoading, listToTree} from 'utils'
 const createForm = Form.create
-import styles from './index.scss'
 const FormItem = Form.Item
+import styles from './index.scss'
 const RadioGroup = Radio.Group
 const ButtonGroup = Button.Group
 import ZGrid from 'components/Grid/index'
@@ -127,8 +127,7 @@ export default connect(state => ({
   },
   handleSubmit() {
     this.props.form.validateFields((errors, values) => {
-      const wtf = !!errors
-      if (wtf) {
+      if (errors) {
         return false
       }
       this.setState({
