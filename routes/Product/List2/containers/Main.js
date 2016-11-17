@@ -475,20 +475,16 @@ const ModifyModal = connect(state => ({
         }
       }
     }
-    let name = ''
-    y.name === undefined ? name = y.val_name : name = y.name
-    let id = ''
-    y.id === undefined ? id = y.ID : id = y.id
-    return (
-      this.props.form.getFieldDecorator(`sku-${id}-${y.pid}-${y.mapping}`,
-                    { initialValue: {
-                      checked: ischeck,
-                      value: `${name}`,
-                      id: id,
-                      IsOther: isother
-                    }
-                    })(<SkuCC key={y.pid + id + Math.random() * 1000} />)
-    )
+    let name = y.name === undefined ? y.val_name : y.name
+    let id = y.id === undefined ? y.ID : y.id
+    return this.props.form.getFieldDecorator(`sku-${id}-${y.pid}-${y.mapping}`, {
+      initialValue: {
+        checked: ischeck,
+        value: `${name}`,
+        id: id,
+        IsOther: isother
+      }
+    })(<SkuCC key={y.pid + id + Math.random() * 1000} />)
   },
   _ChangeProps(newValue) {
     this.setState({
@@ -501,7 +497,7 @@ const ModifyModal = connect(state => ({
     let sizeOther = []
     let sizeOwn = []
     if (vs.length > 0) {
-      vs.map(x => {
+      vs.forEach(x => {
         if (x.skuprops_values != null) {
           if (x.pid === '100016110194735') {
             x.skuprops_values.map(y =>
@@ -533,7 +529,7 @@ const ModifyModal = connect(state => ({
             skuprops_values: [{pid: y.pid, id: y.ID, mapping: null, name: y.val_name, IsOther: y.IsOther}]
           })
         })
-        this._ChangeProps.bind(null, sp)()
+        this._ChangeProps(sp)
       }
     }
     return (
@@ -575,7 +571,6 @@ const ModifyModal = connect(state => ({
     return (
       <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={confirmLoading} width={680} maskClosable={false} closable={false}>
         <Form horizontal className='pos-form'>
-
           <FormItem {...formItemLayout2} label='款式编码(货号)'>
             {getFieldDecorator('GoodsCode', {
               rules: [{ required: true, message: '必填' }]
@@ -653,9 +648,10 @@ const ModifyModal = connect(state => ({
           <FormItem {...formItemLayout} label='商品属性' className={styles.item}>
             {this.commAttrs(this.state.itemprops)}
           </FormItem>
-          <FormItem {...formItemLayout} label='商品规格' className={styles.item}>
-            { this.state.kindid === 0 ? <div>无</div> : this.commSkus(this.state.skuprops, this.state.editSp)}
-          </FormItem>
+          <div className={styles.item}>
+            <h4>商品规格：</h4>
+            {this.state.kindid === 0 ? (<div>无</div>) : this.commSkus(this.state.skuprops, this.state.editSp)}
+          </div>
           <FormItem {...formItemLayout3} >
             {getFieldDecorator('items', {initialValue: {
               display: skutable[0],
@@ -908,4 +904,3 @@ const AttrCC = React.createClass({
     }
   }
 })
-
