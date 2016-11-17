@@ -43,11 +43,76 @@
   }
 }
 
-.chk{
+.checked{
   position:relative;
-  .input{
-//    display: none
+  display: inline-block;
+  width: 100px;
+  .chkInput{
+    width: 75px;
+    position: absolute;
+    left: 20px;
+    top: 8px
   }
 }
+.not_checked{
+  display: inline-block;
+  width: 100px;
+}
+
+.selectInput{
+    width: 160px;
+    position: absolute;
+    left: 0px;
+    top: 8px
+}
+
+.items {
+  .right {
+    vertical-align: top;
+    padding-left:10px;    
+    }
+    :global {
+      .ant-input {
+        padding: 2px 5px;
+      }
+    }
+    .zhang {
+      width:100%;
+      background: #f5f5f5
+    }
+    .chun {
+      border: 1px solid #eee;
+      padding:5px;
+      background-color:#f9f9f9;
+      border-radius: 1px;
+      .op3 {
+        font-size:12px;
+      }
+    }
+    .op5 {
+      width: 5%;
+      text-align: center;
+    }
+    .op10 {
+      width: 10%;
+    }
+    .op20 {
+      width: 20%;
+    }
+    .op15 {
+      width: 15%;
+      text-align: center;
+    }
+    .zhang {
+      border:1px solid #eee;
+      padding:5px 0;
+      text-align: center;
+      margin-bottom: 2px;
+      border-radius: 1px;
+    }
+    .hua {
+      margin-top:8px;
+    }
+  }
 
 

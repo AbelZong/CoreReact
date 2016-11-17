@@ -12,6 +12,7 @@
 * file that was distributed with this source code.
 */
 import React from 'react'
+import update from 'react-addons-update'
 import {
   connect
 } from 'react-redux'
@@ -22,6 +23,7 @@ import {
 } from 'utils/Xfetch'
 import ZGrid from 'components/Grid/index'
 import styles from './index.scss'
+import SkuInfo from './SkuInfo'
 import Wrapper from 'components/MainWrapper'
 import SupplierPicker from 'components/SupplierPicker'
 import BrandPicker from 'components/BrandPicker'
@@ -34,22 +36,15 @@ import {
   Form,
   Input,
   Modal,
-  Checkbox,
-  Radio
+  Checkbox
 } from 'antd'
 import {
   Icon as Iconfa
 } from 'components/Icon'
-import {
-  reactCellRendererFactory
-} from 'ag-grid-react'
-import EE from 'utils/EE'
 const createForm = Form.create
 const FormItem = Form.Item
 const ButtonGroup = Button.Group
-const RadioGroup = Radio.Group
 const Option = Select.Option
-const CheckboxGroup = Checkbox.Group
 const Main = React.createClass({
   componentDidMount() {
     this._firstBlood()
@@ -77,7 +72,7 @@ const Main = React.createClass({
     message.info('没有选中')
   },
   deleteRowByIDs(ids) {
-    this.grid.x0pCall(ZPost('XyCore/CoreSku/UptGoodsDel', {GoodsLst: ids, IsDelete: true}, () => {
+    this.grid.x0pCall(ZPost('XyCore/CoreSku/DeleteGoods', {IDLst: ids, IsDelete: true}, () => {
       this.refreshDataCallback()
     }))
   },
@@ -93,7 +88,15 @@ const Main = React.createClass({
   handleEnable() {
     const ids = this._getIDs()
     if (ids) {
-      this.grid.x0pCall(ZPost('XyComm/Customkind/SkuKindEnable', {IDLst: ids, Enable: 'true'}, () => {
+      this.grid.x0pCall(ZPost('XyComm/Customkind/SkuKindEnable', {IDLst: ids, Enable: 1}, () => {
+        this.refreshDataCallback()
+      }))
+    }
+  },
+  handleBackup() {
+    const ids = this._getIDs()
+    if (ids) {
+      this.grid.x0pCall(ZPost('XyComm/Customkind/SkuKindEnable', {IDLst: ids, Enable: 2}, () => {
         this.refreshDataCallback()
       }))
     }
@@ -101,13 +104,12 @@ const Main = React.createClass({
   handleDisable() {
     const ids = this._getIDs()
     if (ids) {
-      this.grid.x0pCall(ZPost('XyComm/Customkind/SkuKindEnable', {IDLst: ids, Enable: 'false'}, () => {
+      this.grid.x0pCall(ZPost('XyComm/Customkind/SkuKindEnable', {IDLst: ids, Enable: 0}, () => {
         this.refreshDataCallback()
       }))
     }
   },
   _firstBlood(_conditions) {
-    console.log(_conditions)
     const conditions = Object.assign({}, this.props.conditions || {}, _conditions || {})
     const uri = 'XyCore/CoreSku/GoodsQueryLst'
     const data = Object.assign({
@@ -180,6 +182,9 @@ const Main = React.createClass({
     )
   }
 })
+const skuprops = []
+const skutable = ['none']
+const colorAndsize = []
 const DEFAULT_TITLE = '创建新商品'
 const ModifyModal = connect(state => ({
   doge: state.product_list2_modify_vis
@@ -192,7 +197,13 @@ const ModifyModal = connect(state => ({
       shops: [],
       itemprops: [],
       skuprops: [],
-      kindid: 0
+      kindid: 0,
+      items: [],
+      editSp: [],
+      editIp: [],
+      brandid: '',
+      brandname: '',
+      Supplier: ['', '']
     }
   },
   componentWillReceiveProps(nextProps) {
@@ -216,19 +227,47 @@ const ModifyModal = connect(state => ({
       } else {
         startLoading()
         ZGet({
-          uri: 'Purchase/PurchaseSingle',
+          uri: 'XyCore/CoreSku/GoodsQuery',
           data: {
             ID: nextProps.doge
           },
           success: ({d}) => {
+            console.log(d)
+            this.props.form.setFieldsValue({
+              GoodsCode: d.main.GoodsCode,
+              GoodsName: d.main.GoodsName,
+              KindID: d.main.KindID,
+              ScoID: d.main.ScoID,
+              ScoGoodsCode: d.main.ScoGoodsCode,
+              MarketPrice: d.main.MarketPrice,
+              SalePrice: d.main.SalePrice,
+              PurPrice: d.main.PurPrice,
+              Weight: d.main.Weight,
+              TempShopID: d.main.TempShopID,
+              TempID: d.main.TempID,
+              Remark: d.main.Remark,
+              Img: d.main.Img
+            })
+            if (d.items.length > 0) {
+              skutable.splice(0, 1)
+              skutable.push('block')
+            }
             this.setState({
-              title: `修改采购单：[${d.id}]`,
+              title: `修改商品：[${d.main.ID}]`,
               visible: true,
-              confirmLoading: false
+              confirmLoading: false,
+              kindid: d.main.KindID,
+              itemprops: d.itemprops_base,
+              skuprops: d.skuprops_base,
+              items: d.items,
+              editSp: d.skuprops,
+              editIp: d.itemprops,
+              brandid: d.main.Brand,
+              brandname: d.main.BrandName
             })
           },
           error: () => {
-            this.props.dispatch({type: 'PRODUCT_LIST_MODIFY_VIS_SET', payload: -1})
+            this.props.dispatch({type: 'PRODUCT_LIST2_MODIFY_VIS_SET', payload: -1})
           }
         }).then(endLoading)
       }
@@ -243,25 +282,84 @@ const ModifyModal = connect(state => ({
       this.setState({
         confirmLoading: true
       })
-      //const {doge} = this.props
+      console.log(v)
+      const {doge} = this.props
       v.KindID = (v.KindID && v.KindID.id) ? v.KindID.id : ''
       v.Brand = (v.Brand && v.Brand.id) ? v.Brand.id : ''
       v.Supplier = (v.Supplier && v.Supplier.id) ? v.Supplier.id : ''
-      console.log(v)
+      const keys1 = Object.keys(v)
+      let Coresku_main = {}
+      let itemprops = []
+      let items = []
+      for (let item of v.items.items) {
+        items.push({
+          SkuID: item.SkuID,
+          SkuName: v.GoodsName,
+          SkuSimple: v.GoodsName,
+          Norm: item.Color + ';' + item.Size,
+          PurPrice: item.PurPrice,
+          SalePrice: item.SalePrice,
+          Weight: item.Weight,
+          Pid1: item.Pid1,
+          val_id1: item.val_id1,
+          Pid2: item.Pid2,
+          val_id2: item.val_id2
+        })
+      }
+
+      for (let id of keys1) {
+        if (v[id] === undefined) continue
+        let cc = v[id]
+        if (typeof cc === 'object') {
+          let a = id.split('-')
+          if (cc.value === '') continue
+          if (a[0] === 'attr') {
+            itemprops.push({
+              pid: a[2],
+              val_id: a[1],
+              val_name: cc.value
+            })
+          } else {
+            if (!cc.checked) continue
+            // if (id.indexOf('--') > -1) { //自定义规格
+            //   let selfSku = id.split('-')
+            //   skuprops.push({
+            //     pid: selfSku[3],
+            //     val_id: 0,
+            //     mapping: 0,
+            //     val_name: cc.value
+            //   })
+            // } else {
+            //   skuprops.push({
+            //     pid: a[2],
+            //     val_id: a[1],
+            //     mapping: a[3],
+            //     val_name: cc.value
+            //   })
+            // }
+          }
+        } else {
+          Coresku_main[id] = v[id]
+        }
+      }
+      console.log('items', items)
+      console.log('itemprops', itemprops)
+      console.log('skuprops', skuprops)
+      console.log('Coresku_main', Coresku_main)
       // let uri = ''
-      // const data = {}
-      // if (doge === 0) {
-      //   uri = 'Purchase/InsertPur'
-      //   data.id = 0
-      // } else {
-      //   uri = 'Purchase/UpdatePur'
-      //   data.id = doge
+      // let data = {
+      //   main: Coresku_main,
+      //   itemprops: itemprops,
+      //   skuprops: skuprops,
+      //   items: items
       // }
-      // ZPost(uri, {
-      //   Pur: data
-      // }, () => {
+      // if (doge === 0) {
+      //   uri = 'XyCore/CoreSku/InsertGoods'
+      // } else {
+      //   uri = 'XyCore/CoreSku/UpdateGoods'
+      // }
+      // ZPost(uri, data, () => {
       //   this.hideModal()
-      //   EE.triggerRefreshMain()
       // }, () => {
       //   this.setState({
       //     confirmLoading: false
@@ -278,10 +376,11 @@ const ModifyModal = connect(state => ({
       ZGet({
         uri: 'XyComm/Customkind/SkuKindProps',
         data: {
-          ID: 365,
+          ID: e.id,
           Enable: true
         },
         success: ({d}) => {
+          this.autoIndex = 0
           this.setState({
             itemprops: d
           })
@@ -291,7 +390,7 @@ const ModifyModal = connect(state => ({
       ZGet({
         uri: 'XyComm/CustomKindSkuProps/SkuPropsByKind',
         data: {
-          KindID: 365
+          KindID: e.id
         },
         success: ({d}) => {
           this.setState({
@@ -303,43 +402,160 @@ const ModifyModal = connect(state => ({
   },
   hideModal() {
     this.props.dispatch({ type: 'PRODUCT_LIST2_MODIFY_VIS_SET', payload: -1 })
+    this.setState({
+      items: [],
+      visible: false,
+      itemprops: [],
+      skuprops: []
+    })
     requestAnimationFrame(() => this.props.form.resetFields())
   },
   commAttrs(vs) {
-    return vs.map(x => {
+    if (vs.length > 0) {
+      return vs.map(x => {
+        return (
+          <div key={x.pid}>
+            <FormItem className={styles.itemSelect} style={{ margin: '5px 0 0 0' }}>
+              {this.props.form.getFieldDecorator(`attr-${x.id}-${x.pid}`, {initialValue: {
+                value: '',
+                values: x.values,
+                name: x.name
+              }})(
+                <AttrCC />
+              )}
+            </FormItem>
+          </div>
+        )
+      })
+    } else {
       return (
-        <div key={x.id}>
-          <FormItem className={styles.itemSelect} style={{ margin: '5px 0 0 0' }}>
-            {this.props.form.getFieldDecorator(`attr-${x.id}`)(
-              <Select placeholder={`-选择${x.name}-`} style={{ width: 200 }}>
-                {x.values != null ? (JSON.parse(x.values).prop_value.map(y => <Option value={`${y.vid}`} key={y.vid}>{y.name}</Option>)) : <Option key={0} />}
-              </Select>
-            )}
-          </FormItem>
-        </div>
+        <div>（无）</div>
       )
+    }
+  },
+  handleSkuAdd(pid) {
+    const index = this.state.skuprops.findIndex(x => x.pid === pid)
+    if (index > -1) {
+      this.setState(update(this.state, {
+        skuprops: {
+          [`${index}`]: {
+            skuprops_values: {
+              $push: [
+                {pid, id: --this.autoIndex, mapping: null, name: '自定义', IsOther: 1}
+              ]
+            }
+          }
+        }
+      }))
+    } else {
+      const sb = this.state.skuprops
+      if (pid === '100016110114201') {
+        sb.push({
+          pid: pid,
+          name: '尺码',
+          skuprops_values: [{pid, id: --this.autoIndex, mapping: null, name: '自定义', IsOther: 1}]
+        })
+      } else {
+        sb.push({
+          pid: pid,
+          name: '颜色',
+          skuprops_values: [{pid, id: --this.autoIndex, mapping: null, name: '自定义', IsOther: 1}]})
+      }
+      this.setState({
+        skuprops: sb
+      })
+    }
+  },
+  skusC(y, isother, editSp, ischeck = false) {
+    if (!ischeck) {
+      for (let i of editSp) {
+        if (i.val_name === y.name) {
+          ischeck = true
+          break
+        }
+      }
+    }
+    let name = ''
+    y.name === undefined ? name = y.val_name : name = y.name
+    let id = ''
+    y.id === undefined ? id = y.ID : id = y.id
+    return (
+      this.props.form.getFieldDecorator(`sku-${id}-${y.pid}-${y.mapping}`,
+                    { initialValue: {
+                      checked: ischeck,
+                      value: `${name}`,
+                      id: id,
+                      IsOther: isother
+                    }
+                    })(<SkuCC key={y.pid + id + Math.random() * 1000} />)
+    )
+  },
+  _ChangeProps(newValue) {
+    this.setState({
+      skuprops: newValue
     })
   },
-  skuChange(e) {
-    console.log(e.target.id)
-  },
-  commSkus(vs) {
-    return vs.map(x => {
-      return (
-        <div key={x.pid}>
-          <FormItem label={`${x.name}`} style={{ margin: '5px 0 0 0' }}>
-            {
-                x.skuprops_values != null ? (x.skuprops_values.map(y => this.props.form.getFieldDecorator(`sku-${y.id}`)(<Checkbox key={y.id} label={`${y.name}`} className={styles.chk} onChange={this.skuChange}>
-                  {y.name}
-                  <Input style={{display: 'none'}} className={styles.input} value={`${y.name}`} />
-                </Checkbox>)
-                )
-                ) : <Checkbox />
-              }
-          </FormItem>
-        </div>
-      )
-    })
+  commSkus(vs, editSp) {
+    let colorOwn = []
+    let colorOther = []
+    let sizeOther = []
+    let sizeOwn = []
+    if (vs.length > 0) {
+      vs.map(x => {
+        if (x.skuprops_values != null) {
+          if (x.pid === '100016110194735') {
+            x.skuprops_values.map(y =>
+              y.IsOther !== 1 ? (colorOwn.push(this.skusC(y, 0, editSp))) : (colorOther.push(this.skusC(y, 1, editSp)))
+            )
+          } else {
+            x.skuprops_values.map(y =>
+              y.IsOther !== 1 ? (sizeOwn.push(this.skusC(y, 0, editSp))) : (sizeOther.push(this.skusC(y, 1, editSp)))
+            )
+          }
+        }
+      })
+    } else {
+      let sp = []
+      let cORs = ''
+      if (editSp.length > 0) {
+        editSp.map(y => {
+          colorAndsize.push(y.pid)
+          if (y.pid === '100016110194735') {
+            cORs = '颜色'
+            y.IsOther !== 1 ? (colorOwn.push(this.skusC(y, 0, [], true))) : (colorOther.push(this.skusC(y, 1, [], true)))
+          } else {
+            cORs = '尺码'
+            y.IsOther !== 1 ? (sizeOwn.push(this.skusC(y, 0, [], true))) : (sizeOther.push(this.skusC(y, 1, [], true)))
+          }
+          sp.push({
+            pid: y.pid,
+            name: cORs,
+            skuprops_values: [{pid: y.pid, id: y.ID, mapping: null, name: y.val_name, IsOther: y.IsOther}]
+          })
+        })
+        this._ChangeProps.bind(null, sp)()
+      }
+    }
+    return (
+      <div>
+        <FormItem label='颜色' style={{ margin: '5px 0 0 0' }}>
+          {colorOwn}
+          <div className={styles.hua}>
+            <div>颜色->其他：</div>
+            {colorOther}
+          </div>
+          <Button type='primary' size='small' onClick={() => this.handleSkuAdd('100016110194735')}>增加自定义</Button>
+        </FormItem>
+        <FormItem label='尺码' style={{ margin: '5px 0 0 0' }}>
+          {sizeOwn}
+          <div className={styles.hua}>
+            <div>尺码->其他：</div>
+            {sizeOther}
+          </div>
+          <Button type='primary' size='small' onClick={() => this.handleSkuAdd('100016110114201')}>增加自定义</Button>
+        </FormItem>
+      </div>
+    )
   },
   render() {
     const { getFieldDecorator } = this.props.form
@@ -351,6 +567,10 @@ const ModifyModal = connect(state => ({
     const formItemLayout2 = {
       labelCol: { span: 4 },
       wrapperCol: { span: 12 }
+    }
+    const formItemLayout3 = {
+      labelCol: { span: 0 },
+      wrapperCol: { span: 24 }
     }
     return (
       <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={confirmLoading} width={680} maskClosable={false} closable={false}>
@@ -364,7 +584,10 @@ const ModifyModal = connect(state => ({
             )}
           </FormItem>
           <FormItem {...formItemLayout} label='品牌'>
-            {getFieldDecorator('Brand')(
+            {getFieldDecorator('Brand', {initialValue: {
+              id: this.state.brandid,
+              name: this.state.brandname
+            }})(
               <BrandPicker />
             )}
           </FormItem>
@@ -381,16 +604,12 @@ const ModifyModal = connect(state => ({
             )}
           </FormItem>
           <FormItem {...formItemLayout} label='供应商'>
-            {getFieldDecorator('Supplier', {
-              rules: [
-                { required: true, type: 'object', message: '必选' }
-              ]
-            })(
+            {getFieldDecorator('ScoID')(
               <SupplierPicker />
             )}
           </FormItem>
           <FormItem {...formItemLayout2} label='供应商货号'>
-            {getFieldDecorator('SupplierCode')(
+            {getFieldDecorator('ScoGoodsCode')(
               <Input />
             )}
           </FormItem>
@@ -435,8 +654,28 @@ const ModifyModal = connect(state => ({
             {this.commAttrs(this.state.itemprops)}
           </FormItem>
           <FormItem {...formItemLayout} label='商品规格' className={styles.item}>
-            {this.commSkus(this.state.skuprops)}
+            { this.state.kindid === 0 ? <div>无</div> : this.commSkus(this.state.skuprops, this.state.editSp)}
           </FormItem>
+          <FormItem {...formItemLayout3} >
+            {getFieldDecorator('items', {initialValue: {
+              display: skutable[0],
+              skuprops: skuprops,
+              goodscode: this.props.form.getFieldValue('GoodsCode'),
+              salePrice: this.props.form.getFieldValue('SalePrice'),
+              purPrice: this.props.form.getFieldValue('PurPrice'),
+              weight: this.props.form.getFieldValue('Weight'),
+              reflash: true,
+              items: this.state.items
+            }})(
+              <SkuInfo />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout} label='商品图片'>
+            {getFieldDecorator('Img')(
+              <Input placeholder='主图片路径' />
+            )}
+          </FormItem>
+
         </Form>
       </Modal>
     )
@@ -506,7 +745,7 @@ const columnDefs = [
     width: 70,
     cellStyle: {textAlign: 'center'},
     cellRenderer: function(params) {
-      console.log(params)
+      //console.log(params)
     },
     suppressMenu: true
     //pinned: 'right'
@@ -520,53 +759,153 @@ const columnDefs = [
 const gridOptions = {
 }
 
-// <div>
-//   {getFieldDecorator('name', {
-//     initialValue: {
-//       checked: false,
-//       value: ''
-//     }
-//   })(
-//     <SkuCC />
-//   )}
-// </div>
 const SkuCC = React.createClass({
-  // getInitialState() {
-  //   return {
-  //     checked: !!this.props.checked,
-  //     value: this.props.value
-  //   }
-  // },
-  // componentWillReceiveProps(nextProps) {
-  //   if (nextProps.checked !== this.props.checked || nextProps.value !== this.props.value) {
-  //     this.setState(nextProps)
-  //   }
-  // },
+  getInitialState() {
+    return {
+      checked: this.props.value.checked,
+      value: this.props.value.value
+    }
+  },
   handleCheck(e) {
+    let id = 0
+    let isNew = false
+    console.log('this.props', this.props)
+    if (this.props.id.indexOf('--') > -1) {
+      isNew = true
+      id = this.props.id.split('-')[2]
+    } else {
+      id = this.props.id.split('-')[1]
+    }
+    let iIndex = skuprops.findIndex(p => p.val_id === id)
+    if (e.target.checked) {
+      if (!isNew) {
+        colorAndsize.push(this.props.id.split('-')[2])
+      } else {
+        colorAndsize.push(this.props.id.split('-')[3])
+      }
+      skuprops.push({
+        pid: !isNew ? this.props.id.split('-')[2] : this.props.id.split('-')[3],
+        val_id: !isNew ? this.props.id.split('-')[1] : '-' + this.props.id.split('-')[2],
+        mapping: !isNew ? this.props.id.split('-')[3] : 0,
+        val_name: e.target.checked,
+        value: this.state.value,
+        IsOther: !isNew ? this.props.value.IsOther : 1
+      })
+    } else {
+      skuprops.splice(iIndex, 1)
+      iIndex = !isNew ? colorAndsize.findIndex(p => p === this.props.id.split('-')[2]) : colorAndsize.findIndex(p => p === this.props.id.split('-')[3])
+      colorAndsize.splice(iIndex, 1)
+    }
+    if (colorAndsize.toString().indexOf('100016110114201') > -1 && colorAndsize.toString().indexOf('100016110194735') > -1) {
+      skutable.splice(0, 1)
+      skutable.push('block')
+    } else {
+      skutable.splice(0, 1)
+      skutable.push('none')
+    }
+    this.setState({
+      checked: e.target.checked
+    })
+
     this.props.onChange && this.props.onChange({
-      checked: e.target.checked,
-      value: this.props.value
+      checked: this.state.checked,
+      value: this.state.value
     })
   },
   handleChange(e) {
+    this.setState({
+      value: e.target.value
+    })
     this.props.onChange && this.props.onChange({
-      checked: this.props.checked,
-      value: e
+      value: e.target.value,
+      checked: this.state.checked
+    })
+    let id = 0
+    let isNew = false
+    if (this.props.id.indexOf('--') > -1) {
+      isNew = true
+      id = this.props.id.split('-')[2]
+    } else {
+      id = this.props.id.split('-')[1]
+    }
+    let iIndex = skuprops.findIndex(p => p.val_id === id)
+    skuprops.splice(iIndex, 1)
+    skuprops.push({
+      pid: !isNew ? this.props.id.split('-')[2] : this.props.id.split('-')[3],
+      val_id: !isNew ? this.props.id.split('-')[1] : 0,
+      mapping: !isNew ? this.props.id.split('-')[3] : 0,
+      val_name: this.state.checked,
+      value: e.target.value,
+      IsOther: !isNew ? 0 : 1
     })
   },
   render() {
-    if (this.props.value.checked) {
+    if (!this.state.checked) {
       return (
-        <div className='not-checked'>
-          <Checkbox checked={this.props.value.checked} onChange={this.handleCheck} />
+        <div className={styles.not_checked}>
+          <Checkbox key={this.props.value.id} checked={this.state.checked} onChange={this.handleCheck} >{this.state.value} </Checkbox>
+        </div>
+      )
+    } else {
+      return (
+        <div className={styles.checked}>
+          <Checkbox key={this.props.value.id} checked={this.state.checked} onChange={this.handleCheck} />
+          <Input className={styles.chkInput} size='small' value={this.state.value} onChange={this.handleChange} />
         </div>
       )
     }
-    return (
-      <div className='checked'>
-        <Checkbox checked={this.props.value.checked} onChange={this.handleCheck} />
-        <Input size='small' value={this.props.value.value} onChange={this.handleChange} />
-      </div>
-    )
   }
 })
+
+const AttrCC = React.createClass({
+  getInitialState() {
+    return {
+      value: this.props.value.value,
+      values: this.props.value.values,
+      name: this.props.value.name
+    }
+  },
+  handleCheck(e) {
+    this.setState({
+      value: e
+    })
+    this.props.onChange && this.props.onChange({
+      value: e
+    })
+  },
+  handleChange(e) {
+    if (e.target.value !== '') {
+      this.setState({
+        value: e.target.value
+      })
+      this.props.onChange && this.props.onChange({
+        value: e.target.value
+      })
+    }
+  },
+  render() {
+    if (this.state.value === '') {
+      return (
+        <div className={styles.checked}>
+          <Select placeholder={`-选择${this.state.name}-`} style={{ width: 200 }} onChange={this.handleCheck}>
+            {this.state.values != null ? (JSON.parse(this.state.values).prop_value.map(y => <Option value={`${y.name}`} key={y.vid}>{y.name}
+            </Option>)
+            ) : <Option key={0} />}
+          </Select>
+        </div>
+      )
+    } else {
+      return (
+        <div className={styles.checked}>
+          <Select placeholder={`-选择${this.state.name}-`} style={{ width: 200 }} onChange={this.handleCheck}>
+            {this.state.values != null ? (JSON.parse(this.state.values).prop_value.map(y => <Option value={`${y.name}`} key={y.vid}>{y.name}
+            </Option>)
+            ) : <Option key={0} />}
+          </Select>
+          <Input className={styles.selectInput} size='small' value={this.state.value} onChange={this.handleChange} />
+        </div>
+      )
+    }
+  }
+})
+
