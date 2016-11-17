@@ -134,9 +134,9 @@ const columnDefs = [
     width: 180
   }, {
     headerName: '商品品牌',
-    field: 'Brand',
+    field: 'BrandName',
     suppressSorting: true,
-    width: 80
+    width: 90
   }, {
     headerName: '规格',
     field: 'Norm',
@@ -146,7 +146,7 @@ const columnDefs = [
     headerName: '启用',
     field: 'Enable',
     cellStyle: {textAlign: 'center'},
-    width: 50,
+    width: 65,
     suppressSorting: true,
     cellClass: function(params) {
       return styles.status + ' ' + (styles[`status${params.data.Enable}`] || '')

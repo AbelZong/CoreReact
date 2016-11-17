@@ -21,10 +21,13 @@ const order_list_conditions = handleActions({
   ORDER_LIST_CONDITIONS_SET: (state, action) => action.payload,
   ORDER_LIST_CONDITIONS_UPDATE: (state, action) => update(state, action.update)
 }, {})
-// const item_sku_wrapper_data = handleActions({
-//   ITEM_SKU_WRAPPER_DATA_SET: (state, action) => action.payload
-// }, {})
+const order_list_new_egg_vis = handleActions({
+  ORDER_LIST_NEW_EGG_VIS_SET: (state, action) => action.payload
+}, -1)
+const order_list_buyer_select_vis = handleActions({
+  ORDER_LIST_BUYER_SELECT_VIS_SET: (state, action) => action.payload
+}, -1)
 
 export default {
-  order_list_collapse, order_list_conditions
+  order_list_collapse, order_list_conditions, order_list_new_egg_vis, order_list_buyer_select_vis
 }

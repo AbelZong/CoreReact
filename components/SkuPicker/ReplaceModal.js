@@ -5,7 +5,7 @@
 * Description:
 *
 * Author: HuaZhang <yahveh.zh@gmail.com>
-* Date  : 2016-10-14 11:23:01
+* Date  : 2016-11-17 PM
 * Last Updated:
 *
 * For the full copyright and license information, please view the LICENSE
@@ -29,9 +29,9 @@ export default React.createClass({
     this.ignoreCase = true
   },
   handleOK() {
-    const selecters = this.grid.api.getSelectedRows()
-    if (selecters) {
-      this.props.onOk(selecters)
+    const selecter = this.grid.api.getSelectedRows()[0]
+    if (selecter) {
+      this.props.onOk(selecter)
     } else {
       message.info('没有选择商品')
       this.props.onCancel()
@@ -87,10 +87,10 @@ export default React.createClass({
   },
   render() {
     return (
-      <Modal wrapClassName={styles.modal} title='选择一个或多个商品' visible={this.props.doge} maskClosable={false} onCancel={this.props.onCancel} footer='' width={950}>
+      <Modal wrapClassName={styles.modal} title='选择一个商品' visible={this.props.doge} maskClosable={false} onCancel={this.props.onCancel} footer='' width={950}>
         <div className={styles.hua}>
-          <Toolbars onSearch={this.handleSearch} />
-          <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'zhanghua_1' }} columnDefs={columnDefs} paged grid={this} pagesAlign='left'>
+          <Toolbars onSearch={this.handleSearch} initialValues={this.props.initialValues} />
+          <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'zhanghua_3' }} columnDefs={columnDefs} paged grid={this} pagesAlign='left'>
             <div className={styles.footerBtns}>
               <Button type='primary' onClick={this.handleOK}>确认商品</Button>
               <Button onClick={this.handleok}>关闭</Button>
@@ -106,8 +106,6 @@ const EnableRender = function(params) {
 }
 const columnDefs = [
   {
-    headerName: '#', width: 30, checkboxSelection: true, suppressSorting: true, suppressMenu: true, pinned: true
-  }, {
     headerName: '货品编码',
     field: 'GoodsCode',
     width: 120
@@ -155,7 +153,7 @@ const columnDefs = [
 const gridOptions = {
   enableSorting: true,
   enableServerSideSorting: true,
-  rowSelection: 'multiple',
+  rowSelection: 'single',
   onBeforeSortChanged: function() {
     const sorter = this.api.getSortModel()[0]
     const conditions = sorter ? { SortField: sorter.colId, SortDirection: sorter.sort.toUpperCase() } : { SortField: null, SortDirection: null }

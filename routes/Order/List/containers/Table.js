@@ -11,16 +11,28 @@
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
 */
-import React, {createClass} from 'react'
+import React, {
+  createClass
+} from 'react'
+import Areas from 'json/AreaCascader'
 //import ReactDOM from 'react-dom'
 import classNames from 'classnames'
 import SkuAppendPicker from 'components/SkuPicker/append'
+import ShopPicker from 'components/ShopPicker'
+import BuyerModal from './BuyerModal'
 import {
   Button,
   message,
-  Popconfirm,
+  Cascader,
+  Modal,
   Input,
-  Form
+  Form,
+  notification,
+  Icon,
+  Col,
+  InputNumber,
+  DatePicker,
+  Checkbox
 } from 'antd'
 import {
   connect
@@ -37,6 +49,7 @@ const createForm = Form.create
 const FormItem = Form.Item
 import styles from './index.scss'
 import ZGrid from 'components/Grid/index'
+import SkuReplacePicker from 'components/SkuPicker/replace'
 const ButtonGroup = Button.Group
 const BuyerShop = createClass({
   render() {
@@ -118,6 +131,13 @@ const defColumns = [{
       render() {
         const data = this.props.data
         const SkuList = data.SkuList || []
+        let fck = SkuList.length
+        let SkuListS = null
+        if (fck >= 10) {
+          SkuListS = SkuList.slice(0, 10)
+        } else {
+          SkuListS = SkuList
+        }
         // if (!SkuList || !(SkuList instanceof Array) || !SkuList.length) {
         //   return (
         //     <div className={styles.centerWrapper}>
@@ -141,11 +161,16 @@ const defColumns = [{
         return (
           <div className={styles.centerWrapper}>
             <div className={styles.mLeftMiddle}>
-              {SkuList.length ? SkuList.map(x => (
+              {SkuListS.length ? SkuListS.map(x => (
                 <div className={styles.poster} key={`${data.ID}-${x.SkuAutoID}`} style={{backgroundImage: x.Img ? `url('${x.Img}')` : ''}}>
                   <span>{x.Qty}</span>
                 </div>
-              )) : <div className={styles.noData}>没有卖出去的订单？</div>}
+              )) : <div className={styles.noData}>-添加商品-</div>}
+              {fck >= 10 ? (
+                <div className={styles.posterCircal}>
+                  <span>{fck}</span>
+                </div>
+              ) : null}
             </div>
             <ItemSKUWrapper item={data} onChange={this.refreshRowBySetter} />
           </div>
@@ -219,8 +244,8 @@ const defColumns = [{
         <div className={styles.centerWrapper}>
           <div className={styles.mAuto}>
             <div className='tc'>
-              <div>{data.Status}</div>
-              {data.Status === 7 ? <div className='mt5'>{data.StatusDec}</div> : null}
+              <div>{data.StatusDec}</div>
+              {data.Status === 7 ? <div className='mt5'>{data.AbnormalStatusDec}</div> : null}
             </div>
           </div>
         </div>
@@ -411,6 +436,7 @@ const Table = React.createClass({
         <ZGrid gridOptions={gridOptions} rowHeight='75' className={styles.zgrid} onReady={this.handleGridReady} storeConfig={{ prefix: 'order_list' }} columnDefs={defColumns} paged grid={this}>
           批量 内部订单号 测试用 486741
         </ZGrid>
+        <ModalNewEgg refreshRowData={this.refreshRowData} />
       </div>
     )
   }
@@ -497,18 +523,49 @@ const gridOptions = {
 // }))
 const ItemSKUWrapper = createClass({
   handleAppendSKU(skus) {
-    console.log(this.props)
-    this.props.onChange({})
+    const ids = skus.map(x => x.ID)
+    if (ids.length) {
+      startLoading()
+      ZPost('Order/InsertOrderDetail', {OID: this.props.item.ID, SkuIDList: ids}, ({d}) => {
+        this.props.onChange(d.Order)
+        this._noticeFails(d.failIDs)
+      }).then(endLoading)
+    }
   },
   handleAppendSku(skus) {
-    console.log('handleAppendSKU', skus)
+    const ids = skus.map(x => x.ID)
+    if (ids.length) {
+      startLoading()
+      ZPost('Order/InsertGift', {OID: this.props.item.ID, SkuIDList: ids}, ({d}) => {
+        this.props.onChange(d.Order)
+        this._noticeFails(d.failIDs)
+      }).then(endLoading)
+    }
+  },
+  _noticeFails(failIDs) {
+    if (failIDs && failIDs.length) {
+      const description = (<div>
+        {failIDs.map(x => {
+          return (
+            <div key={x.id}>
+              {x.id}: {x.reason || '已存在'}
+            </div>
+          )
+        })}
+      </div>)
+      notification.error({
+        message: '订单商品附加错误',
+        description,
+        icon: <Icon type='meh-o' />
+      })
+    }
   },
   render() {
     const {item} = this.props
     return (
       <div className={styles.itemSKUsWrapper}>
         <div className={styles.skus}>
-          {item.SkuList && item.SkuList.length ? item.SkuList.map(x => <SkuItemsForm key={x.SkuAutoID} x={x} id={item.ID} />) : null}
+          {item.SkuList && item.SkuList.length ? item.SkuList.map(x => <SkuItemsForm key={x.ID} x={x} oid={item.ID} onChange={this.props.onChange} />) : null}
         </div>
         <div className='mt10'>
           <div className='ml20'>
@@ -525,27 +582,46 @@ const NUM_PATTERN = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]
 const SkuItemsForm = createForm()(createClass({
   handleOP1() {
     this.props.form.validateFields((errors, values) => {
-    console.log(values)
       if (errors) {
         return false
       }
-      this.setState({
-        confirmLoading: true
-      })
-      // ZPost(uri, data, () => {
-      //   this.hideModal()
-      // }, () => {
-      //   this.setState({
-      //     confirmLoading: false
-      //   })
-      // })
+      startLoading()
+      ZPost('Order/UpdateOrderDetail', {
+        OID: this.props.oid,
+        ID: this.props.x.ID,
+        Price: values.RealPrice,
+        Qty: values.Qty,
+        SkuName: values.SkuName
+      }, ({d}) => {
+        this.props.onChange(d)
+      }).then(endLoading)
     })
+  },
+  handleOP3() {
+    startLoading()
+    ZPost('Order/DeleteOrderDetail', {
+      OID: this.props.oid,
+      ID: this.props.x.ID
+    }, ({d}) => {
+      this.props.onChange(d)
+    }).then(endLoading)
+  },
+  handleOP2(x) {
+    //console.log(x)
+    startLoading()
+    ZPost('Order/ChangeOrderDetail', {
+      OID: this.props.oid,
+      ID: this.props.x.ID,
+      SkuID: x.ID
+    }, ({d}) => {
+      this.props.onChange(d)
+    }).then(endLoading)
   },
   render() {
     const {x} = this.props
     const {getFieldDecorator} = this.props.form
     const ZPCN = classNames({
-      [`${styles._zp}`]: x.IsGift || true
+      [`${styles._zp}`]: x.IsGift
     })
     return (
       <Form className='pos-form'>
@@ -618,7 +694,8 @@ const SkuItemsForm = createForm()(createClass({
             <div className={styles._ipts}>
               <ButtonGroup>
                 <Button type='primary' size='small' onClick={this.handleOP1}>保存</Button>
-                <Button type='ghost' size='small' onClick={this.handleOP2}>换货</Button>
+                <Button type='ghost' size='small' onClick={this.handleOP2} className='hide'>换货</Button>
+                <SkuReplacePicker size='small' initialValues={{GoodsCode: x.GoodsCode}} onChange={this.handleOP2} />
                 <Button type='default' icon='delete' size='small' onClick={this.handleOP3} />
               </ButtonGroup>
             </div>
@@ -628,6 +705,262 @@ const SkuItemsForm = createForm()(createClass({
     )
   }
 }))
+const ModalNewEgg = connect(state => ({
+  visible: state.order_list_new_egg_vis
+}))(createForm()(createClass({
+  getInitialState() {
+    return {
+      visible: false,
+      confirmLoading: false
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (this.props.visible !== nextProps.visible) {
+      this.setState({
+        visible: nextProps.visible >= 0
+      })
+    }
+  },
+  handleSubmit() {
+    this.props.form.validateFields((errors, values) => {
+      console.log(values)
+      if (errors) {
+        return false
+      }
+      this.setState({
+        confirmLoading: true
+      })
+      const p1 = Areas.filter(x => x.value === values.s6[0])[0]
+      const p2 = values.s6[1] ? p1.children.filter(x => x.value === values.s6[1])[0] : null
+      const p3 = values.s6[2] && p2 ? p2.children.filter(x => x.value === values.s6[2])[0] : null
+      ZPost('Order/InsertOrder', {
+        ODate: values.s3 ? values.s3.format() : '',
+        BuyerShopID: values.s5,
+        SoID: values.s2,
+        ExAmount: values.s4,
+        ShopID: values.s1 ? values.s1.id : '',
+        RecName: values.s5 || '',
+        RecLogistics: p1 ? p1.label : '',
+        RecCity: p2 ? p2.label : '',
+        RecDistrict: p3 ? p3.label : '',
+        RecAddress: values.s7 || '',
+        RecPhone: values.s10 || '',
+        RecTel: values.s9 || '',
+        RecMessage: values.s11 || '',
+        SendMessage: values.s111 || '',
+        IsFaceToFace: values.s99 ? 'true' : 'false'
+      }, () => {
+        this.props.refreshRowData()
+        this.hideModal()
+      })
+    })
+  },
+  hideModal() {
+    this.props.dispatch({ type: 'ORDER_LIST_NEW_EGG_VIS_SET', payload: -1 })
+    this.props.form.resetFields()
+    this.props.refreshRowData()
+  },
+  rendFooter() {
+    return (
+      <div>
+        <span className='gray'>订单商品请在建立订单信息后在订单明细中添加</span>&emsp;
+        <Button type='primary' onClick={this.handleSubmit} loading={this.state.confirmLoading}>确定并创建新的订单</Button>
+      </div>
+    )
+  },
+  handleBuyer(u) {
+    const s6 = []
+    if (u.Logistics) {
+      let index = Areas.findIndex(x => x.label === u.Logistics)
+      if (index !== -1) {
+        let p1 = Areas[index]
+        s6.push(p1.value)
+        if (u.City) {
+          let index = p1.children.findIndex(x => x.label === u.City)
+          if (index !== -1) {
+            let p2 = p1.children[index]
+            s6.push(p2.value)
+            if (u.District) {
+              let index = p2.children.findIndex(x => x.label === u.District)
+              if (index !== -1) {
+                s6.push(p2.children[index].value)
+              }
+            }
+          }
+        }
+      }
+    }
+    this.props.form.setFieldsValue({
+      s5: u.BuyerId,
+      s6: s6.length ? s6 : undefined,
+      s7: u.Address,
+      s8: u.Receiver,
+      s9: u.Tel,
+      s10: u.Phone
+    })
+    this.props.dispatch({type: 'ORDER_LIST_BUYER_SELECT_VIS_SET', payload: -1})
+  },
+  render() {
+    const {getFieldDecorator} = this.props.form
+    const formItemLayout = {
+      labelCol: { span: 3 },
+      wrapperCol: { span: 18 }
+    }
+    return (
+      <Modal title='创建新订单' visible={this.state.visible} onCancel={this.hideModal} width={780} maskClosable={false} footer={this.rendFooter()}>
+        <Form horizontal className='pos-form'>
+          <h3 className={styles.modalFormTitle}>基本信息</h3>
+          <FormItem {...formItemLayout} label='选择店铺'>
+            <Col span={12}>
+              <FormItem>
+                {getFieldDecorator('s1', {
+                  rules: [
+                    { required: true, whitespace: true, message: '必填', type: 'object' }
+                  ]
+                })(
+                  <ShopPicker width={180} />
+                )}
+              </FormItem>
+            </Col>
+          </FormItem>
+          <FormItem {...formItemLayout} label='线上订单号'>
+            <Col span={12}>
+              <FormItem>
+                {getFieldDecorator('s2')(
+                  <Input placeholder='为空将自动生成线上订单号' />
+                )}
+              </FormItem>
+            </Col>
+            <Col span={12}>
+              <span className='gray'>&emsp;授权店铺请尽量避免手工下单</span>
+            </Col>
+          </FormItem>
+          <FormItem {...formItemLayout} label='下单时间'>
+            <Col span={12}>
+              <FormItem>
+                {getFieldDecorator('s3', {
+                  rules: [
+                    { required: true, whitespace: true, message: '必填', type: 'object' }
+                  ]
+                })(
+                  <DatePicker showTime placeholder='点击设置' format='YYYY-MM-DD HH:mm:ss' />
+                )}
+              </FormItem>
+            </Col>
+          </FormItem>
+          <FormItem {...formItemLayout} label='运费'>
+            <Col span={12}>
+              <FormItem>
+                {getFieldDecorator('s4', {
+                  rules: [
+                    { required: true, whitespace: true, message: '必填', type: 'number' }
+                  ]
+                })(
+                  <InputNumber min={0} />
+                )}
+              </FormItem>
+            </Col>
+          </FormItem>
+          <h3 className={styles.modalFormTitle}>买家及收货地址</h3>
+          <FormItem {...formItemLayout} label='选择买家'>
+            <Col span={8}>
+              <FormItem>
+                {getFieldDecorator('s5')(
+                  <Input />
+                )}
+              </FormItem>
+            </Col>
+            <Col span={16}>
+              <Button type='primary' size='small' onClick={() => {
+                this.props.dispatch({type: 'ORDER_LIST_BUYER_SELECT_VIS_SET', payload: 1})
+              }} className='ml10'>选择买家</Button>
+            </Col>
+          </FormItem>
+          <FormItem {...formItemLayout} label='收货地址'>
+            <Col span={8}>
+              <FormItem>
+                {getFieldDecorator('s6', {
+                  rules: [
+                    {required: true, whitespace: true, message: '必填', type: 'array'}
+                  ]
+                })(
+                  <Cascader options={Areas} placeholder='选择省/市/区' />
+                )}
+              </FormItem>
+            </Col>
+            <Col span={16}>
+              <FormItem>
+                {getFieldDecorator('s7', {
+                  rules: [
+                    {required: true, whitespace: true, message: '必填'}
+                  ]
+                })(
+                  <Input placeholder='详细地址：街区/门牌号' className='ml10' />
+                )}
+              </FormItem>
+            </Col>
+          </FormItem>
+          <FormItem {...formItemLayout} label='收货人名'>
+            <Col span={8}>
+              <FormItem>
+                {getFieldDecorator('s8', {
+                  rules: [
+                    {required: true, whitespace: true, message: '必填'}
+                  ]
+                })(
+                  <Input />
+                )}
+              </FormItem>
+            </Col>
+            <Col span={16}>
+              <FormItem>
+                {getFieldDecorator('s99', { valuePropName: 'checked' })(
+                  <Checkbox className='ml20'>现场取货</Checkbox>
+                )}
+              </FormItem>
+            </Col>
+          </FormItem>
+          <FormItem {...formItemLayout} label='联系电话'>
+            <Col span={8}>
+              <FormItem>
+                {getFieldDecorator('s9')(
+                  <Input />
+                )}
+              </FormItem>
+            </Col>
+          </FormItem>
+          <FormItem {...formItemLayout} label='手机号码'>
+            <Col span={8}>
+              <FormItem>
+                {getFieldDecorator('s10', {
+                  rules: [
+                    {required: true, whitespace: true, message: '必填'}
+                  ]
+                })(
+                  <Input />
+                )}
+              </FormItem>
+            </Col>
+          </FormItem>
+          <h3 className={styles.modalFormTitle}>补充信息</h3>
+          <FormItem {...formItemLayout} label='买家留言'>
+            {getFieldDecorator('s11')(
+              <Input placeholder='填写买家留言' />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout} label='卖家备注'>
+            {getFieldDecorator('s111')(
+              <Input placeholder='填写卖家备注' />
+            )}
+          </FormItem>
+        </Form>
+        <BuyerModal onOk={this.handleBuyer} onCancel={() => {
+          this.props.dispatch({type: 'ORDER_LIST_BUYER_SELECT_VIS_SET', payload: -1})
+        }} />
+      </Modal>
+    )
+  }
+})))
 export default connect(state => ({
   conditions: state.order_list_conditions
 }), null, null, { withRef: true })(Table)

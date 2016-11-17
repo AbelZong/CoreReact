@@ -633,7 +633,7 @@ export default connect()(Wrapper(React.createClass({
                   ) : null}
                 </div>
               </Panel>
-              <Panel header='发货仓库'>
+              <Panel header='其它'>
                 <div className={styles.sColumn}>
                   {dt.Others && dt.Others.length ? (
                     <WheatCheckboxGroup options={dt.Others} onChange={(e) => {

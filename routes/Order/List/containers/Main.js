@@ -15,7 +15,7 @@ import React from 'react'
 import {connect} from 'react-redux'
 import {
   Button,
-  message,
+  //message,
   Dropdown,
   Menu
 } from 'antd'
@@ -25,7 +25,13 @@ import Iconfa from 'components/Icon'
 import Table from './Table'
 
 class Main extends React.Component {
-  handleCreateNew = () => {
+  handleNewEvent = (e) => {
+    switch (e.key) {
+      case '1': {
+        this.props.dispatch({type: 'ORDER_LIST_NEW_EGG_VIS_SET', payload: 0})
+        break
+      }
+    }
   }
   render() {
     return (
@@ -36,7 +42,7 @@ class Main extends React.Component {
             <div className={appStyles.tools}>
               <Dropdown overlay={<Menu onClick={this.handleNewEvent}>
                 <Menu.Item key='1' title='一般用于手工添加线下订单'><Iconfa type='plus' style={{color: 'red'}} />&nbsp;&nbsp;手工下单</Menu.Item>
-                <Menu.Item key='2'><Iconfa type='upload' />&nbsp;&nbsp;导入订单</Menu.Item>
+                <Menu.Item key='2' disabled><Iconfa type='upload' />&nbsp;&nbsp;导入订单</Menu.Item>
                 <Menu.Divider />
                 <Menu.Item key='3' title='授权店铺订单接口会自动下载到系统,不需要手工操作`个别情况需要手工操作`可重复下载'>&nbsp;&nbsp;手工下载授权店铺订单[按单号]</Menu.Item>
                 <Menu.Item key='4' title='授权店铺订单接口会自动下载到系统,不需要手工操作`个别情况需要手工操作`可重复下载'>&nbsp;&nbsp;手工下载授权店铺订单[按时间]</Menu.Item>

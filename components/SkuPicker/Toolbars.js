@@ -55,32 +55,41 @@ export default createForm()(React.createClass({
   },
   render() {
     const { getFieldDecorator } = this.props.form
+    const _initialValues = this.props.initialValues || {}
     return (
       <div className={styles.toolbars}>
         <Form inline>
           <FormItem>
-            {getFieldDecorator('GoodsCode')(
+            {getFieldDecorator('GoodsCode', {
+              initialValue: _initialValues.GoodsCode || ''
+            })(
               <Input placeholder='款式编码' size='small' style={{width: 90}} onPressEnter={this.runSearching} />
             )}
           </FormItem>
           <FormItem>
-            {getFieldDecorator('SkuID')(
+            {getFieldDecorator('SkuID', {
+              initialValue: _initialValues.SkuID || ''
+            })(
               <Input placeholder='商品条码|编码' size='small' style={{width: 120}} onPressEnter={this.runSearching} />
             )}
           </FormItem>
           <FormItem>
-            {getFieldDecorator('Filter')(
+            {getFieldDecorator('Filter', {
+              initialValue: _initialValues.Filter || ''
+            })(
               <Input placeholder='商品名称|简介|颜色或规格' size='small' style={{width: 155}} onPressEnter={this.runSearching} />
             )}
           </FormItem>
           <FormItem>
-            {getFieldDecorator('SCoID')(
+            {getFieldDecorator('SCoID', {
+              initialValue: _initialValues.SCoID || undefined
+            })(
               <SupplierPicker size='small' />
             )}
           </FormItem>
           <FormItem>
             {getFieldDecorator('Enable', {
-              initialValue: 'true'
+              initialValue: typeof _initialValues.Enable === 'undefined' ? 'true' : _initialValues.Enable
             })(
               <Select style={{ width: 60 }} size='small'>
                 <Option value='true'>启用</Option>
@@ -89,7 +98,9 @@ export default createForm()(React.createClass({
             )}
           </FormItem>
           <FormItem>
-            {getFieldDecorator('Type')(
+            {getFieldDecorator('Type', {
+              initialValue: _initialValues.Type || ''
+            })(
               <Select placeholder='商品类型' style={{ width: 80 }} size='small'>
                 <Option value=''>不限类型</Option>
                 {Object.keys(types).map(k => <Option key={k} value={k}>{types[k]}</Option>)}
@@ -97,7 +108,9 @@ export default createForm()(React.createClass({
             )}
           </FormItem>
           <FormItem>
-            {getFieldDecorator('Brand')(
+            {getFieldDecorator('Brand', {
+              initialValue: _initialValues.Brand || undefined
+            })(
               <BrandPicker size='small' />
             )}
           </FormItem>
