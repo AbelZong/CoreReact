@@ -20,40 +20,45 @@ import {
   Input, Tag, Button
 } from 'antd'
 import styles from './index.scss'
+// let item = {
+//   Color: '',
+//   Size: '',
+//   SalePrice: 0,
+//   PurPrice: 0,
+//   Weight: 0,
+//   SkuID: '',
+//   BarCode: '',
+//   UniqueCode: '',
+//   ColorMapping: '',
+//   SizeMapping: '',
+//   Pid1: '',
+//   val_id1: 0,
+//   Pid2: '',
+//   val_id2: ''
+// }
 
-let item = {
-  Color: '',
-  Size: '',
-  SalePrice: 0,
-  PurPrice: 0,
-  Weight: 0,
-  SkuID: '',
-  BarCode: '',
-  UniqueCode: '',
-  ColorMapping: '',
-  SizeMapping: '',
-  Pid1: '',
-  val_id1: 0,
-  Pid2: '',
-  val_id2: ''
+const DEFAULT_STATES = {
+  skuprops: [],
+  items: {}
 }
-
+// {
+//   skuprops: this.props.value.skuprops,
+//   items: this.props.value.items,
+//   display: this.props.value.display,
+//   goodscode: this.props.value.goodscode
+// }
 const SkuInfo = React.createClass({
   getInitialState() {
-    return {
-      skuprops: this.props.value.skuprops,
-      items: this.props.value.items,
-      display: this.props.value.display,
-      goodscode: this.props.value.goodscode
-    }
+    return DEFAULT_STATES
   },
   componentDidMount() {
     //this._firstl()
   },
   componentWillReceiveProps(nextProps) {
-    
-      this._firstl(nextProps.value)
-    
+    console.log(nextProps)
+
+    //  this._firstl(nextProps.value)
+
   },
   componentWillUpdate(nextProps, nextState) {
     return false
@@ -208,11 +213,18 @@ const SkuInfo = React.createClass({
         }
       }
     }
-    if (this.props.value.skupid !== 0 && this.props.value.skupid === catalog.length) {
-      this.setState({
-        display: 'block'
-      })
-    }
+    // {
+    //   path: '...',
+    //   price:'''
+    // }
+    // {
+    //   [`path`]: {}
+    // }
+    // if (this.props.value.skupid !== 0 && this.props.value.skupid === catalog.length) {
+    //   this.setState({
+    //     display: 'block'
+    //   })
+    // }
     this.setState({
       items: items
     })
@@ -222,7 +234,7 @@ const SkuInfo = React.createClass({
   render() {
     return (
       <div>
-        <table className={styles.items} style={{display: this.state.display}}>
+        <table className={styles.items}>
           <thead className={styles.right}>
             <tr className={styles.zhang}>
               <th className={styles.op10}>颜色分类</th>
@@ -237,7 +249,7 @@ const SkuInfo = React.createClass({
             </tr>
           </thead>
           <tbody className={styles.right}>
-            {this.state.items.map((y, index) =>
+            {this.props.value.skupid && this.state.items.map((y, index) =>
               <tr key={`tr+${index}`} className={styles.chun}>
                 <td><Input value={`${y.Color === undefined ? y.Norm.split(';')[0] : y.Color}`} /></td>
                 <td><Input value={`${y.Size === undefined ? y.Norm.split(';')[1] : y.Size}`} /></td>

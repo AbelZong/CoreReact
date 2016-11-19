@@ -15,7 +15,6 @@ import React, {
   createClass
 } from 'react'
 import Areas from 'json/AreaCascader'
-//import ReactDOM from 'react-dom'
 import classNames from 'classnames'
 import SkuAppendPicker from 'components/SkuPicker/append'
 import ShopPicker from 'components/ShopPicker'
@@ -32,7 +31,12 @@ import {
   Col,
   InputNumber,
   DatePicker,
-  Checkbox
+  Checkbox,
+  Steps,
+  Radio,
+  Collapse,
+  Row,
+  Alert
 } from 'antd'
 import {
   connect
@@ -51,6 +55,9 @@ import styles from './index.scss'
 import ZGrid from 'components/Grid/index'
 import SkuReplacePicker from 'components/SkuPicker/replace'
 const ButtonGroup = Button.Group
+const Step = Steps.Step
+const RadioGroup = Radio.Group
+const Panel = Collapse.Panel
 const BuyerShop = createClass({
   render() {
     return (
@@ -65,28 +72,33 @@ const BuyerShop = createClass({
     )
   }
 })
-const SellerNote = createClass({
-  render() {
-    return (
-      <div className={styles.centerWrapper}>
-        <div className={styles.mLeftMiddle}>
-          <div>{this.props.data.SendMessage}</div>
-        </div>
-      </div>
-    )
-  }
-})
+// const SellerNote = createClass({
+//   render() {
+//     return (
+//       <div className={styles.centerWrapper}>
+//         <div className={styles.mLeftMiddle}>
+//           <div>{this.props.data.SendMessage}</div>
+//         </div>
+//       </div>
+//     )
+//   }
+// })
 const IDrender = createClass({
   _renderType(type, text) {
     return <div className={styles[`custType${type}`]}>{text}</div>
   },
   render() {
-    const {data} = this.props
+    const {data, api, rowIndex} = this.props
     return (
       <div className={styles.centerWrapper}>
         <div className={styles.mLeftMiddle}>
           <div>{data.ID}</div>
           {data.Type > 0 ? this._renderType(data.Type, data.TypeString) : null}
+        </div>
+        <div className={`${styles.float} ${styles['float-0']}`} onClick={e => {
+          api.gridOptionsWrapper.gridOptions.grid.props.dispatch({type: 'ORDER_LIST_DETAIL_1_SET', payload: rowIndex})
+        }}>
+          <span>详</span>
         </div>
       </div>
     )
@@ -94,7 +106,6 @@ const IDrender = createClass({
 })
 const mLeftRender = function(params) {
   return '<div class=' + styles.centerWrapper + '><div class=' + styles.mLeftMiddle + '><div>' + params.value + '</div></div></div>'
-  //return '<div class=' + styles.autoLine + '>' + params.value + '</div>'
 }
 const defColumns = [{
   headerName: '#',
@@ -105,9 +116,8 @@ const defColumns = [{
   headerName: '订单',
   children: [{
     headerName: '内部订单号',
-    //field: 'ID',
+    field: 'ID',
     width: 110,
-    //enableRowGroup: true,
     cellRendererFramework: IDrender
   }, {
     headerName: '商品',
@@ -122,7 +132,7 @@ const defColumns = [{
       // },
       refreshRowBySetter(data) {
         //更新数据后刷新 row
-        console.log(this)
+        //console.log(this)
         //this.props.node.setDataValue('ID', 'sdfsdfsdf') //only refresh `field` setted
         //setData -> refresh all
         this.props.node.setData(Object.assign(this.props.data, data))
@@ -133,8 +143,8 @@ const defColumns = [{
         const SkuList = data.SkuList || []
         let fck = SkuList.length
         let SkuListS = null
-        if (fck >= 10) {
-          SkuListS = SkuList.slice(0, 10)
+        if (fck >= 9) {
+          SkuListS = SkuList.slice(0, 9)
         } else {
           SkuListS = SkuList
         }
@@ -147,11 +157,10 @@ const defColumns = [{
         //     </div>
         //   )
         // }
-        //
-          // api.gridOptionsWrapper.gridOptions.grid.props.dispatch({type: 'ITEM_SKU_WRAPPER_DATA_SET', payload: {
-          //   rect: e.target.getBoundingClientRect(),
-          //   item: data
-          // }})
+        // api.gridOptionsWrapper.gridOptions.grid.props.dispatch({type: 'ITEM_SKU_WRAPPER_DATA_SET', payload: {
+        //   rect: e.target.getBoundingClientRect(),
+        //   item: data
+        // }})
         //   onClick={(e) => {
         //    console.log(this)
         //    this.setState({
@@ -166,7 +175,7 @@ const defColumns = [{
                   <span>{x.Qty}</span>
                 </div>
               )) : <div className={styles.noData}>-添加商品-</div>}
-              {fck >= 10 ? (
+              {fck >= 9 ? (
                 <div className={styles.posterCircal}>
                   <span>{fck}</span>
                 </div>
@@ -231,11 +240,6 @@ const defColumns = [{
     headerName: '状态',
     field: 'Status', //AbnormalStatus StatusDec
     width: 100,
-    // cellClassRules: {
-    //   'rag-green': (params) => { return params.value === '已发货' },
-    //   'rag-amber': (params) => { return params.value === '发货中' },
-    //   'rag-red': (params) => { return params.value === '待付款' }
-    // }
     cellClass: function(params) {
       return styles[`orderS${params.value}`] || ''
     },
@@ -255,12 +259,45 @@ const defColumns = [{
     headerName: '买家留言',
     field: 'RecMessage',
     width: 180,
-    cellRenderer: mLeftRender
+    //cellRenderer: mLeftRender
+    cellRendererFramework: createClass({
+      render() {
+        // <div className={styles.float} onClick={e => {
+        //     ZPost('', {}, () => {
+        //     })
+        // }}>
+        //   <span>标</span>
+        // </div>
+        return (
+          <div className={styles.centerWrapper}>
+            <div className={styles.mLeftMiddle}>
+              <div>{this.props.data.RecMessage}</div>
+            </div>
+          </div>
+        )
+      }
+    })
   }, {
     headerName: '卖家备注',
-    //field: 'remark',
+    field: 'SendMessage',
     width: 180,
-    cellRendererFramework: SellerNote
+    //cellRendererFramework: SellerNote
+    cellRendererFramework: createClass({
+      render() {
+        return (
+          <div className={styles.centerWrapper}>
+            <div className={styles.mLeftMiddle}>
+              <div>{this.props.data.SendMessage}</div>
+            </div>
+            <div className={`${styles.float} ${styles['float-1']}`} onClick={e => {
+              this.props.api.gridOptionsWrapper.gridOptions.grid.props.dispatch({type: 'ORDER_LIST_SELLERNOTE_1_SET', payload: this.props.rowIndex})
+            }}>
+              <span>改</span>
+            </div>
+          </div>
+        )
+      }
+    })
   // }, {
   //   headerName: '便签',
   //   field: 'node',
@@ -271,32 +308,44 @@ const defColumns = [{
   headerName: '快递信息',
   children: [{
     headerName: '快递公司',
-    //field: 'Express',
+    field: 'Express',
     width: 100,
-    cellRendererFramework: ({data}) => {
+    cellRendererFramework: ({data, api, rowIndex}) => {
       return (
         <div className={styles.centerWrapper}>
           <div className={styles.mAuto}>
             <div>{data.Express}</div>
             <div>{data.ExCode}</div>
           </div>
+          <div className={`${styles.float} ${styles['float-2']}`} onClick={e => {
+            api.gridOptionsWrapper.gridOptions.grid.props.dispatch({type: 'ORDER_LIST_EXPR_1_SET', payload: rowIndex})
+          }}>
+            <span>设</span>
+          </div>
         </div>
       )
     }
   }, {
     headerName: '收货地址/人',
-    //field: 'address',
+    field: 'RecAddress',
     width: 260,
-    cellRendererFramework: ({data}) => {
-      //api.gridOptionsWrapper.gridOptions.grid.props.dispatch
-      return (
-        <div className={styles.centerWrapper}>
-          <div className={styles.mLeftMiddle}>
-            <div>{data.RecLogistics} {data.RecCity} {data.RecDistrict} {data.RecAddress}&emsp;<small className={styles.gray}>({data.RecName})</small></div>
+    cellRendererFramework: createClass({
+      render() {
+        const {data, api, rowIndex} = this.props
+        return (
+          <div className={styles.centerWrapper}>
+            <div className={styles.mLeftMiddle}>
+              <div>{data.RecLogistics} {data.RecCity} {data.RecDistrict} {data.RecAddress}&emsp;<small className={styles.gray}>({data.RecName})</small></div>
+            </div>
+            <div className={`${styles.float} ${styles['float-3']}`} onClick={e => {
+              api.gridOptionsWrapper.gridOptions.grid.props.dispatch({type: 'ORDER_LIST_BUYERADDRESS_1_SET', payload: rowIndex})
+            }}>
+              <span>改</span>
+            </div>
           </div>
-        </div>
-      )
-    }
+        )
+      }
+    })
   }, {
     headerName: '分销商',
     field: 'Distributor',
@@ -345,7 +394,31 @@ const defColumns = [{
     cellRenderer: mLeftRender
   }]
 }]
-//cellRendererFramework
+
+const parseArea = function(l, c, d) {
+  const s6 = []
+  if (l) {
+    let index = Areas.findIndex(x => x.label === l)
+    if (index !== -1) {
+      let p1 = Areas[index]
+      s6.push(p1.value)
+      if (c) {
+        let index = p1.children.findIndex(x => x.label === c)
+        if (index !== -1) {
+          let p2 = p1.children[index]
+          s6.push(p2.value)
+          if (d) {
+            let index = p2.children.findIndex(x => x.label === d)
+            if (index !== -1) {
+              s6.push(p2.children[index].value)
+            }
+          }
+        }
+      }
+    }
+  }
+  return s6
+}
 const Table = React.createClass({
   componentWillReceiveProps(nextProps) {
     this._firstBlood(nextProps.conditions)
@@ -437,11 +510,521 @@ const Table = React.createClass({
           批量 内部订单号 测试用 486741
         </ZGrid>
         <ModalNewEgg refreshRowData={this.refreshRowData} />
+        <ComSeller1 zch={this} />
+        <ComRecAddress1 zch={this} />
+        <ComDetail1 zch={this} />
+        <ComExpr1 zch={this} />
       </div>
     )
   }
 })
+const ComDetail1 = connect(state => ({
+  doge: state.order_list_detail_1
+}))(createForm()(createClass({
+  getInitialState() {
+    return {
+      visible: false,
+      loading: false
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (this.props.doge !== nextProps.doge) {
+      if (nextProps.doge === null) {
+        this.setState({
+          visible: false
+        })
+      } else {
+        this.setState({
+          visible: true
+        }, () => {
+          const u = this.props.zch.grid.api.getModel().getRow(nextProps.doge).data
+          const s6 = parseArea(u.RecLogistics, u.RecCity, u.RecDistrict)
+          this.props.form.setFieldsValue({
+            s6: s6.length ? s6 : undefined,
+            s7: u.RecAddress,
+            s8: u.RecName,
+            s9: u.RecTel,
+            s10: u.RecPhone
+          })
+        })
+      }
+    }
+  },
+  hideModal() {
+    this.props.dispatch({ type: 'ORDER_LIST_BUYERADDRESS_1_SET', payload: null })
+    this.props.form.resetFields()
+  },
+  handleOK() {
+    console.log(this.props.form)
+    this.props.form.validateFields((errors, values) => {
+      console.log(values)
+      if (errors) {
+        return false
+      }
+      // this.setState({ loading: true })
+      // const node = this.props.zch.grid.api.getModel().getRow(this.props.doge)
+      // const p1 = Areas.filter(x => x.value === values.s6[0])[0]
+      // const p2 = values.s6[1] ? p1.children.filter(x => x.value === values.s6[1])[0] : null
+      // const p3 = values.s6[2] && p2 ? p2.children.filter(x => x.value === values.s6[2])[0] : null
+      // const data = {
+      //   RecName: values.s8 || '',
+      //   RecLogistics: p1 ? p1.label : '',
+      //   RecCity: p2 ? p2.label : '',
+      //   RecDistrict: p3 ? p3.label : '',
+      //   RecAddress: values.s7 || '',
+      //   RecPhone: values.s10 || '',
+      //   RecTel: values.s9 || ''
+      // }
+      // ZPost('Order/ModifyAddress', {
+      //   OID: node.data.ID,
+      //   ...data
+      // }, () => {
+      //   this.hideModal()
+      //   Object.assign(node.data, data)
+      //   this.props.zch.grid.api.refreshCells([node], ['RecAddress'])
+      // }).then(() => {
+      //   this.setState({ loading: false })
+      // })
+    })
+  },
+  render() {
+    const {getFieldDecorator} = this.props.form
+    const formItemLayout = {
+      labelCol: { span: 4 },
+      wrapperCol: { span: 18 }
+    }
+    return (
+      <Modal title='查看或编辑备注' confirmLoading={this.state.loading} visible={this.state.visible}onCancel={this.hideModal} width={900} footer=''>
+        <Steps current={1}>
+          <Step title='待付款' />
+          <Step title='已付款待审核' />
+          <Step title='已审核待配快递' />
+          <Step title='发货中' />
+          <Step title='已发货' />
+        </Steps>
+        <div className='flex-row mt25'>
+          <div className='flex-grow'><_ComDetailForm1 /></div>
+          <div className={styles.opsArea}>
+            <div><Button type='ghost' size='small'>标记异常</Button></div>
+            <div className='mt20'><Button type='ghost' size='small'>取消订单</Button></div>
+          </div>
+        </div>
+        <div className='hr' />
+        <Form>
+          <FormItem {...formItemLayout} label='手机号码'>
+            <Col span={8}>
+              <FormItem>
+                {getFieldDecorator('s101', {
+                  rules: [
+                    {required: true, whitespace: true, message: '必填'}
+                  ]
+                })(
+                  <Input size='small' />
+                )}
+              </FormItem>
+            </Col>
+          </FormItem>
+        </Form>
+      </Modal>
+    )
+  }
+})))
+const _ComDetailForm1 = createForm()(createClass({
+  componentWillReceiveProps(nextProps) {
+    console.log(nextProps)
+  },
+  render() {
+    const {getFieldDecorator} = this.props.form
+    const formItemLayout = {
+      labelCol: { span: 4 },
+      wrapperCol: { span: 18 }
+    }
+    return (
+      <div>
+        <Form horizontal className='pos-form'>
+          <h3>订单基本信息</h3>
+          <FormItem {...formItemLayout} label='收货地址'>
+            <Col span={8}>
+              <FormItem>
+                {getFieldDecorator('s6', {
+                  rules: [
+                    {required: true, whitespace: true, message: '必填', type: 'array'}
+                  ]
+                })(
+                  <Cascader options={Areas} placeholder='选择省/市/区' />
+                )}
+              </FormItem>
+            </Col>
+            <Col span={16}>
+              <FormItem>
+                {getFieldDecorator('s7', {
+                  rules: [
+                    {required: true, whitespace: true, message: '必填'}
+                  ]
+                })(
+                  <Input placeholder='详细地址：街区/门牌号' className='ml10' />
+                )}
+              </FormItem>
+            </Col>
+          </FormItem>
+          <FormItem {...formItemLayout} label='收货人名'>
+            <Col span={8}>
+              <FormItem>
+                {getFieldDecorator('s8', {
+                  rules: [
+                    {required: true, whitespace: true, message: '必填'}
+                  ]
+                })(
+                  <Input />
+                )}
+              </FormItem>
+            </Col>
+          </FormItem>
+          <FormItem {...formItemLayout} label='联系电话'>
+            <Col span={8}>
+              <FormItem>
+                {getFieldDecorator('s9')(
+                  <Input />
+                )}
+              </FormItem>
+            </Col>
+          </FormItem>
+          <FormItem {...formItemLayout} label='手机号码'>
+            <Col span={8}>
+              <FormItem>
+                {getFieldDecorator('s10', {
+                  rules: [
+                    {required: true, whitespace: true, message: '必填'}
+                  ]
+                })(
+                  <Input />
+                )}
+              </FormItem>
+            </Col>
+          </FormItem>
+        </Form>
+      </div>
+    )
+  }
+}))
+const ComRecAddress1 = connect(state => ({
+  doge: state.order_list_buyerAddress_1
+}))(createForm()(createClass({
+  getInitialState() {
+    return {
+      visible: false,
+      loading: false
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (this.props.doge !== nextProps.doge) {
+      if (nextProps.doge === null) {
+        this.setState({
+          visible: false
+        })
+      } else {
+        this.setState({
+          visible: true
+        }, () => {
+          const u = this.props.zch.grid.api.getModel().getRow(nextProps.doge).data
+          const s6 = parseArea(u.RecLogistics, u.RecCity, u.RecDistrict)
+          this.props.form.setFieldsValue({
+            s6: s6.length ? s6 : undefined,
+            s7: u.RecAddress,
+            s8: u.RecName,
+            s9: u.RecTel,
+            s10: u.RecPhone
+          })
+        })
+      }
+    }
+  },
+  hideModal() {
+    this.props.dispatch({ type: 'ORDER_LIST_BUYERADDRESS_1_SET', payload: null })
+    this.props.form.resetFields()
+  },
+  handleOK() {
+    this.props.form.validateFields((errors, values) => {
+      if (errors) {
+        return false
+      }
+      this.setState({ loading: true })
+      const node = this.props.zch.grid.api.getModel().getRow(this.props.doge)
+      const p1 = Areas.filter(x => x.value === values.s6[0])[0]
+      const p2 = values.s6[1] ? p1.children.filter(x => x.value === values.s6[1])[0] : null
+      const p3 = values.s6[2] && p2 ? p2.children.filter(x => x.value === values.s6[2])[0] : null
+      const data = {
+        RecName: values.s8 || '',
+        RecLogistics: p1 ? p1.label : '',
+        RecCity: p2 ? p2.label : '',
+        RecDistrict: p3 ? p3.label : '',
+        RecAddress: values.s7 || '',
+        RecPhone: values.s10 || '',
+        RecTel: values.s9 || ''
+      }
+      ZPost('Order/ModifyAddress', {
+        OID: node.data.ID,
+        ...data
+      }, () => {
+        this.hideModal()
+        Object.assign(node.data, data)
+        this.props.zch.grid.api.refreshCells([node], ['RecAddress'])
+      }).then(() => {
+        this.setState({ loading: false })
+      })
+    })
+  },
+  render() {
+    const {getFieldDecorator} = this.props.form
+    const formItemLayout = {
+      labelCol: { span: 4 },
+      wrapperCol: { span: 18 }
+    }
+    return (
+      <Modal title='查看或编辑备注' confirmLoading={this.state.loading} visible={this.state.visible} onOk={this.handleOK} onCancel={this.hideModal} width={720}>
+        <Form horizontal className='pos-form'>
+          <FormItem {...formItemLayout} label='收货地址'>
+            <Col span={8}>
+              <FormItem>
+                {getFieldDecorator('s6', {
+                  rules: [
+                    {required: true, whitespace: true, message: '必填', type: 'array'}
+                  ]
+                })(
+                  <Cascader options={Areas} placeholder='选择省/市/区' />
+                )}
+              </FormItem>
+            </Col>
+            <Col span={16}>
+              <FormItem>
+                {getFieldDecorator('s7', {
+                  rules: [
+                    {required: true, whitespace: true, message: '必填'}
+                  ]
+                })(
+                  <Input placeholder='详细地址：街区/门牌号' className='ml10' />
+                )}
+              </FormItem>
+            </Col>
+          </FormItem>
+          <FormItem {...formItemLayout} label='收货人名'>
+            <Col span={8}>
+              <FormItem>
+                {getFieldDecorator('s8', {
+                  rules: [
+                    {required: true, whitespace: true, message: '必填'}
+                  ]
+                })(
+                  <Input />
+                )}
+              </FormItem>
+            </Col>
+          </FormItem>
+          <FormItem {...formItemLayout} label='联系电话'>
+            <Col span={8}>
+              <FormItem>
+                {getFieldDecorator('s9')(
+                  <Input />
+                )}
+              </FormItem>
+            </Col>
+          </FormItem>
+          <FormItem {...formItemLayout} label='手机号码'>
+            <Col span={8}>
+              <FormItem>
+                {getFieldDecorator('s10', {
+                  rules: [
+                    {required: true, whitespace: true, message: '必填'}
+                  ]
+                })(
+                  <Input />
+                )}
+              </FormItem>
+            </Col>
+          </FormItem>
+        </Form>
+      </Modal>
+    )
+  }
+})))
+const ComSeller1 = connect(state => ({
+  doge: state.order_list_sellerNote_1
+}))(createForm()(createClass({
+  getInitialState() {
+    return {
+      visible: false,
+      loading: false
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (this.props.doge !== nextProps.doge) {
+      if (nextProps.doge === null) {
+        this.setState({
+          visible: false
+        })
+      } else {
+        this.setState({
+          visible: true
+        }, () => {
+          this.props.form.setFieldsValue({
+            zch: this.props.zch.grid.api.getModel().getRow(nextProps.doge).data.SendMessage
+          })
+        })
+      }
+    }
+  },
+  hideModal() {
+    this.props.dispatch({ type: 'ORDER_LIST_SELLERNOTE_1_SET', payload: null })
+    this.props.form.resetFields()
+  },
+  handleOK() {
+    this.props.form.validateFields((errors, values) => {
+      console.log(values)
+      if (errors) {
+        return false
+      }
+      this.setState({ loading: true })
+      const node = this.props.zch.grid.api.getModel().getRow(this.props.doge)
+      ZPost('Order/ModifyRemark', {OID: node.data.ID, SendMessage: values.zch}, () => {
+        this.hideModal()
+        node.data.SendMessage = values.zch
+        this.props.zch.grid.api.refreshCells([node], ['SendMessage'])
+      }).then(() => {
+        this.setState({ loading: false })
+      })
+    })
+  },
+  render() {
+    const {getFieldDecorator} = this.props.form
+    return (
+      <Modal title='查看或编辑备注' confirmLoading={this.state.loading} visible={this.state.visible} onOk={this.handleOK} onCancel={this.hideModal} width={480}>
+        <Form horizontal className='pos-form'>
+          <FormItem>
+            {getFieldDecorator('zch')(
+              <Input type='textarea' placeholder='填写卖家备注/可空' autosize={{minRows: 6, maxRows: 12}} />
+            )}
+          </FormItem>
+        </Form>
+      </Modal>
+    )
+  }
+})))
+const ComExpr1 = connect(state => ({
+  doge: state.order_list_expr_1
+}))(createClass({
+  getInitialState() {
+    return {
+      visible: false,
+      loading: false,
+      exps: [],
+      expers: []
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (this.props.doge !== nextProps.doge) {
+      if (nextProps.doge === null) {
+        this.setState({
+          visible: false,
+          address: '',
+          exps: [],
+          expers: []
+        })
+      } else {
+        startLoading()
+        const u = this.props.zch.grid.api.getModel().getRow(nextProps.doge).data
+        ZGet('Order/GetExp', {
+          Logistics: u.RecLogistics,
+          City: u.RecCity,
+          District: u.RecDistrict,
+          IsQuick: true
+        }, ({d}) => {
+          const address = `${u.RecLogistics} ${u.RecCity} ${u.RecDistrict} ${u.RecAddress}`
+          if (d.LogisticsNetwork && d.LogisticsNetwork.length) {
+            const expers = {}
+            for (let er of d.LogisticsNetwork) {
+              if (!expers[er.kd_name]) {
+                expers[er.kd_name] = {
+                  count: 0,
+                  name: er.kd_name,
+                  children: []
+                }
+              }
+              expers[er.kd_name].count ++
+              expers[er.kd_name].children.push({
+                cp_name: er.cp_name_raw,
+                cp_loc: er.cp_location,
+                delivery_area_1: er.delivery_area_1,
+                delivery_area_0: er.delivery_area_0,
+                delivery_contact: er.delivery_contact
+              })
+            }
+            this.setState({ visible: true, exps: d.Express, expers: Object.values(expers), address })
+          } else {
+            this.setState({ visible: true, exps: d.Express, expers: null, address })
+          }
+        }).then(endLoading)
+      }
+    }
+  },
+  hideModal() {
+    this.props.dispatch({ type: 'ORDER_LIST_EXPR_1_SET', payload: null })
+  },
+  handleOK() {
+    console.log(this.refs.zch.state.value)
+  },
+  render() {
+    return (
+      <Modal title='请选择需要设定的物流(快递)公司' confirmLoading={this.state.loading} visible={this.state.visible} onOk={this.handleOK} onCancel={this.hideModal} width={820}>
+        <div className={styles.experWrapper}>
+          <div className={styles.exps}>
+            <Alert message={this.state.address} type='warning' />
+            <Collapse>
+              {this.state.expers.length ? this.state.expers.map((x, i) => (
+                <Panel header={`${x.name} (${x.count})`} key={i}>
+                  <div className={styles.pch}>
+                    {x.children && x.children.length ? x.children.map(y => (
+                      <div className={styles.row}>
+                        <Row>
+                          <Col span={4} className='tr'>网店名：</Col>
+                          <Col span={20}><strong>{y.cp_name}</strong></Col>
+                        </Row>
+                        <Row>
+                          <Col span={4} className='tr'>地址：</Col>
+                          <Col span={20}>{y.cp_loc}</Col>
+                        </Row>
+                        <Row>
+                          <Col span={4} className='tr'>联系：</Col>
+                          <Col span={20}>{y.delivery_contact}</Col>
+                        </Row>
+                        <Row>
+                          <Col span={4} className='tr'>到达区域：</Col>
+                          <Col span={20}><span className={styles.green}>{y.delivery_area_1}</span></Col>
+                        </Row>
+                        <Row>
+                          <Col span={4} className='tr'>不达区域：</Col>
+                          <Col span={20}>{y.delivery_area_0}</Col>
+                        </Row>
+                      </div>
+                    )) : null}
+                  </div>
+                </Panel>
+              )) : null}
+            </Collapse>
+          </div>
+          <div className={styles.radios}>
+            <RadioGroup ref='zch'>
+              {this.state.exps.length ? this.state.exps.map(x => <Radio key={x.ID} value={x.ID}>{x.Name}</Radio>) : null}
+            </RadioGroup>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+}))
 const gridOptions = {
+  getRowClass: function(params) {
+    return styles[`fck-${params.data.Status}`]
+  },
   getContextMenuItems: function(params) {
     const data = params.node.data
     return [
@@ -526,7 +1109,7 @@ const ItemSKUWrapper = createClass({
     const ids = skus.map(x => x.ID)
     if (ids.length) {
       startLoading()
-      ZPost('Order/InsertOrderDetail', {OID: this.props.item.ID, SkuIDList: ids}, ({d}) => {
+      ZPost('Order/InsertOrderDetail', {OID: this.props.item.ID, SkuIDList: ids, isQuick: true}, ({d}) => {
         this.props.onChange(d.Order)
         this._noticeFails(d.failIDs)
       }).then(endLoading)
@@ -536,7 +1119,7 @@ const ItemSKUWrapper = createClass({
     const ids = skus.map(x => x.ID)
     if (ids.length) {
       startLoading()
-      ZPost('Order/InsertGift', {OID: this.props.item.ID, SkuIDList: ids}, ({d}) => {
+      ZPost('Order/InsertGift', {OID: this.props.item.ID, SkuIDList: ids, isQuick: true}, ({d}) => {
         this.props.onChange(d.Order)
         this._noticeFails(d.failIDs)
       }).then(endLoading)
@@ -591,7 +1174,8 @@ const SkuItemsForm = createForm()(createClass({
         ID: this.props.x.ID,
         Price: values.RealPrice,
         Qty: values.Qty,
-        SkuName: values.SkuName
+        SkuName: values.SkuName,
+        isQuick: true
       }, ({d}) => {
         this.props.onChange(d)
       }).then(endLoading)
@@ -723,7 +1307,6 @@ const ModalNewEgg = connect(state => ({
   },
   handleSubmit() {
     this.props.form.validateFields((errors, values) => {
-      console.log(values)
       if (errors) {
         return false
       }
@@ -739,7 +1322,7 @@ const ModalNewEgg = connect(state => ({
         SoID: values.s2,
         ExAmount: values.s4,
         ShopID: values.s1 ? values.s1.id : '',
-        RecName: values.s5 || '',
+        RecName: values.s8 || '',
         RecLogistics: p1 ? p1.label : '',
         RecCity: p2 ? p2.label : '',
         RecDistrict: p3 ? p3.label : '',

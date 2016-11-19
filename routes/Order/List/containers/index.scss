@@ -103,6 +103,7 @@ height: 100%;
   display: flex;
   height: 68px;
   flex-direction: column;
+  position: relative;
   .gray {
     color: #8A8A8A;
   }
@@ -449,5 +450,93 @@ height: 100%;
   margin-right: 9px;
   :global(.ant-btn) {
     margin-left:4px;
+  }
+}
+
+.float {
+  position: absolute;
+  right: 3px;
+  top: 28px;
+  line-height: 22px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #fff;
+  white-space: nowrap;
+  width: 20px;
+  height: 20px;
+  font-family: 'Microsoft YaHei';
+  text-align: center;
+  background-color: #42c8ff;
+  display: none;
+  &:hover {
+    background-color: #f00;
+  }
+}
+.zgrid {
+  .fck-0,
+  .fck-1,
+  .fck-7 {
+    &:hover {
+      .float-0 {
+        display: block;
+      }
+      .float-1 {
+        display: block;
+      }
+      .float-2 {
+        display: block;
+      }
+      .float-3 {
+        display: block;
+      }
+    }
+  }
+}
+
+.noMBForm {
+  :global {
+    .pos-form .ant-form-item,
+    .pos-form .ant-form-item-with-help {
+        margin-bottom: 0;
+    }
+  }
+}
+.opsArea {
+  background-color:#f9f9f9;
+  padding:10px;
+  width: 220px;
+}
+
+.experWrapper {
+  display: flex;
+  flex-direction: row;
+  .exps {
+    flex: 1;
+  }
+  .radios {
+    width: 200px;
+    padding-left:20px;
+    :global {
+      .ant-radio-wrapper {
+        display: block;
+      }
+    }
+  }
+  .pch {
+    .green {
+      color: green;
+    }
+  }
+  .row {
+    margin-bottom: 5px;
+    border-bottom: 1px dotted #f9f9f9;
+    :global {
+      .ant-row {
+        margin-bottom: 5px;
+      }
+    }
+    strong {
+      font-size:14px;
+    }
   }
 }

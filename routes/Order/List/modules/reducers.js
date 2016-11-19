@@ -27,7 +27,23 @@ const order_list_new_egg_vis = handleActions({
 const order_list_buyer_select_vis = handleActions({
   ORDER_LIST_BUYER_SELECT_VIS_SET: (state, action) => action.payload
 }, -1)
+const order_list_detail_1 = handleActions({
+  ORDER_LIST_DETAIL_1_SET: (state, action) => action.payload
+}, null)
+const order_list_sellerNote_1 = handleActions({
+  ORDER_LIST_SELLERNOTE_1_SET: (state, action) => action.payload
+}, null)
+// const order_list_buyerNote_1 = handleActions({
+//   ORDER_LIST_BUYERNOTE_1_SET: (state, action) => action.payload
+// }, null)
+const order_list_expr_1 = handleActions({
+  ORDER_LIST_EXPR_1_SET: (state, action) => action.payload
+}, null)
+const order_list_buyerAddress_1 = handleActions({
+  ORDER_LIST_BUYERADDRESS_1_SET: (state, action) => action.payload
+}, null)
 
 export default {
-  order_list_collapse, order_list_conditions, order_list_new_egg_vis, order_list_buyer_select_vis
+  order_list_collapse, order_list_conditions, order_list_new_egg_vis, order_list_buyer_select_vis,
+  order_list_detail_1, order_list_sellerNote_1, order_list_buyerAddress_1, order_list_expr_1
 }

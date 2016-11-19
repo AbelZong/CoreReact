@@ -36,11 +36,15 @@ import {
   Form,
   Input,
   Modal,
-  Checkbox, Row, Col
+  Checkbox,
+  Row,
+  Col,
+  InputNumber
 } from 'antd'
 import {
   Icon as Iconfa
 } from 'components/Icon'
+import ShopPicker from 'components/ShopPicker'
 const createForm = Form.create
 const FormItem = Form.Item
 const ButtonGroup = Button.Group
@@ -183,7 +187,6 @@ const Main = React.createClass({
   }
 })
 const skuprops = []
-const skutable = ['none']
 const DEFAULT_TITLE = '创建新商品'
 const ModifyModal = connect(state => ({
   doge: state.product_list2_modify_vis
@@ -246,75 +249,125 @@ const ModifyModal = connect(state => ({
               Remark: d.main.Remark,
               Img: d.main.Img
             })
-            let skus = []
-            let skupid = d.skuprops_base.length
-            if (d.skuprops_base.length > 0) {
-              for (let sp of d.skuprops_base) {
-                let temps = {pid: sp.pid, name: sp.name, skuprops_values: []}
-                for (let spv of sp.skuprops_values) {
-                  for (let edit of d.skuprops) {
-                    if (sp.pid === edit.pid) {
-                      if (edit.IsOther === 1) {
-                        temps.skuprops_values.push({
-                          ischeck: true,
-                          name: edit.val_name,
-                          fname: sp.name,
-                          id: edit.ID,
-                          mapping: edit.mapping,
-                          IsOther: edit.IsOther,
-                          pid: edit.pid
-                        })
-                      } else {
-                        if (spv.name === edit.val_name) {
-                          temps.skuprops_values.push({
-                            ischeck: true,
-                            name: spv.name,
-                            fname: sp.name,
-                            id: spv.id,
-                            mapping: spv.mapping,
-                            IsOther: 0,
-                            pid: spv.pid
-                          })
-                        }
+            const _skuProps = {}
+            if (d.skuprops && d.skuprops instanceof Array && d.skuprops.length) {
+              for (let sku of d.skuprops) {
+                _skuProps[sku.val_id] = sku
+              }
+            }
+            const skuProps = {}
+            if (d.skuprops_base && d.skuprops_base instanceof Array && d.skuprops_base.length) {
+              for (let sku of d.skuprops_base) {
+                let children1 = [] //其它的
+                let children0 = [] //内置的 ok
+                if (sku.skuprops_values && sku.skuprops_values instanceof Array && sku.skuprops_values.length) {
+                  for (let prop of sku.skuprops_values) {
+                    let cc = null
+                    if (_skuProps && _skuProps[prop.id]) {
+                      cc = _skuProps[prop.id]
+                      delete _skuProps[prop.id]
+                    } else {
+                      cc = {
+                        Enable: 0,
+                        ID: 0,
+                        mapping: prop.mapping,
+                        pid: prop.pid,
+                        val_id: prop.id,
+                        val_name: prop.name
                       }
+                    }
+                    children0.push(cc)
+                  }
+                }
+                if (_skuProps && Object.keys(_skuProps).length) {
+                  for (let id in _skuProps) {
+                    if (_skuProps[id].pid === sku.pid) {
+                      children1.push(_skuProps[id])
+                      delete _skuProps[id]
                     }
                   }
                 }
-                skus.push(temps)
-              }
-              for (let sp of d.skuprops_base) {
-                for (let spv of sp.skuprops_values) {
-                  for (let edit of skus) {
-                    if (sp.pid === edit.pid) {
-                      if (edit.skuprops_values.findIndex(x => x.name === spv.name) === -1) {
-                        edit.skuprops_values.push({
-                          ischeck: false,
-                          name: spv.name,
-                          fname: sp.name,
-                          id: spv.id,
-                          mapping: spv.mapping,
-                          IsOther: 0,
-                          pid: spv.pid
-                        })
-                      }
-                    }
-                  }
+                skuProps[sku.pid] = {
+                  name: sku.name,
+                  pid: sku.pid,
+                  children1,
+                  children0
                 }
               }
             }
+            // let skus = []
+            // let skupid = d.skuprops_base.length
+            // if (d.skuprops_base.length > 0) {
+            //   for (let sp of d.skuprops_base) {
+            //     let temps = {pid: sp.pid, name: sp.name, skuprops_values: []}
+            //     for (let spv of sp.skuprops_values) {
+            //       for (let edit of d.skuprops) {
+            //         if (sp.pid === edit.pid) {
+            //           if (edit.IsOther === 1) {
+            //             temps.skuprops_values.push({
+            //               ischeck: true,
+            //               name: edit.val_name,
+            //               fname: sp.name,
+            //               id: edit.ID,
+            //               mapping: edit.mapping,
+            //               IsOther: edit.IsOther,
+            //               pid: edit.pid
+            //             })
+            //           } else {
+            //             if (spv.name === edit.val_name) {
+            //               temps.skuprops_values.push({
+            //                 ischeck: true,
+            //                 name: spv.name,
+            //                 fname: sp.name,
+            //                 id: spv.id,
+            //                 mapping: spv.mapping,
+            //                 IsOther: 0,
+            //                 pid: spv.pid
+            //               })
+            //             }
+            //           }
+            //         }
+            //       }
+            //     }
+            //     skus.push(temps)
+            //   }
+            //   for (let sp of d.skuprops_base) {
+            //     for (let spv of sp.skuprops_values) {
+            //       for (let edit of skus) {
+            //         if (sp.pid === edit.pid) {
+            //           if (edit.skuprops_values.findIndex(x => x.name === spv.name) === -1) {
+            //             edit.skuprops_values.push({
+            //               ischeck: false,
+            //               name: spv.name,
+            //               fname: sp.name,
+            //               id: spv.id,
+            //               mapping: spv.mapping,
+            //               IsOther: 0,
+            //               pid: spv.pid
+            //             })
+            //           }
+            //         }
+            //       }
+            //     }
+            //   }
+            // }
             this.setState({
               title: `修改商品：[${d.main.ID}]`,
               visible: true,
               confirmLoading: false,
-              kindid: d.main.KindID,
-              itemprops: d.itemprops_base,
-              skuprops: skus,
-              items: d.items,
-              editSp: d.skuprops,
-              editIp: d.itemprops,
-              brandid: d.main.Brand,
-              brandname: d.main.BrandName,
-              skupid: skupid
+              itemProps: [], //todo 数据清洗
+              skuProps: Object.values(skuProps)
+              //kindid: d.main.KindID,
+              //itemprops: d.itemprops_base,
+              //skuprops: skus,
+              //items: d.items,
+              //editSp: d.skuprops,
+              //editIp: d.itemprops,
+              //brandid: d.main.Brand,
+              //brandname: d.main.BrandName,
+              //skupid: skupid
+            }, () => {
+              console.log(this.state)
             })
           },
           error: () => {
@@ -334,7 +387,7 @@ const ModifyModal = connect(state => ({
         confirmLoading: true
       })
       console.log(v)
-      const {doge} = this.props
+    //  const {doge} = this.props
       v.KindID = (v.KindID && v.KindID.id) ? v.KindID.id : ''
       v.Brand = (v.Brand && v.Brand.id) ? v.Brand.id : ''
       v.Supplier = (v.Supplier && v.Supplier.id) ? v.Supplier.id : ''
@@ -479,24 +532,25 @@ const ModifyModal = connect(state => ({
       visible: false,
       itemprops: [],
       skuprops: []
+    }, () => {
+      this.props.form.resetFields()
     })
-    requestAnimationFrame(() => this.props.form.resetFields())
   },
   commAttrs(vs) {
     if (vs.length > 0) {
+      const getFieldDecorator = this.props.form.getFieldDecorator
+      //todo 注意下多选是否可以编辑新增
       return vs.map(x => {
         return (
-          <div key={x.pid}>
-            <FormItem className={styles.itemSelect} style={{ margin: '5px 0 0 0' }}>
-              {this.props.form.getFieldDecorator(`attr-${x.id}-${x.pid}`, {initialValue: {
-                value: '',
-                values: x.values,
-                name: x.name
-              }})(
-                <AttrCC />
-              )}
-            </FormItem>
-          </div>
+          <FormItem key={x.pid} className={styles.itemSelect} style={{ margin: '5px 0 0 0' }}>
+            {getFieldDecorator(`attr.${x.id}-${x.pid}`, {initialValue: {
+              value: '',
+              values: x.values,
+              name: x.name
+            }})(
+              <AttrCC />
+            )}
+          </FormItem>
         )
       })
     } else {
@@ -522,7 +576,7 @@ const ModifyModal = connect(state => ({
     }
   },
   skusC(y, index) {
-    return (this.props.form.getFieldDecorator(`sku-${y.id}-${y.pid}-${y.mapping}`, {
+    return (this.props.form.getFieldDecorator(`skus.${y.id}-${y.pid}-${y.mapping}`, {
       initialValue: {
         checked: y.ischeck,
         value: `${y.name}`,
@@ -535,9 +589,9 @@ const ModifyModal = connect(state => ({
   commSkus(vs) {
     return vs.map((x, index) => {
       return (
-        <FormItem key={x.pid + index} label={x.name} style={{ margin: '5px 0 0 0' }}>
+        <FormItem key={index} label={x.name} style={{ margin: '5px 0 0 0' }}>
           {
-            x.skuprops_values != null ? x.skuprops_values.map((y, i) => y.IsOther !== 1 ? (this.skusC(y, i)) : null) : null
+            x.skuprops_values !== null ? x.skuprops_values.map((y, i) => y.IsOther !== 1 ? (this.skusC(y, i)) : null) : null
           }
           <div className={styles.hua}>
             <div>{x.name}->其他：</div>
@@ -572,7 +626,7 @@ const ModifyModal = connect(state => ({
             {getFieldDecorator('GoodsCode', {
               rules: [{ required: true, message: '必填' }]
             })(
-              <Input />
+              <Input placeholder='货号，一旦填写尽量不要修改，可另外创建商品' />
             )}
           </FormItem>
           <FormItem {...formItemLayout2} label='商品名称'>
@@ -630,7 +684,7 @@ const ModifyModal = connect(state => ({
           </Row>
           <Row>
             <Col sm={10}>
-              <FormItem labelCol={{ span: 10 }} wrapperCol={{ span: 12 }} label='市场|吊牌价'>
+              <FormItem labelCol={{ span: 10 }} wrapperCol={{ span: 12 }} label='市场/吊牌价'>
                 {getFieldDecorator('MarketPrice')(
                   <Input />
                 )}
@@ -655,7 +709,7 @@ const ModifyModal = connect(state => ({
             <Col sm={14}>
               <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 12 }} label='重量(KG)'>
                 {getFieldDecorator('Weight')(
-                  <Input />
+                  <InputNumber min={0} step={0.01} />
                 )}
               </FormItem>
             </Col>
@@ -664,11 +718,9 @@ const ModifyModal = connect(state => ({
             <Col sm={10}>
               <FormItem labelCol={{ span: 10 }} wrapperCol={{ span: 12 }} label='淘宝模板店铺'>
                 {getFieldDecorator('TempShopID', {
-                  rules: [{ required: true, message: '必填' }]
+                  rules: [{ required: true, message: '必填', type: 'object' }]
                 })(
-                  <Select placeholder='-选择店铺-' style={{ width: 128 }}>
-                    {this.state.shops.map(x => <Option value={`${x.value}`} key={x.value}>{x.label}</Option>)}
-                  </Select>
+                  <ShopPicker />
                 )}
               </FormItem>
             </Col>
@@ -685,27 +737,22 @@ const ModifyModal = connect(state => ({
               <Input type='textarea' autosize={{minRows: 1, maxRows: 3}} />
             )}
           </FormItem>
-          <FormItem {...formItemLayout} label='商品属性' />
-          <div key='attr123456' className={styles.item}>
+          <h3>商品属性</h3>
+          <div className='hr' />
+          <div className={styles.item}>
             {this.commAttrs(this.state.itemprops)}
           </div>
-          <FormItem {...formItemLayout} label='商品规格' />
-          <div key='sku123456' className={styles.item}>
-            {
-              this.state.kindid === 0 ? (<div style={{textAlign: 'center'}}>(无)</div>) : this.commSkus(this.state.skuprops)}
+          <h3>商品规格</h3>
+          <div className='hr' />
+          <div className={styles.item}>
+            {this.state.kindid === 0 ? (<div style={{textAlign: 'center'}}>(无)</div>) : this.commSkus(this.state.skuprops)}
           </div>
           <FormItem {...formItemLayout3} >
             {getFieldDecorator('items', {initialValue: {
-              display: 'none',
-              skuprops: skuprops,
-              goodscode: this.props.form.getFieldValue('GoodsCode'),
-              salePrice: this.props.form.getFieldValue('SalePrice'),
-              purPrice: this.props.form.getFieldValue('PurPrice'),
-              weight: this.props.form.getFieldValue('Weight'),
-              reflash: true,
-              items: this.state.items,
-              skupid: this.state.skupid,
-              fieldv: this.props.form.getFieldsValue()
+              skuprops: this.state.skuProps,
+              goodscode: this.state.GoodsCode,
+              salePrice: this.state.SalePrice,
+              purPrice: this.state.PurPrice
             }})(
               <SkuInfo />
             )}
@@ -913,25 +960,34 @@ const AttrCC = React.createClass({
   getInitialState() {
     return {
       value: this.props.value.value,
-      values: this.props.value.values,
+      values: this.props.value.values ? JSON.parse(this.props.value.values) || [] : [],
       name: this.props.value.name
     }
   },
+  // componentWillReceiveProps(nextProps) {
+  //   if (this.state.value !== nextProps.value) {
+  //     this.setState({
+  //       value: nextProps.value
+  //     })
+  //   }
+  // },
   handleCheck(e) {
     this.setState({
       value: e
-    })
-    this.props.onChange && this.props.onChange({
-      value: e
+    }, () => {
+      this.props.onChange && this.props.onChange({
+        value: this.state.value
+      })
     })
   },
   handleChange(e) {
     if (e.target.value !== '') {
       this.setState({
         value: e.target.value
-      })
-      this.props.onChange && this.props.onChange({
-        value: e.target.value
+      }, () => {
+        this.props.onChange && this.props.onChange({
+          value: this.stae.value
+        })
       })
     }
   },
@@ -939,8 +995,8 @@ const AttrCC = React.createClass({
     if (this.state.value === '') {
       return (
         <div className={styles.checked}>
-          <Select placeholder={`-选择${this.state.name}-`} style={{ width: 200 }} onChange={this.handleCheck}>
-            {this.state.values != null ? (JSON.parse(this.state.values).prop_value.map(y => <Option value={`${y.name}`} key={y.vid}>{y.name}
+          <Select size='small' placeholder={`-选择${this.state.name}-`} style={{ width: 200 }} onChange={this.handleCheck}>
+            {this.state.values.length ? (this.state.values.prop_value.map(y => <Option value={`${y.name}`} key={y.vid}>{y.name}
             </Option>)
             ) : <Option key={0} />}
           </Select>
@@ -949,8 +1005,8 @@ const AttrCC = React.createClass({
     } else {
       return (
         <div className={styles.checked}>
-          <Select placeholder={`-选择${this.state.name}-`} style={{ width: 200 }} onChange={this.handleCheck}>
-            {this.state.values != null ? (JSON.parse(this.state.values).prop_value.map(y => <Option value={`${y.name}`} key={y.vid}>{y.name}
+          <Select size='small' placeholder={`-选择${this.state.name}-`} style={{ width: 200 }} onChange={this.handleCheck}>
+            {this.state.values.length ? (this.state.values.prop_value.map(y => <Option value={`${y.name}`} key={y.vid}>{y.name}
             </Option>)
             ) : <Option key={0} />}
           </Select>
