@@ -36,7 +36,7 @@ import {
   Form,
   Input,
   Modal,
-  Checkbox
+  Checkbox, Row, Col
 } from 'antd'
 import {
   Icon as Iconfa
@@ -184,7 +184,6 @@ const Main = React.createClass({
 })
 const skuprops = []
 const skutable = ['none']
-const colorAndsize = []
 const DEFAULT_TITLE = '创建新商品'
 const ModifyModal = connect(state => ({
   doge: state.product_list2_modify_vis
@@ -199,8 +198,7 @@ const ModifyModal = connect(state => ({
       skuprops: [],
       kindid: 0,
       items: [],
-      editSp: [],
-      editIp: [],
+      skupid: 0,
       brandid: '',
       brandname: '',
       Supplier: ['', '']
@@ -248,9 +246,61 @@ const ModifyModal = connect(state => ({
               Remark: d.main.Remark,
               Img: d.main.Img
             })
-            if (d.items.length > 0) {
-              skutable.splice(0, 1)
-              skutable.push('block')
+            let skus = []
+            let skupid = d.skuprops_base.length
+            if (d.skuprops_base.length > 0) {
+              for (let sp of d.skuprops_base) {
+                let temps = {pid: sp.pid, name: sp.name, skuprops_values: []}
+                for (let spv of sp.skuprops_values) {
+                  for (let edit of d.skuprops) {
+                    if (sp.pid === edit.pid) {
+                      if (edit.IsOther === 1) {
+                        temps.skuprops_values.push({
+                          ischeck: true,
+                          name: edit.val_name,
+                          fname: sp.name,
+                          id: edit.ID,
+                          mapping: edit.mapping,
+                          IsOther: edit.IsOther,
+                          pid: edit.pid
+                        })
+                      } else {
+                        if (spv.name === edit.val_name) {
+                          temps.skuprops_values.push({
+                            ischeck: true,
+                            name: spv.name,
+                            fname: sp.name,
+                            id: spv.id,
+                            mapping: spv.mapping,
+                            IsOther: 0,
+                            pid: spv.pid
+                          })
+                        }
+                      }
+                    }
+                  }
+                }
+                skus.push(temps)
+              }
+              for (let sp of d.skuprops_base) {
+                for (let spv of sp.skuprops_values) {
+                  for (let edit of skus) {
+                    if (sp.pid === edit.pid) {
+                      if (edit.skuprops_values.findIndex(x => x.name === spv.name) === -1) {
+                        edit.skuprops_values.push({
+                          ischeck: false,
+                          name: spv.name,
+                          fname: sp.name,
+                          id: spv.id,
+                          mapping: spv.mapping,
+                          IsOther: 0,
+                          pid: spv.pid
+                        })
+                      }
+                    }
+                  }
+                }
+              }
             }
             this.setState({
               title: `修改商品：[${d.main.ID}]`,
@@ -258,12 +308,13 @@ const ModifyModal = connect(state => ({
               confirmLoading: false,
               kindid: d.main.KindID,
               itemprops: d.itemprops_base,
-              skuprops: d.skuprops_base,
+              skuprops: skus,
               items: d.items,
               editSp: d.skuprops,
               editIp: d.itemprops,
               brandid: d.main.Brand,
-              brandname: d.main.BrandName
+              brandname: d.main.BrandName,
+              skupid: skupid
             })
           },
           error: () => {
@@ -393,8 +444,29 @@ const ModifyModal = connect(state => ({
           KindID: e.id
         },
         success: ({d}) => {
+          let skus = []
+          let skupid = d.length
+          if (skupid > 0) {
+            for (let sp of d) {
+              let temps = {pid: sp.pid, name: sp.name, skuprops_values: []}
+              for (let spv of sp.skuprops_values) {
+                temps.skuprops_values.push({
+                  ischeck: 0,
+                  name: spv.name,
+                  fname: sp.name,
+                  id: spv.id,
+                  mapping: spv.mapping,
+                  IsOther: 0,
+                  pid: spv.pid
+                })
+              }
+              skus.push(temps)
+            }
+          }
+
           this.setState({
-            skuprops: d
+            skuprops: skus,
+            skupid: skupid
           })
         }
       }).then(endLoading)
@@ -429,7 +501,7 @@ const ModifyModal = connect(state => ({
       })
     } else {
       return (
-        <div>（无）</div>
+        <div style={{textAlign: 'center'}}>（无）</div>
       )
     }
   },
@@ -447,111 +519,36 @@ const ModifyModal = connect(state => ({
           }
         }
       }))
-    } else {
-      const sb = this.state.skuprops
-      if (pid === '100016110114201') {
-        sb.push({
-          pid: pid,
-          name: '尺码',
-          skuprops_values: [{pid, id: --this.autoIndex, mapping: null, name: '自定义', IsOther: 1}]
-        })
-      } else {
-        sb.push({
-          pid: pid,
-          name: '颜色',
-          skuprops_values: [{pid, id: --this.autoIndex, mapping: null, name: '自定义', IsOther: 1}]})
-      }
-      this.setState({
-        skuprops: sb
-      })
     }
   },
-  skusC(y, isother, editSp, ischeck = false) {
-    if (!ischeck) {
-      for (let i of editSp) {
-        if (i.val_name === y.name) {
-          ischeck = true
-          break
-        }
-      }
-    }
-    let name = y.name === undefined ? y.val_name : y.name
-    let id = y.id === undefined ? y.ID : y.id
-    return this.props.form.getFieldDecorator(`sku-${id}-${y.pid}-${y.mapping}`, {
+  skusC(y, index) {
+    return (this.props.form.getFieldDecorator(`sku-${y.id}-${y.pid}-${y.mapping}`, {
       initialValue: {
-        checked: ischeck,
-        value: `${name}`,
-        id: id,
-        IsOther: isother
+        checked: y.ischeck,
+        value: `${y.name}`,
+        fname: `${y.fname}`,
+        id: y.id,
+        IsOther: y.IsOther
       }
-    })(<SkuCC key={y.pid + id + Math.random() * 1000} />)
+    })(<SkuCC key={y.pid + y.id + index} />))
   },
-  _ChangeProps(newValue) {
-    this.setState({
-      skuprops: newValue
+  commSkus(vs) {
+    return vs.map((x, index) => {
+      return (
+        <FormItem key={x.pid + index} label={x.name} style={{ margin: '5px 0 0 0' }}>
+          {
+            x.skuprops_values != null ? x.skuprops_values.map((y, i) => y.IsOther !== 1 ? (this.skusC(y, i)) : null) : null
+          }
+          <div className={styles.hua}>
+            <div>{x.name}->其他：</div>
+            {
+            x.skuprops_values != null ? x.skuprops_values.map((y, i) => y.IsOther === 1 ? (this.skusC(y, i)) : null) : null
+          }
+          </div>
+          <Button type='primary' size='small' onClick={() => this.handleSkuAdd(x.pid)}>增加自定义</Button>
+        </FormItem>
+      )
     })
-  },
-  commSkus(vs, editSp) {
-    let colorOwn = []
-    let colorOther = []
-    let sizeOther = []
-    let sizeOwn = []
-    if (vs.length > 0) {
-      vs.forEach(x => {
-        if (x.skuprops_values != null) {
-          if (x.pid === '100016110194735') {
-            x.skuprops_values.map(y =>
-              y.IsOther !== 1 ? (colorOwn.push(this.skusC(y, 0, editSp))) : (colorOther.push(this.skusC(y, 1, editSp)))
-            )
-          } else {
-            x.skuprops_values.map(y =>
-              y.IsOther !== 1 ? (sizeOwn.push(this.skusC(y, 0, editSp))) : (sizeOther.push(this.skusC(y, 1, editSp)))
-            )
-          }
-        }
-      })
-    } else {
-      let sp = []
-      let cORs = ''
-      if (editSp.length > 0) {
-        editSp.map(y => {
-          colorAndsize.push(y.pid)
-          if (y.pid === '100016110194735') {
-            cORs = '颜色'
-            y.IsOther !== 1 ? (colorOwn.push(this.skusC(y, 0, [], true))) : (colorOther.push(this.skusC(y, 1, [], true)))
-          } else {
-            cORs = '尺码'
-            y.IsOther !== 1 ? (sizeOwn.push(this.skusC(y, 0, [], true))) : (sizeOther.push(this.skusC(y, 1, [], true)))
-          }
-          sp.push({
-            pid: y.pid,
-            name: cORs,
-            skuprops_values: [{pid: y.pid, id: y.ID, mapping: null, name: y.val_name, IsOther: y.IsOther}]
-          })
-        })
-        this._ChangeProps(sp)
-      }
-    }
-    return (
-      <div>
-        <FormItem label='颜色' style={{ margin: '5px 0 0 0' }}>
-          {colorOwn}
-          <div className={styles.hua}>
-            <div>颜色->其他：</div>
-            {colorOther}
-          </div>
-          <Button type='primary' size='small' onClick={() => this.handleSkuAdd('100016110194735')}>增加自定义</Button>
-        </FormItem>
-        <FormItem label='尺码' style={{ margin: '5px 0 0 0' }}>
-          {sizeOwn}
-          <div className={styles.hua}>
-            <div>尺码->其他：</div>
-            {sizeOther}
-          </div>
-          <Button type='primary' size='small' onClick={() => this.handleSkuAdd('100016110114201')}>增加自定义</Button>
-        </FormItem>
-      </div>
-    )
   },
   render() {
     const { getFieldDecorator } = this.props.form
@@ -569,21 +566,13 @@ const ModifyModal = connect(state => ({
       wrapperCol: { span: 24 }
     }
     return (
-      <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={confirmLoading} width={680} maskClosable={false} closable={false}>
+      <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={confirmLoading} width={800} maskClosable={false} closable={false}>
         <Form horizontal className='pos-form'>
           <FormItem {...formItemLayout2} label='款式编码(货号)'>
             {getFieldDecorator('GoodsCode', {
               rules: [{ required: true, message: '必填' }]
             })(
               <Input />
-            )}
-          </FormItem>
-          <FormItem {...formItemLayout} label='品牌'>
-            {getFieldDecorator('Brand', {initialValue: {
-              id: this.state.brandid,
-              name: this.state.brandname
-            }})(
-              <BrandPicker />
             )}
           </FormItem>
           <FormItem {...formItemLayout2} label='商品名称'>
@@ -593,75 +582,130 @@ const ModifyModal = connect(state => ({
               <Input />
             )}
           </FormItem>
-          <FormItem {...formItemLayout2} label='商品分类'>
-            {getFieldDecorator('KindID')(
-              <ItemCatPicker onChange={this.handleKind} />
-            )}
-          </FormItem>
-          <FormItem {...formItemLayout} label='供应商'>
-            {getFieldDecorator('ScoID')(
-              <SupplierPicker />
-            )}
-          </FormItem>
-          <FormItem {...formItemLayout2} label='供应商货号'>
-            {getFieldDecorator('ScoGoodsCode')(
-              <Input />
-            )}
-          </FormItem>
-          <FormItem {...formItemLayout2} label='市场|吊牌价'>
-            {getFieldDecorator('MarketPrice')(
-              <Input />
-            )}
-          </FormItem>
-          <FormItem {...formItemLayout2} label='一口价'>
-            {getFieldDecorator('SalePrice')(
-              <Input />
-            )}
-          </FormItem>
-          <FormItem {...formItemLayout2} label='成本价(采购价)'>
-            {getFieldDecorator('PurPrice')(
-              <Input />
-            )}
-          </FormItem>
-          <FormItem {...formItemLayout2} label='重量(KG)'>
-            {getFieldDecorator('Weight')(
-              <Input />
-            )}
-          </FormItem>
-          <FormItem {...formItemLayout2} label='淘宝模板店铺'>
-            {getFieldDecorator('TempShopID')(
-              <Select placeholder='-选择店铺-' style={{ width: 200 }}>
-                {this.state.shops.map(x => <Option value={`${x.value}`} key={x.value}>{x.label}</Option>)}
-              </Select>
-            )}
-          </FormItem>
-          <FormItem {...formItemLayout2} label='淘宝宝贝编号'>
-            {getFieldDecorator('TempID')(
-              <Input />
-            )}
-          </FormItem>
+          <Row>
+            <Col sm={10}>
+              <FormItem labelCol={{ span: 10 }} wrapperCol={{ span: 12 }} label='商品分类'>
+                {getFieldDecorator('KindID', {
+                  rules: [
+                    { required: true, type: 'object', message: '必选' }
+                  ]
+                })(
+                  <ItemCatPicker onChange={this.handleKind} />
+                )}
+              </FormItem>
+            </Col>
+            <Col sm={10}>
+              <FormItem labelCol={{ span: 7 }} wrapperCol={{ span: 12 }} label='品牌'>
+                {getFieldDecorator('Brand', {initialValue: {
+                  id: this.state.brandid,
+                  name: this.state.brandname
+                }, rules: [
+                    { required: true, type: 'object', message: '必选' }
+                ]
+                })(
+                  <BrandPicker />
+                )}
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={10}>
+              <FormItem labelCol={{ span: 10 }} wrapperCol={{ span: 12 }} label='供应商'>
+                {getFieldDecorator('ScoID', {
+                  rules: [
+                    { required: true, type: 'object', message: '必选' }
+                  ]
+                })(
+                  <SupplierPicker />
+                )}
+              </FormItem>
+            </Col>
+            <Col sm={14}>
+              <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 12 }} label='供应商货号'>
+                {getFieldDecorator('ScoGoodsCode')(
+                  <Input />
+                )}
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={10}>
+              <FormItem labelCol={{ span: 10 }} wrapperCol={{ span: 12 }} label='市场|吊牌价'>
+                {getFieldDecorator('MarketPrice')(
+                  <Input />
+                )}
+              </FormItem>
+            </Col>
+            <Col sm={14}>
+              <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 12 }} label='一口价'>
+                {getFieldDecorator('SalePrice')(
+                  <Input />
+                )}
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={10}>
+              <FormItem labelCol={{ span: 10 }} wrapperCol={{ span: 12 }} label='采购成本价'>
+                {getFieldDecorator('PurPrice')(
+                  <Input />
+                )}
+              </FormItem>
+            </Col>
+            <Col sm={14}>
+              <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 12 }} label='重量(KG)'>
+                {getFieldDecorator('Weight')(
+                  <Input />
+                )}
+              </FormItem>
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={10}>
+              <FormItem labelCol={{ span: 10 }} wrapperCol={{ span: 12 }} label='淘宝模板店铺'>
+                {getFieldDecorator('TempShopID', {
+                  rules: [{ required: true, message: '必填' }]
+                })(
+                  <Select placeholder='-选择店铺-' style={{ width: 128 }}>
+                    {this.state.shops.map(x => <Option value={`${x.value}`} key={x.value}>{x.label}</Option>)}
+                  </Select>
+                )}
+              </FormItem>
+            </Col>
+            <Col sm={14}>
+              <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 12 }} label='淘宝宝贝编号'>
+                {getFieldDecorator('TempID')(
+                  <Input />
+                )}
+              </FormItem>
+            </Col>
+          </Row>
           <FormItem {...formItemLayout} label='备注'>
             {getFieldDecorator('Remark')(
               <Input type='textarea' autosize={{minRows: 1, maxRows: 3}} />
             )}
           </FormItem>
-          <FormItem {...formItemLayout} label='商品属性' className={styles.item}>
+          <FormItem {...formItemLayout} label='商品属性' />
+          <div key='attr123456' className={styles.item}>
             {this.commAttrs(this.state.itemprops)}
-          </FormItem>
-          <div className={styles.item}>
-            <h4>商品规格：</h4>
-            {this.state.kindid === 0 ? (<div>无</div>) : this.commSkus(this.state.skuprops, this.state.editSp)}
+          </div>
+          <FormItem {...formItemLayout} label='商品规格' />
+          <div key='sku123456' className={styles.item}>
+            {
+              this.state.kindid === 0 ? (<div style={{textAlign: 'center'}}>(无)</div>) : this.commSkus(this.state.skuprops)}
           </div>
           <FormItem {...formItemLayout3} >
             {getFieldDecorator('items', {initialValue: {
-              display: skutable[0],
+              display: 'none',
               skuprops: skuprops,
               goodscode: this.props.form.getFieldValue('GoodsCode'),
               salePrice: this.props.form.getFieldValue('SalePrice'),
               purPrice: this.props.form.getFieldValue('PurPrice'),
               weight: this.props.form.getFieldValue('Weight'),
               reflash: true,
-              items: this.state.items
+              items: this.state.items,
+              skupid: this.state.skupid,
+              fieldv: this.props.form.getFieldsValue()
             }})(
               <SkuInfo />
             )}
@@ -759,53 +803,61 @@ const SkuCC = React.createClass({
   getInitialState() {
     return {
       checked: this.props.value.checked,
-      value: this.props.value.value
+      value: this.props.value.value,
+      id: this.props.value.id,
+      fname: this.props.value.fname,
+      mapping: this.props.value.mapping,
+      IsOther: this.props.value.IsOther
     }
   },
   handleCheck(e) {
-    let id = 0
-    let isNew = false
-    console.log('this.props', this.props)
-    if (this.props.id.indexOf('--') > -1) {
-      isNew = true
-      id = this.props.id.split('-')[2]
-    } else {
-      id = this.props.id.split('-')[1]
-    }
-    let iIndex = skuprops.findIndex(p => p.val_id === id)
-    if (e.target.checked) {
-      if (!isNew) {
-        colorAndsize.push(this.props.id.split('-')[2])
-      } else {
-        colorAndsize.push(this.props.id.split('-')[3])
-      }
-      skuprops.push({
-        pid: !isNew ? this.props.id.split('-')[2] : this.props.id.split('-')[3],
-        val_id: !isNew ? this.props.id.split('-')[1] : '-' + this.props.id.split('-')[2],
-        mapping: !isNew ? this.props.id.split('-')[3] : 0,
-        val_name: e.target.checked,
-        value: this.state.value,
-        IsOther: !isNew ? this.props.value.IsOther : 1
-      })
-    } else {
-      skuprops.splice(iIndex, 1)
-      iIndex = !isNew ? colorAndsize.findIndex(p => p === this.props.id.split('-')[2]) : colorAndsize.findIndex(p => p === this.props.id.split('-')[3])
-      colorAndsize.splice(iIndex, 1)
-    }
-    if (colorAndsize.toString().indexOf('100016110114201') > -1 && colorAndsize.toString().indexOf('100016110194735') > -1) {
-      skutable.splice(0, 1)
-      skutable.push('block')
-    } else {
-      skutable.splice(0, 1)
-      skutable.push('none')
-    }
+    // let id = 0
+    // let isNew = false
+    // console.log('this.props', this.props)
+    // if (this.props.id.indexOf('--') > -1) {
+    //   isNew = true
+    //   id = this.props.id.split('-')[2]
+    // } else {
+    //   id = this.props.id.split('-')[1]
+    // }
+    // let iIndex = skuprops.findIndex(p => p.val_id === id)
+    // if (e.target.checked) {
+    //   if (!isNew) {
+    //     colorAndsize.push(this.props.id.split('-')[2])
+    //   } else {
+    //     colorAndsize.push(this.props.id.split('-')[3])
+    //   }
+    //   skuprops.push({
+    //     pid: !isNew ? this.props.id.split('-')[2] : this.props.id.split('-')[3],
+    //     val_id: !isNew ? this.props.id.split('-')[1] : '-' + this.props.id.split('-')[2],
+    //     mapping: !isNew ? this.props.id.split('-')[3] : 0,
+    //     val_name: e.target.checked,
+    //     value: this.state.value,
+    //     IsOther: !isNew ? this.props.value.IsOther : 1
+    //   })
+    // } else {
+    //   skuprops.splice(iIndex, 1)
+    //   iIndex = !isNew ? colorAndsize.findIndex(p => p === this.props.id.split('-')[2]) : colorAndsize.findIndex(p => p === this.props.id.split('-')[3])
+    //   colorAndsize.splice(iIndex, 1)
+    // }
+    // if (colorAndsize.toString().indexOf('100016110114201') > -1 && colorAndsize.toString().indexOf('100016110194735') > -1) {
+    //   skutable.splice(0, 1)
+    //   skutable.push('block')
+    // } else {
+    //   skutable.splice(0, 1)
+    //   skutable.push('none')
+    // }
     this.setState({
       checked: e.target.checked
     })
 
     this.props.onChange && this.props.onChange({
-      checked: this.state.checked,
-      value: this.state.value
+      checked: e.target.checked,
+      value: this.state.value,
+      id: this.state.id,
+      fname: this.state.fname,
+      mapping: this.state.mapping,
+      IsOther: this.state.IsOther
     })
   },
   handleChange(e) {
@@ -814,26 +866,30 @@ const SkuCC = React.createClass({
     })
     this.props.onChange && this.props.onChange({
       value: e.target.value,
-      checked: this.state.checked
+      checked: this.state.checked,
+      id: this.props.value.id,
+      fname: this.props.value.fname,
+      mapping: this.props.value.mapping,
+      IsOther: this.props.value.IsOther
     })
-    let id = 0
-    let isNew = false
-    if (this.props.id.indexOf('--') > -1) {
-      isNew = true
-      id = this.props.id.split('-')[2]
-    } else {
-      id = this.props.id.split('-')[1]
-    }
-    let iIndex = skuprops.findIndex(p => p.val_id === id)
-    skuprops.splice(iIndex, 1)
-    skuprops.push({
-      pid: !isNew ? this.props.id.split('-')[2] : this.props.id.split('-')[3],
-      val_id: !isNew ? this.props.id.split('-')[1] : 0,
-      mapping: !isNew ? this.props.id.split('-')[3] : 0,
-      val_name: this.state.checked,
-      value: e.target.value,
-      IsOther: !isNew ? 0 : 1
-    })
+    // let id = 0
+    // let isNew = false
+    // if (this.props.id.indexOf('--') > -1) {
+    //   isNew = true
+    //   id = this.props.id.split('-')[2]
+    // } else {
+    //   id = this.props.id.split('-')[1]
+    // }
+    // let iIndex = skuprops.findIndex(p => p.val_id === id)
+    // skuprops.splice(iIndex, 1)
+    // skuprops.push({
+    //   pid: !isNew ? this.props.id.split('-')[2] : this.props.id.split('-')[3],
+    //   val_id: !isNew ? this.props.id.split('-')[1] : 0,
+    //   mapping: !isNew ? this.props.id.split('-')[3] : 0,
+    //   val_name: e.target.value,
+    //   value: e.target.value,
+    //   IsOther: !isNew ? 0 : 1
+    // })
   },
   render() {
     if (!this.state.checked) {

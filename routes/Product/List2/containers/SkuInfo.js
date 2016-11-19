@@ -12,6 +12,7 @@
 * file that was distributed with this source code.
 */
 import React from 'react'
+import update from 'react-addons-update'
 import {
   connect
 } from 'react-redux'
@@ -42,16 +43,17 @@ const SkuInfo = React.createClass({
     return {
       skuprops: this.props.value.skuprops,
       items: this.props.value.items,
+      display: this.props.value.display,
       goodscode: this.props.value.goodscode
     }
   },
   componentDidMount() {
-    //this._firstload()
+    //this._firstl()
   },
   componentWillReceiveProps(nextProps) {
-    if (nextProps.value.reflash) {
-      this._firstload(nextProps.value)
-    }
+    
+      this._firstl(nextProps.value)
+    
   },
   componentWillUpdate(nextProps, nextState) {
     return false
@@ -60,32 +62,26 @@ const SkuInfo = React.createClass({
     let items = this.state.items
     let keys = Object.keys(items)
     for (let id of keys) {
-      items[id].SkuID = this.props.value.goodscode + id
+      items[id].SkuID = this.props.value.fieldv.GoodsCode + id
     }
     this.setState({
+      //reflash: false,
       items: items
     })
-    this.props.onChange && this.props.onChange({
-      reflash: false,
-      goodscode: this.props.value.goodscode,
-      skuprops: this.props.value.skuprops,
-      items: items
-    })
+    // this.props.onChange && this.props.onChange({
+    //   fieldv: this.props.value.fieldv,
+    //   items: items
+    // })
   },
   handleCreateSku() {
     let items = this.state.items
     let keys = Object.keys(items)
     for (let id of keys) {
-      items[id].SkuID = this.props.value.goodscode + items[id].Color + items[id].Size
+      items[id].SkuID = this.props.value.fieldv.GoodsCode + items[id].Color + items[id].Size
     }
     this.setState({
-      items: items
-    })
-    this.props.onChange && this.props.onChange({
-      items: items,
       reflash: false,
-      skuprops: this.props.value.skuprops,
-      goodscode: this.props.value.goodscode
+      items: items
     })
   },
   handleCreateMap() {
@@ -96,104 +92,137 @@ const SkuInfo = React.createClass({
     for (let id of keys) {
       items[id].ColorMapping === 0 ? Cm = items[id].Color : Cm = items[id].ColorMapping
       items[id].SizeMapping === 0 ? Sm = items[id].Size : Sm = items[id].SizeMapping
-      items[id].SkuID = this.props.value.goodscode + Cm + Sm
+      items[id].SkuID = this.props.value.fieldv.GoodsCode + Cm + Sm
     }
     this.setState({
+      reflash: false,
       items: items
     })
     this.props.onChange && this.props.onChange({
-      reflash: false,
-      items: items,
-      skuprops: this.props.value.skuprops,
-      display: this.props.value.display,
-      goodscode: this.props.value.goodscode
+      fieldv: this.props.value.fieldv,
+      items: items
     })
   },
   handleCleanSku() {
+    this.props.onChange && this.props.onChange({
+      items: [],
+      fieldv: this.props.value.fieldv
+    })
+  },
+  inputChange(e, field, i) {
     let items = this.state.items
-    for (let i of items) {
-      i.SkuID = ''
-    }
+    items[i][field] = e.target.value
+    items[i]['isedit'] = true
     this.setState({
       items: items
     })
-    this.props.onChange && this.props.onChange({
-      items: items,
-      goodscode: this.props.value.goodscode,
-      skuprops: this.props.value.skuprops,
-      reflash: true
-    })
   },
-  _firstload(_v) {
-    let items = []
-    let itemTemp = []
-    const v = Object.assign({}, this.props.value || {}, _v || {})
-    for (let p of this.state.skuprops) {
-      if (p.pid === '100016110114201') { //尺码
-        item.Size = p.value
-        item.SizeMapping = p.mapping
-        item.Pid1 = '100016110114201'
-        item.val_id1 = p.val_id
-        itemTemp.push(item)
-        item = {
-          Color: '',
-          Size: '',
-          SalePrice: 0,
-          PurPrice: 0,
-          Weight: 0,
-          SkuID: '',
-          BarCode: '',
-          UniqueCode: '',
-          ColorMapping: '',
-          SizeMapping: '',
-          Pid1: '',
-          val_id1: 0,
-          Pid2: '',
-          val_id2: ''}
-      }
-    }
-    const keys1 = Object.keys(itemTemp)
-    for (let p of v.skuprops) {
-      if (p.pid === '100016110194735') { //颜色
-        for (let id of keys1) {
-          item.Size = itemTemp[id].Size
-          item.SizeMapping = itemTemp[id].SizeMapping
-          item.Pid1 = itemTemp[id].Pid1
-          item.val_id1 = itemTemp[id].val_id1
-          item.Color = p.value
-          item.ColorMapping = p.mapping
-          item.Pid2 = '100016110194735'
-          item.val_id2 = p.val_id
-          item.PurPrice = v.purPrice === undefined ? 0 : v.purPrice
-          item.SalePrice = v.salePrice === undefined ? 0 : v.salePrice
-          item.Weight = v.weight === undefined ? 0 : v.weight
-          items.push(item)
-          item = {
-            Color: '',
-            Size: '',
-            SalePrice: 0,
-            PurPrice: 0,
-            Weight: 0,
-            SkuID: '',
-            BarCode: '',
-            UniqueCode: '',
-            ColorMapping: '',
-            SizeMapping: '',
-            Pid1: '',
-            val_id1: 0,
-            Pid2: '',
-            val_id2: ''}
+  _firstl(_v) {
+    console.log(_v)
+    const vv = Object.assign({}, this.props.value || {}, _v || {})
+    const v = vv.fieldv
+    const keys1 = Object.keys(v)
+    let skuprops = []
+    for (let id of keys1) {
+      if (v[id] === undefined) continue
+      let cc = v[id]
+      if (typeof cc === 'object') {
+        let a = id.split('-')
+        if (a[0] === 'sku') {
+          if (!cc.checked) continue
+          if (id.indexOf('--') > -1) { //自定义规格
+            let selfSku = id.split('-')
+            skuprops.push({
+              pid: selfSku[3],
+              val_id: 0,
+              mapping: 0,
+              fname: cc.fname,
+              val_name: cc.value
+            })
+          } else {
+            skuprops.push({
+              pid: a[2],
+              val_id: a[1],
+              mapping: a[3],
+              fname: cc.fname,
+              val_name: cc.value
+            })
+          }
         }
       }
     }
+
+    //console.log(skuprops)
+    let items = []
+    let catalog = []
+    for (let sku of skuprops) {
+      for (let s2 of skuprops) {
+        if (sku.pid !== s2.pid) {
+          catalog.findIndex(x => x === s2.pid) > -1 ? null : (catalog.push(s2.pid))
+          if (items.findIndex(x => (x.Pid1 === s2.pid && x.Pid2 === sku.pid)) === -1) {
+            let skuid = ''
+            if (vv.cmd === 'handleCreateMap') {
+              skuid = v.GoodsCode + sku.mapping + s2.mapping
+            }
+            let lt = this.state.items.find(x => x.Color === sku.val_name && x.Size === s2.val_name)
+            let item = { }
+            if (lt !== undefined) {
+              item = {
+                Color: sku.val_name,
+                Size: s2.val_name,
+                SalePrice: lt.SalePrice !== undefined && lt.isedit ? lt.SalePrice : v.SalePrice,
+                PurPrice: lt.PurPrice !== undefined && lt.isedit ? lt.PurPrice : v.PurPrice,
+                Weight: lt.Weight !== undefined && lt.isedit ? lt.Weight : v.Weight,
+                SkuID: skuid,
+                BarCode: lt.BarCode !== undefined && lt.isedit ? lt.BarCode : '',
+                UniqueCode: lt.UniqueCode !== undefined && lt.isedit ? lt.UniqueCode : '',
+                ColorMapping: sku.mapping,
+                SizeMapping: s2.mapping,
+                Pid1: sku.pid,
+                val_id1: sku.val_id,
+                Pid2: s2.pid,
+                val_id2: s2.val_id,
+                isedit: lt.isedit
+              }
+            } else {
+              item = {
+                Color: sku.val_name,
+                Size: s2.val_name,
+                SalePrice: v.SalePrice,
+                PurPrice: v.PurPrice,
+                Weight: v.Weight,
+                SkuID: skuid,
+                BarCode: '',
+                UniqueCode: '',
+                ColorMapping: sku.mapping,
+                SizeMapping: s2.mapping,
+                Pid1: sku.pid,
+                val_id1: sku.val_id,
+                Pid2: s2.pid,
+                val_id2: s2.val_id,
+                isedit: false
+              }
+            }
+            items.push(item)
+          }
+        }
+      }
+    }
+    if (this.props.value.skupid !== 0 && this.props.value.skupid === catalog.length) {
+      this.setState({
+        display: 'block'
+      })
+    }
     this.setState({
       items: items
     })
+
+    //console.log(this.state.display)
   },
   render() {
     return (
       <div>
-        <table className={styles.items} style={{display: this.props.value.display}}>
+        <table className={styles.items} style={{display: this.state.display}}>
           <thead className={styles.right}>
             <tr className={styles.zhang}>
               <th className={styles.op10}>颜色分类</th>
@@ -208,13 +237,13 @@ const SkuInfo = React.createClass({
             </tr>
           </thead>
           <tbody className={styles.right}>
-            {this.state.items.map(y =>
-              <tr key={Math.random() * 10000} className={styles.chun}>
+            {this.state.items.map((y, index) =>
+              <tr key={`tr+${index}`} className={styles.chun}>
                 <td><Input value={`${y.Color === undefined ? y.Norm.split(';')[0] : y.Color}`} /></td>
                 <td><Input value={`${y.Size === undefined ? y.Norm.split(';')[1] : y.Size}`} /></td>
-                <td><Input value={`${y.SalePrice}`} /></td>
-                <td><Input value={`${y.PurPrice}`} /></td>
-                <td><Input value={`${y.Weight}`} /></td>
+                <td><Input value={`${y.SalePrice}`} onChange={(e) => this.inputChange(e, 'Weight', index)} /></td>
+                <td><Input value={`${y.PurPrice}`} onChange={(e) => this.inputChange(e, 'Weight', index)} /></td>
+                <td><Input value={`${y.Weight}`} onChange={(e) => this.inputChange(e, 'Weight', index)} /></td>
                 <td><Input value={`${y.SkuID === undefined ? '' : y.SkuID}`} /></td>
                 <td><Input value={`${y.BarCode === undefined ? '' : y.BarCode}`} /></td>
                 <td><Input value={`${y.UniqueCode === undefined ? '' : y.UniqueCode}`} /></td>
