@@ -198,7 +198,7 @@ const ModifyModal = connect(state => ({
       title: DEFAULT_TITLE,
       shops: [],
       itemprops: [],
-      skuprops: [],
+      skuProps: [],
       kindid: 0,
       items: [],
       skupid: 0,
@@ -233,6 +233,7 @@ const ModifyModal = connect(state => ({
             ID: nextProps.doge
           },
           success: ({d}) => {
+            this.autoIndex = 0
             console.log(d)
             this.props.form.setFieldsValue({
               GoodsCode: d.main.GoodsCode,
@@ -357,7 +358,6 @@ const ModifyModal = connect(state => ({
               confirmLoading: false,
               itemProps: [], //todo 数据清洗
               skuProps: Object.values(skuProps)
-              //kindid: d.main.KindID,
               //itemprops: d.itemprops_base,
               //skuprops: skus,
               //items: d.items,
@@ -484,7 +484,6 @@ const ModifyModal = connect(state => ({
           Enable: true
         },
         success: ({d}) => {
-          this.autoIndex = 0
           this.setState({
             itemprops: d
           })
@@ -560,14 +559,23 @@ const ModifyModal = connect(state => ({
     }
   },
   handleSkuAdd(pid) {
-    const index = this.state.skuprops.findIndex(x => x.pid === pid)
+    console.log('autoIndex', this.autoIndex)
+    const index = this.state.skuProps.findIndex(x => x.pid === pid)
     if (index > -1) {
       this.setState(update(this.state, {
-        skuprops: {
+        skuProps: {
           [`${index}`]: {
-            skuprops_values: {
+            children1: {
               $push: [
-                {pid, id: --this.autoIndex, mapping: null, name: '自定义', IsOther: 1}
+                {
+                  Enable: 0,
+                  ID: --this.autoIndex,
+                  mapping: null,
+                  pid: pid,
+                  val_id: --this.autoIndex,
+                  val_name: '自定义'
+                }
+                //{pid, id: --this.autoIndex, mapping: null, name: '自定义', IsOther: 1}
               ]
             }
           }
@@ -576,28 +584,27 @@ const ModifyModal = connect(state => ({
     }
   },
   skusC(y, index) {
-    return (this.props.form.getFieldDecorator(`skus.${y.id}-${y.pid}-${y.mapping}`, {
+    return (this.props.form.getFieldDecorator(`skus.${y.ID}-${y.pid}-${y.mapping}`, {
       initialValue: {
-        checked: y.ischeck,
-        value: `${y.name}`,
-        fname: `${y.fname}`,
-        id: y.id,
+        checked: y.Enable === 1,
+        value: `${y.val_name}`,
+        id: y.ID,
         IsOther: y.IsOther
       }
-    })(<SkuCC key={y.pid + y.id + index} />))
+    })(<SkuCC key={y.pid + y.ID + index} />))
   },
   commSkus(vs) {
     return vs.map((x, index) => {
       return (
         <FormItem key={index} label={x.name} style={{ margin: '5px 0 0 0' }}>
           {
-            x.skuprops_values !== null ? x.skuprops_values.map((y, i) => y.IsOther !== 1 ? (this.skusC(y, i)) : null) : null
+            x.children0.length ? x.children0.map((y, i) => this.skusC(y, i)) : null
           }
           <div className={styles.hua}>
             <div>{x.name}->其他：</div>
             {
-            x.skuprops_values != null ? x.skuprops_values.map((y, i) => y.IsOther === 1 ? (this.skusC(y, i)) : null) : null
-          }
+            x.children1.length ? x.children1.map((y, i) => this.skusC(y, i)) : null
+            }
           </div>
           <Button type='primary' size='small' onClick={() => this.handleSkuAdd(x.pid)}>增加自定义</Button>
         </FormItem>
@@ -745,7 +752,7 @@ const ModifyModal = connect(state => ({
           <h3>商品规格</h3>
           <div className='hr' />
           <div className={styles.item}>
-            {this.state.kindid === 0 ? (<div style={{textAlign: 'center'}}>(无)</div>) : this.commSkus(this.state.skuprops)}
+            {this.props.form.getFieldValue('KindID') === 0 ? (<div style={{textAlign: 'center'}}>(无)</div>) : this.commSkus(this.state.skuProps)}
           </div>
           <FormItem {...formItemLayout3} >
             {getFieldDecorator('items', {initialValue: {

@@ -37,10 +37,6 @@ import styles from './index.scss'
 //   val_id2: ''
 // }
 
-const DEFAULT_STATES = {
-  skuprops: [],
-  items: {}
-}
 // {
 //   skuprops: this.props.value.skuprops,
 //   items: this.props.value.items,
@@ -49,16 +45,18 @@ const DEFAULT_STATES = {
 // }
 const SkuInfo = React.createClass({
   getInitialState() {
-    return DEFAULT_STATES
+    return {
+      skuprops: this.props.value.skuprops,
+      items: []
+    }
   },
   componentDidMount() {
+    this._firstload()
     //this._firstl()
   },
   componentWillReceiveProps(nextProps) {
     console.log(nextProps)
-
-    //  this._firstl(nextProps.value)
-
+    this._firstl(nextProps.value)
   },
   componentWillUpdate(nextProps, nextState) {
     return false
@@ -122,8 +120,55 @@ const SkuInfo = React.createClass({
       items: items
     })
   },
+  _loopitem(items, item, skuprops, l, a) {
+    let _items = []
+    if (items.length > 0) {
+      for (let it of items) {
+        for (let prop of skuprops[a].children0) {
+          if (prop.Enable === 1) {
+            it[`sku${a}`] = prop.val_name
+            it[`pid${a}`] = prop.pid
+            it[`val_id${a}`] = prop.val_id
+            console.log(it)
+            _items.push(it)
+          }
+        }
+      }
+      console.log('_items', _items)
+      if (a < l - 1) {
+        a++
+        this._loopitem(_items, item, skuprops, l, a)
+      } else {
+        items = _items
+      }
+    } else {
+      for (let prop of skuprops[a].children0) {
+        if (prop.Enable === 1) {
+          item[`sku${a}`] = prop.val_name
+          item[`pid${a}`] = prop.pid
+          item[`val_id${a}`] = prop.val_id
+        }
+      }
+      items.push(item)
+      if (a < l - 1) {
+        a++
+        this._loopitem(items, item, skuprops, l, a)
+      }
+    }
+    return items
+  },
+  _firstload() {
+    let items = []
+    let skuprops = this.state.skuprops
+    let catalogNum = skuprops.length
+    let a = 0
+    let item = {}
+    items = this._loopitem(items, item, skuprops, catalogNum, a)
+    //items.push(item)
+    console.log('items', items)
+  },
   _firstl(_v) {
-    console.log(_v)
+    console.log('_firstl', _v)
     const vv = Object.assign({}, this.props.value || {}, _v || {})
     const v = vv.fieldv
     const keys1 = Object.keys(v)
@@ -213,13 +258,6 @@ const SkuInfo = React.createClass({
         }
       }
     }
-    // {
-    //   path: '...',
-    //   price:'''
-    // }
-    // {
-    //   [`path`]: {}
-    // }
     // if (this.props.value.skupid !== 0 && this.props.value.skupid === catalog.length) {
     //   this.setState({
     //     display: 'block'
@@ -253,8 +291,8 @@ const SkuInfo = React.createClass({
               <tr key={`tr+${index}`} className={styles.chun}>
                 <td><Input value={`${y.Color === undefined ? y.Norm.split(';')[0] : y.Color}`} /></td>
                 <td><Input value={`${y.Size === undefined ? y.Norm.split(';')[1] : y.Size}`} /></td>
-                <td><Input value={`${y.SalePrice}`} onChange={(e) => this.inputChange(e, 'Weight', index)} /></td>
-                <td><Input value={`${y.PurPrice}`} onChange={(e) => this.inputChange(e, 'Weight', index)} /></td>
+                <td><Input value={`${y.SalePrice}`} onChange={(e) => this.inputChange(e, 'SalePrice', index)} /></td>
+                <td><Input value={`${y.PurPrice}`} onChange={(e) => this.inputChange(e, 'PurPrice', index)} /></td>
                 <td><Input value={`${y.Weight}`} onChange={(e) => this.inputChange(e, 'Weight', index)} /></td>
                 <td><Input value={`${y.SkuID === undefined ? '' : y.SkuID}`} /></td>
                 <td><Input value={`${y.BarCode === undefined ? '' : y.BarCode}`} /></td>
