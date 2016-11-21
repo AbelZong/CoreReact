@@ -276,16 +276,6 @@ height: 100%;
       }
     }
   }
-  &:hover {
-    background-color: #f9f9f9;
-    text-shadow: 1px 1px 1px #fff;
-    ._text {
-      display: none;
-    }
-    ._ipts {
-      display: block;
-    }
-  }
   ._gray2 {
     color: #999;
   }
@@ -380,6 +370,24 @@ height: 100%;
     }
   }
 }
+.quickModify {
+  .skuer:hover {
+    background-color: #f9f9f9;
+    text-shadow: 1px 1px 1px #fff;
+    ._text {
+      display: none;
+    }
+    ._ipts {
+      display: block;
+    }
+  }
+}
+
+.sliver {
+  color:#999;
+  margin-left:4px;
+  margin-right:4px;
+}
 
 .modalFormTitle {
   font-weight: 500;
@@ -434,6 +442,10 @@ height: 100%;
   }
 }.hua {
   height:478px;
+  display: flex;
+  flex-direction: column;
+}.hua1 {
+  height:358px;
   display: flex;
   flex-direction: column;
 }
@@ -507,6 +519,14 @@ height: 100%;
   width: 220px;
 }
 
+.radios1 {
+  :global {
+    .ant-radio-wrapper {
+      display: block;
+      line-height: 23px;
+    }
+  }
+}
 .experWrapper {
   display: flex;
   flex-direction: row;
@@ -519,13 +539,11 @@ height: 100%;
     :global {
       .ant-radio-wrapper {
         display: block;
+        line-height: 23px;
       }
     }
   }
   .pch {
-    .green {
-      color: green;
-    }
   }
   .row {
     margin-bottom: 5px;

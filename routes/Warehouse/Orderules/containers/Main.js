@@ -50,7 +50,8 @@ export default connect(
       confirmLoading: false,
       title: '',
       provinces: [],
-      shops: []
+      shops: [],
+      distributors: []
     }
   },
   componentWillReceiveProps(nextProps) {
@@ -65,10 +66,11 @@ export default connect(
           confirmLoading: true
         })
         ZGet('Warehouse/editploy', {id: nextProps.id}, ({d}) => {
-          const {ploy, province, shop} = d
+          const {ploy, province, shop, distributor} = d
           this.setState({
             provinces: province,
-            shops: shop
+            shops: shop,
+            distributors: distributor
           })
           ploy.Payment = ploy.Payment + ''
           ploy.WareHouse = ploy.Wid >= 0 ? {
@@ -126,7 +128,7 @@ export default connect(
         RemoveSkus: values.RemoveSkus ? values.RemoveSkus.split(/,|，/) : [],
         ContainGoods: values.ContainGoods ? values.ContainGoods.split(/,|，/) : [],
         RemoveGoods: values.RemoveGoods ? values.RemoveGoods.split(/,|，/) : [],
-        Did: [], //values.Did.split(/,|，/)
+        Did: values.Did || [],
         MinNum: values.MinNum,
         MaxNum: values.MaxNum,
         Payment: values.Payment
@@ -226,6 +228,13 @@ export default connect(
             {getFieldDecorator('Shopid')(
               <Select multiple placeholder='请选择'>
                 {this.state.shops.map(x => <Option value={`${x.value}`} key={x.value}>{x.label}</Option>)}
+              </Select>
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout} label='限定分销商'>
+            {getFieldDecorator('Did')(
+              <Select multiple placeholder='请选择'>
+                {this.state.distributors.map(x => <Option value={`${x.value}`} key={x.value}>{x.label}</Option>)}
               </Select>
             )}
           </FormItem>

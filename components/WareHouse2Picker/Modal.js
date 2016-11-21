@@ -49,6 +49,11 @@ export default React.createClass({
             dataList: lst,
             value: nextProps.value
           })
+        },
+        error: () => {
+          this.setState({
+            spinning: false
+          })
         }
       })
     }

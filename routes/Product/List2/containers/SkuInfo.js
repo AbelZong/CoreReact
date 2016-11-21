@@ -12,7 +12,7 @@
 * file that was distributed with this source code.
 */
 import React from 'react'
-import update from 'react-addons-update'
+//import update from 'react-addons-update'
 import {
   connect
 } from 'react-redux'
@@ -126,11 +126,12 @@ const SkuInfo = React.createClass({
       for (let it of items) {
         for (let prop of skuprops[a].children0) {
           if (prop.Enable === 1) {
-            it[`sku${a}`] = prop.val_name
-            it[`pid${a}`] = prop.pid
-            it[`val_id${a}`] = prop.val_id
-            console.log(it)
-            _items.push(it)
+            const _it = Object.assign({}, it, {
+              [`sku${a}`]: prop.val_name,
+              [`pid${a}`]: prop.pid,
+              [`val_id${a}`]: prop.val_id
+            })
+            _items.push(_it)
           }
         }
       }

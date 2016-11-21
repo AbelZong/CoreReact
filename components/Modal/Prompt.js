@@ -23,7 +23,8 @@ const defProps = {
   //   })
   //   return p
   // }，
-  title: '请输入内容'
+  title: '请输入内容',
+  children: undefined
 }
 // const Promiser = function() {
 //   const p = new Promise((resolve, reject) => {
@@ -67,8 +68,10 @@ const PP = React.createClass({
     }
   },
   render() {
+    const {children, ...props} = this.props
     return (
-      <Modal maskClosable={false} onOk={this.handleOk} {...this.props}>
+      <Modal maskClosable={false} onOk={this.handleOk} {...props}>
+        {children}
         <Input ref='hua' placeholder='please enter' />
       </Modal>
     )

@@ -39,11 +39,24 @@ const order_list_sellerNote_1 = handleActions({
 const order_list_expr_1 = handleActions({
   ORDER_LIST_EXPR_1_SET: (state, action) => action.payload
 }, null)
+const order_list_expr_2 = handleActions({
+  ORDER_LIST_EXPR_2_SET: (state, action) => action.payload
+}, null)
 const order_list_buyerAddress_1 = handleActions({
   ORDER_LIST_BUYERADDRESS_1_SET: (state, action) => action.payload
+}, null)
+const order_list_to_cancel_1 = handleActions({
+  ORDER_LIST_TO_CANCEL_1_SET: (state, action) => action.payload
+}, null)
+const order_list_to_exception_1 = handleActions({
+  ORDER_LIST_TO_EXCEPTION_1_SET: (state, action) => action.payload
+}, null)
+const order_list_whouse_1 = handleActions({
+  ORDER_LIST_WHOUSE_1_SET: (state, action) => action.payload
 }, null)
 
 export default {
   order_list_collapse, order_list_conditions, order_list_new_egg_vis, order_list_buyer_select_vis,
-  order_list_detail_1, order_list_sellerNote_1, order_list_buyerAddress_1, order_list_expr_1
+  order_list_detail_1, order_list_sellerNote_1, order_list_buyerAddress_1, order_list_expr_1, order_list_expr_2,
+  order_list_to_exception_1, order_list_to_cancel_1, order_list_whouse_1
 }
