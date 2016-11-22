@@ -20,6 +20,9 @@ import SkuAppendPicker from 'components/SkuPicker/append'
 import ShopPicker from 'components/ShopPicker'
 import BuyerModal from './BuyerModal'
 import {
+  Table,
+  Select,
+  Popconfirm,
   Button,
   message,
   Cascader,
@@ -62,6 +65,7 @@ const ButtonGroup = Button.Group
 const Step = Steps.Step
 const RadioGroup = Radio.Group
 const Panel = Collapse.Panel
+const Option = Select.Option
 const BuyerShop = createClass({
   render() {
     return (
@@ -76,6 +80,9 @@ const BuyerShop = createClass({
     )
   }
 })
+// const componentParent = function(that) {
+//   return that._reactInternalInstance._currentElement._owner._instance
+// }
 // const SellerNote = createClass({
 //   render() {
 //     return (
@@ -92,7 +99,7 @@ const IDrender = createClass({
     return <div className={styles[`custType${type}`]}>{text}</div>
   },
   render() {
-    const {data, api, rowIndex} = this.props
+    const {data, api} = this.props
     return (
       <div className={styles.centerWrapper}>
         <div className={styles.mLeftMiddle}>
@@ -100,7 +107,7 @@ const IDrender = createClass({
           {data.Type > 0 ? this._renderType(data.Type, data.TypeString) : null}
         </div>
         <div className={`${styles.float} ${styles['float-0']}`} onClick={e => {
-          api.gridOptionsWrapper.gridOptions.grid.props.dispatch({type: 'ORDER_LIST_DETAIL_1_SET', payload: rowIndex})
+          api.gridOptionsWrapper.gridOptions.grid.props.dispatch({type: 'ORDER_LIST_DETAIL_1_SET', payload: data.ID})
         }}>
           <span>详</span>
         </div>
@@ -197,34 +204,40 @@ const defColumns = [{
     cellRenderer: mLeftRender
   }, {
     headerName: '应付+运费',
-    //field: 'Amount', //ExAmount
+    field: 'Amount', //ExAmount
     width: 100,
-    cellRendererFramework: ({data}) => {
-      return (
-        <div className={styles.centerWrapper}>
-          <div className={styles.mRightMiddle}>
-            <div className='mb5'>{data.Amount}</div>
-            <div className={styles.gray}>{data.ExAmount}</div>
+    cellRendererFramework: createClass({
+      render() {
+        const {data} = this.props
+        return (
+          <div className={styles.centerWrapper}>
+            <div className={styles.mRightMiddle}>
+              <div className='mb5'>{data.Amount}</div>
+              <div className={styles.gray}>{data.ExAmount}</div>
+            </div>
           </div>
-        </div>
-      )
-    }
+        )
+      }
+    })
   }, {
     headerName: '已付金额',
-    //field: 'PaidAmount',
+    field: 'PaidAmount',
     width: 90,
-    cellRendererFramework: ({data}) => {
-      return (
-        <div className={styles.centerWrapper}>
-          <div className={styles.mRightMiddle}>
-            {data.IsCOD ? (
-              <div className='red'>货到付款</div>
-            ) : null}
-            <div className='mt5'>{data.PaidAmount}</div>
+    cellRendererFramework: createClass({
+      render() {
+        const {data} = this.props
+        return (
+          <div className={styles.centerWrapper}>
+            <div className={styles.mRightMiddle}>
+              {data.IsCOD ? (
+                <div className='red'>货到付款</div>
+              ) : null}
+              <div className='mt5'>{data.PaidAmount}</div>
+            </div>
           </div>
-        </div>
-      )
-    }
+        )
+      }
+    })
   }, {
     headerName: '订单日期',
     field: 'ODate',
@@ -247,18 +260,21 @@ const defColumns = [{
     cellClass: function(params) {
       return styles[`orderS${params.value}`] || ''
     },
-    cellRendererFramework: ({data}) => {
-      return (
-        <div className={styles.centerWrapper}>
-          <div className={styles.mAuto}>
-            <div className='tc'>
-              <div>{data.StatusDec}</div>
-              {data.Status === 7 ? <div className='mt5'>{data.AbnormalStatusDec}</div> : null}
+    cellRendererFramework: createClass({
+      render() {
+        const {data} = this.props
+        return (
+          <div className={styles.centerWrapper}>
+            <div className={styles.mAuto}>
+              <div className='tc'>
+                <div>{data.StatusDec}</div>
+                {data.Status === 7 ? <div className='mt5'>{data.AbnormalStatusDec}</div> : null}
+              </div>
             </div>
           </div>
-        </div>
-      )
-    }
+        )
+      }
+    })
   }, {
     headerName: '买家留言',
     field: 'RecMessage',
@@ -426,7 +442,10 @@ const parseArea = function(l, c, d) {
   }
   return s6
 }
-const Table = React.createClass({
+
+export default connect(state => ({
+  conditions: state.order_list_conditions
+}), null, null, { withRef: true })(React.createClass({
   componentWillReceiveProps(nextProps) {
     this._firstBlood(nextProps.conditions)
   },
@@ -435,24 +454,6 @@ const Table = React.createClass({
   },
   refreshRowData() {
     this._firstBlood()
-  },
-  deleteRowByIDs(ids) {
-    const data = {ids: ids}
-    this.grid.showLoading()
-    ZPost('print/tpl/delsyses', data, () => {
-      this.refreshRowData()
-    }, () => {
-      this.grid.hideLoading()
-    })
-  },
-  modifyRowByID(id) {
-    const win = window.open(`/page/print/modify?sys_id=${id}`)
-    const loop = setInterval(() => {
-      if (win.closed) {
-        clearInterval(loop)
-        this.refreshRowData()
-      }
-    }, 1000)
   },
   handleDoRemove() {
     const nodeArr = this.grid.api.selectionController.selectedNodes
@@ -525,6 +526,20 @@ const Table = React.createClass({
     }
     this.props.dispatch({type: 'ORDER_LIST_EXPR_2_SET', payload: ids})
   },
+  refreshRow(OID) {
+    const nodes = this.grid.api.getSelectedNodes()
+    const index = nodes.findIndex(x => x.data.ID === OID)
+    if (index !== -1) {
+      const node = nodes[index]
+      startLoading()
+      ZGet('Order/GetOrderListSingle', {OID}, ({d}) => {
+        node.setData(d.Ord[0])
+        this.grid.api.refreshRows([node])
+      }).then(endLoading)
+    } else {
+      this.refreshRowData()
+    }
+  },
   handleOrderMenuClick(e) {
     const ids = this.getSelectIDs()
     if (ids === false) {
@@ -540,44 +555,84 @@ const Table = React.createClass({
         break
       }
       case '2': {
-        this.grid.x0pCall(ZPost('Order/TransferNormal', {OID: ids}, ({d}) => {
-          if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
-            const successIDs = {}
-            const IDs = []
-            for (let v of d.successIDs) {
-              successIDs[`${v.ID}`] = v
-              IDs.push(v.ID)
-            }
-            const nodes = this.grid.api.getSelectedNodes()
-            nodes.forEach(x => {
-              if (IDs.indexOf(x.data.ID) !== -1) {
-                let qq = successIDs[`${x.data.ID}`]
-                x.data.Status = qq.Status
-                x.data.StatusDec = qq.StatusDec
-              }
-            })
-            this.grid.api.refreshCells(nodes, ['Status'])
-          }
-          if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
-            const description = (<div>
-              {d.FailIDs.map(x => {
-                return (
-                  <div key={x.ID}>
-                    {x.ID}: {x.Reason}
-                  </div>
-                )
-              })}
-              <div className='hr' />
-              <div>请检查相关订单或刷新</div>
-            </div>)
-            notification.error({
-              message: '订单转正常失败IDs',
-              description,
-              icon: <Icon type='meh-o' />,
-              duration: 30
-            })
-          }
+        const nodes = this.grid.api.getSelectedNodes()
+        this.props.zch.grid.x0pCall(ZPost('Order/TransferNormal', {OID: ids}, ({d}) => {
+          parseBatchOperatorResult.call(this, d, function(x, qq) {
+            x.data.Status = qq.Status
+            x.data.StatusDec = qq.StatusDec
+          }, ['Status'], nodes, this.grid)
         }))
+        // this.grid.x0pCall(ZPost('Order/TransferNormal', {OID: ids}, ({d}) => {
+        //   if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
+        //     const successIDs = {}
+        //     const IDs = []
+        //     for (let v of d.successIDs) {
+        //       successIDs[`${v.ID}`] = v
+        //       IDs.push(v.ID)
+        //     }
+        //     const nodes = this.grid.api.getSelectedNodes()
+        //     nodes.forEach(x => {
+        //       if (IDs.indexOf(x.data.ID) !== -1) {
+        //         let qq = successIDs[`${x.data.ID}`]
+        //         x.data.Status = qq.Status
+        //         x.data.StatusDec = qq.StatusDec
+        //       }
+        //     })
+        //     this.grid.api.refreshCells(nodes, ['Status'])
+        //   }
+        //   if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
+        //     const description = (<div>
+        //       {d.FailIDs.map(x => {
+        //         return (
+        //           <div key={x.ID}>
+        //             {x.ID}: {x.Reason}
+        //           </div>
+        //         )
+        //       })}
+        //       <div className='hr' />
+        //       <div>请检查相关订单或刷新</div>
+        //     </div>)
+        //     notification.error({
+        //       message: '订单转正常失败IDs',
+        //       description,
+        //       icon: <Icon type='meh-o' />,
+        //       duration: 30
+        //     })
+        //   }
+        // }))
+        break
+      }
+    }
+  },
+  handleOrderMenuClick1(e) {
+    const ids = this.grid.api.getSelectedRows().map(x => x.ID)
+    if (!ids.length) {
+      return message.info('请先选择')
+    }
+    switch (e.key) {
+      case '1': {
+        ModalPrompt({
+          onPrompt: ({value}) => {
+            const nodes = this.grid.api.getSelectedNodes()
+            return new Promise((resolve, reject) => {
+              this.grid.x0pCall(ZPost('Order/ModifyFreight', {
+                OID: ids,
+                Freight: value
+              }, ({d}) => {
+                resolve()
+                parseBatchOperatorResult.call(this, d, function(x, qq) {
+                  Object.assign(x.data, qq)
+                }, ['Amount', 'Status'], nodes, this.grid)
+              }, reject))
+            })
+          },
+          children: (
+            <div className='mb10'>
+              请输入新的运费
+            </div>
+          ),
+          placeholder: '格式：0.00'
+        })
         break
       }
     }
@@ -600,10 +655,8 @@ const Table = React.createClass({
             <Button type='ghost' size='small'>订单设置<Icon type='down' /></Button>
           </Dropdown>
           &nbsp;
-          <Dropdown overlay={<Menu onClick={this.handleOrderMenuClick}>
-            <Menu.Item key='1'><Icon type='exclamation-circle-o' className='red' /> 转异常单</Menu.Item>
-            <Menu.Item key='2'>转正常单</Menu.Item>
-            <Menu.Item key='3'>取消订单</Menu.Item>
+          <Dropdown overlay={<Menu onClick={this.handleOrderMenuClick1}>
+            <Menu.Item key='1'>改运费</Menu.Item>
           </Menu>}>
             <Button type='ghost' size='small'>
               <Icon type='edit' />修改&标记<Icon type='down' />
@@ -624,7 +677,7 @@ const Table = React.createClass({
       </div>
     )
   }
-})
+}))
 
 const ToExceptions = connect(state => ({
   doge: state.order_list_to_exception_1
@@ -668,47 +721,17 @@ const ToExceptions = connect(state => ({
       confirmLoading: true
     })
     //const valueName = this.state.dataList.filter(x => x.value === value)[0].label
-    ZPost('Order/SetWarehouse', {OID: this.props.doge, WarehouseID: value}, ({d}) => {
-      if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
-        const successIDs = {}
-        const IDs = []
-        for (let v of d.successIDs) {
-          successIDs[`${v.ID}`] = v
-          IDs.push(v.ID)
-        }
-        const nodes = this.props.zch.grid.api.getSelectedNodes()
-        nodes.forEach(x => {
-          if (IDs.indexOf(x.data.ID) !== -1) {
-            let qq = successIDs[`${x.data.ID}`]
-            Object.assign(x.data, qq)
-          }
-        })
-        this.props.zch.grid.api.refreshCells(nodes, ['Status'])
-      }
-      if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
-        const description = (<div>
-          {d.FailIDs.map(x => {
-            return (
-              <div key={x.ID}>
-                {x.ID}: {x.Reason}
-              </div>
-            )
-          })}
-          <div className='hr' />
-          <div>请检查相关订单或刷新</div>
-        </div>)
-        notification.error({
-          message: '异常单转化问题',
-          description,
-          icon: <Icon type='meh-o' />,
-          duration: 30
-        })
-      }
+    const nodes = this.props.zch.grid.api.getSelectedNodes()
+    this.props.zch.grid.x0pCall(ZPost('Order/SetExp', {OID: this.props.doge, WarehouseID: value}, ({d}) => {
+      this.hideModal()
+      parseBatchOperatorResult.call(this, d, function(x, qq) {
+        Object.assign(x.data, qq)
+      }, ['Status'], nodes)
     }).then(() => {
       this.setState({
         confirmLoading: false
       })
-    })
+    }))
   },
   handleok() {
     this.props.dispatch({type: 'ORDER_LIST_TO_EXCEPTION_1_SET', payload: null})
@@ -757,7 +780,7 @@ const ToExceptions = connect(state => ({
             </RadioGroup>
           </div>
           <div className='flex-row' style={{height: 30}}>
-            <div style={{lineHeight: 28}}><span>异常描述：</span></div>
+            <div style={{ lineHeight: '28px' }}><span>异常描述：</span></div>
             <div className='flex-grow'><Input /></div>
           </div>
         </div>
@@ -802,45 +825,56 @@ const Whouse = connect(state => ({
     if (!value) {
       return message.warning('取消了发货仓库的设置')
     }
-    startLoading()
+    const nodes = this.props.zch.grid.api.getSelectedNodes()
+    this.props.zch.grid.x0pCall(ZPost('Order/SetWarehouse', {OID: this.props.doge, WarehouseID: value}, ({d}) => {
+      this.handleok()
+      parseBatchOperatorResult.call(this, d, function(x, qq) {
+        x.data.SendWarehouse = qq.Warehouse
+      }, ['SendWarehouse'], nodes)
+    }).then(() => {
+      this.setState({
+        confirmLoading: false
+      })
+    }))
+    //startLoading()
     //const valueName = this.state.dataList.filter(x => x.value === value)[0].label
-    ZPost('Order/SetWarehouse', {OID: this.props.doge, WarehouseID: value}, ({d}) => {
-      if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
-        const successIDs = {}
-        const IDs = []
-        for (let v of d.successIDs) {
-          successIDs[`${v.ID}`] = v
-          IDs.push(v.ID)
-        }
-        const nodes = this.props.zch.grid.api.getSelectedNodes()
-        nodes.forEach(x => {
-          if (IDs.indexOf(x.data.ID) !== -1) {
-            let qq = successIDs[`${x.data.ID}`]
-            x.data.SendWarehouse = qq.SendWarehouse
-          }
-        })
-        this.props.zch.grid.api.refreshCells(nodes, ['SendWarehouse'])
-      }
-      if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
-        const description = (<div>
-          {d.FailIDs.map(x => {
-            return (
-              <div key={x.ID}>
-                {x.ID}: {x.Reason}
-              </div>
-            )
-          })}
-          <div className='hr' />
-          <div>请检查相关订单或刷新</div>
-        </div>)
-        notification.error({
-          message: '发货仓库修改错误问题',
-          description,
-          icon: <Icon type='meh-o' />,
-          duration: 30
-        })
-      }
-    }).then(endLoading)
+    // ZPost('Order/SetWarehouse', {OID: this.props.doge, WarehouseID: value}, ({d}) => {
+    //   if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
+    //     const successIDs = {}
+    //     const IDs = []
+    //     for (let v of d.successIDs) {
+    //       successIDs[`${v.ID}`] = v
+    //       IDs.push(v.ID)
+    //     }
+    //     const nodes = this.props.zch.grid.api.getSelectedNodes()
+    //     nodes.forEach(x => {
+    //       if (IDs.indexOf(x.data.ID) !== -1) {
+    //         let qq = successIDs[`${x.data.ID}`]
+    //         x.data.SendWarehouse = qq.SendWarehouse
+    //       }
+    //     })
+    //     this.props.zch.grid.api.refreshCells(nodes, ['SendWarehouse'])
+    //   }
+    //   if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
+    //     const description = (<div>
+    //       {d.FailIDs.map(x => {
+    //         return (
+    //           <div key={x.ID}>
+    //             {x.ID}: {x.Reason}
+    //           </div>
+    //         )
+    //       })}
+    //       <div className='hr' />
+    //       <div>请检查相关订单或刷新</div>
+    //     </div>)
+    //     notification.error({
+    //       message: '发货仓库修改错误问题',
+    //       description,
+    //       icon: <Icon type='meh-o' />,
+    //       duration: 30
+    //     })
+    //   }
+    // }).then(endLoading)
   },
   handleok() {
     this.props.dispatch({type: 'ORDER_LIST_WHOUSE_1_SET', payload: null})
@@ -869,9 +903,20 @@ const ComDetail1 = connect(state => ({
   getInitialState() {
     return {
       visible: false,
-      loading: false
+      loading: false,
+      order: {},
+      logs: [],
+      payments: [],
+      items: []
     }
   },
+  // componentDidMount() {
+  //   this.setState({
+  //     visible: true
+  //   }, () => {
+  //     this.componentWillReceiveProps({doge: 10873})
+  //   })
+  // },
   componentWillReceiveProps(nextProps) {
     if (this.props.doge !== nextProps.doge) {
       if (nextProps.doge === null) {
@@ -879,57 +924,509 @@ const ComDetail1 = connect(state => ({
           visible: false
         })
       } else {
-        this.setState({
-          visible: true
-        }, () => {
-          const u = this.props.zch.grid.api.getModel().getRow(nextProps.doge).data
-          const s6 = parseArea(u.RecLogistics, u.RecCity, u.RecDistrict)
-          this.props.form.setFieldsValue({
-            s6: s6.length ? s6 : undefined,
-            s7: u.RecAddress,
-            s8: u.RecName,
-            s9: u.RecTel,
-            s10: u.RecPhone
+        startLoading()
+        ZGet('Order/GetOrderSingle', {OID: nextProps.doge}, ({d}) => {
+          console.log(d)
+          this.setState({
+            visible: true,
+            order: d.Order,
+            logs: d.Log,
+            payments: d.Pay,
+            items: d.OrderItem
           })
-        })
+        }).then(endLoading)
       }
     }
   },
   hideModal() {
-    this.props.dispatch({ type: 'ORDER_LIST_BUYERADDRESS_1_SET', payload: null })
+    if (this.__dirtied) {
+      this.props.zch.refreshRow(this.props.doge)
+    }
+    this.props.dispatch({ type: 'ORDER_LIST_DETAIL_1_SET', payload: null })
+  },
+  _noticeFails(failIDs) {
+    if (failIDs && failIDs.length) {
+      const description = (<div>
+        {failIDs.map(x => {
+          return (
+            <div key={x.id}>
+              {x.id}: {x.reason || '已存在'}
+            </div>
+          )
+        })}
+      </div>)
+      notification.error({
+        message: '订单商品附加错误',
+        description,
+        icon: <Icon type='meh-o' />
+      })
+    }
+  },
+  _updateStates(d) {
+    const states = {}
+    if (typeof d.Order !== 'undefined') {
+      states.order = d.Order
+    }
+    if (typeof d.OrderItem !== 'undefined') {
+      states.items = d.OrderItem
+    }
+    if (typeof d.Log !== 'undefined') {
+      states.logs = d.Log
+    }
+    if (typeof d.Pay !== 'undefined') {
+      states.payments = d.Pay
+    }
+    this.__dirtied = true
+    this.setState(states)
+  },
+  handleAppendSKU(skus) {
+    const ids = skus.map(x => x.ID)
+    if (ids.length) {
+      startLoading()
+      ZPost('Order/InsertOrderDetail', {OID: this.state.order.ID, SkuIDList: ids, isQuick: false}, ({d}) => {
+        this._updateStates(d.Order)
+        this._noticeFails(d.failIDs)
+      }).then(endLoading)
+    }
+  },
+  handleUpdateQty(ID, {target}) {
+    this._handleUpdateItem({
+      ID,
+      Qty: target.value
+    })
+  },
+  handleUpdatePrice(ID, {target}) {
+    this._handleUpdateItem({
+      ID,
+      Price: target.value
+    })
+  },
+  _handleUpdateItem(data) {
+    startLoading()
+    ZPost('Order/UpdateOrderDetail', {
+      OID: this.state.order.ID,
+      isQuick: false,
+      ...data
+    }, ({d}) => {
+      this._updateStates(d)
+    }).then(endLoading)
+  },
+  handleRemove(ID) {
+    startLoading()
+    ZPost('Order/DeleteOrderDetail', {
+      OID: this.state.order.ID,
+      ID,
+      isQuick: false
+    }, ({d}) => {
+      this._updateStates(d)
+    }).then(endLoading)
+  },
+  __payOP0(PayID) {
+    startLoading()
+    ZPost('Order/CancleConfirmPay', {
+      OID: this.state.order.ID,
+      PayID
+    }, ({d}) => {
+      this._updateStates(d)
+    }).then(endLoading)
+  },
+  __payOP1(PayID) {
+    startLoading()
+    ZPost('Order/ConfirmPay', {
+      OID: this.state.order.ID,
+      PayID
+    }, ({d}) => {
+      this._updateStates(d)
+    }).then(endLoading)
+  },
+  __payOP2(PayID) {
+    startLoading()
+    ZPost('Order/CanclePay', {
+      OID: this.state.order.ID,
+      PayID
+    }, ({d}) => {
+      this._updateStates(d)
+    }).then(endLoading)
+  },
+  __renderPayOp(x) {
+    switch (x.Status) {
+      case 0: {
+        return (
+          <ButtonGroup>
+            <Button type='primary' size='small' onClick={() => this.__payOP1(x.ID)}>审核通过</Button>
+            <Popconfirm title='确定将该笔支付作废吗？' onConfirm={() => this.__payOP2(x.ID)}>
+              <Button size='small'>作废</Button>
+            </Popconfirm>
+          </ButtonGroup>
+        )
+      }
+      case 1: {
+        return (
+          <Button type='primary' size='small' onClick={() => this.__payOP0(x.ID)}>重新审核</Button>
+        )
+      }
+    }
+  },
+  _renderPays() {
+    const {order, payments} = this.state
+    if (!order || typeof order.Status === 'undefined') {
+      return (
+        <div className={styles.pays}>
+          <h3>订单支付情况</h3>
+          <div className='mt10 tc'>(无)</div>
+        </div>
+      )
+    }
+    if ([0, 1, 7].indexOf(order.Status) !== -1) {
+      return (
+        <div className={styles.pays}>
+          <h3>订单支付情况 &emsp;&emsp;&emsp;&emsp;<Button type='primary' size='small' onClick={() => {
+            this.props.dispatch({type: 'ORDER_LIST_DO_PAY_1_SET', payload: this.state.order.ID})
+          }}>添加手工支付</Button>&emsp;<Button type='dashed' size='small' onClick={() => {
+            startLoading()
+            ZPost('Order/QuickPay', {OID: this.state.order.ID}, ({d}) => {
+              this._updateStates(d)
+            }).then(endLoading)
+          }}>快速支付</Button></h3>
+          {payments && payments.length ? payments.map(x => (
+            <Row key={x.ID} className='mt5'>
+              <Col span={4}><div className={styles.ppap0}>{x.Payment}</div></Col>
+              <Col span={5}><div className={styles.ppap1}>{x.PayNbr}</div></Col>
+              <Col span={4}><div className={styles.ppap2}>&yen;&nbsp;{x.PayAmount}</div></Col>
+              <Col span={6}><div className={styles.ppap3}>{x.PayDate}</div></Col>
+              <Col span={5}><div className={styles.ppap4}>{this.__renderPayOp(x)}</div></Col>
+            </Row>
+          )) : <div className='tc mt5'>(无)</div>}
+          <ManualOrderPay updateStates={this._updateStates} />
+        </div>
+      )
+    }
+    return (
+      <div className={styles.pays}>
+        <h3>订单支付情况</h3>
+        {payments && payments.length ? payments.map(x => (
+          <Row key={x.ID} className='mt10'>
+            <Col span={4}><div className={styles.ppap0}>{x.Payment}</div></Col>
+            <Col span={5}><div className={styles.ppap1}>{x.PayNbr}</div></Col>
+            <Col span={4}><div className={styles.ppap2}>&yen;&nbsp;{x.PayAmount}</div></Col>
+            <Col span={6}><div className={styles.ppap3}>{x.PayDate}</div></Col>
+          </Row>
+        )) : <div className='tc mt5'>(无)</div>}
+      </div>
+    )
+  },
+  _renderItems() {
+    const {order, items} = this.state
+    if (!order || typeof order.Status === 'undefined') {
+      return (
+        <div className={styles.items}>
+          <h3>订单商品</h3>
+          <div className='mt10 tc'>(无)</div>
+        </div>
+      )
+    }
+    const itemQty = items.reduce(function(a, b) {
+      return a + b.Qty
+    }, 0)
+    if ([0, 1, 7].indexOf(order.Status) !== -1) {
+      return (
+        <div className={styles.items}>
+          <h3>订单商品 &emsp;&emsp;&emsp;&emsp;<SkuAppendPicker onChange={this.handleAppendSKU} size='small' type='primary' />&emsp;<Button className='hide' type='dashed' size='small'>导入商品</Button></h3>
+          <Table columns={[{
+            title: '图片',
+            width: 68,
+            className: 'tc',
+            dataIndex: 'img',
+            render: function(img, record, index) {
+              return (
+                <div className={styles._poster} style={{backgroundImage: img ? `url(${img})` : 'none'}} />
+              )
+            }
+          }, {
+            title: '名称',
+            width: 280,
+            dataIndex: 'SkuID',
+            render: function(text, row, index) {
+              const ZPCN = classNames({
+                [`${styles._zp}`]: row.IsGift
+              })
+              return (
+                <div className={styles._info}>
+                  <div>({row.ID})<a>{row.SkuName}</a></div>
+                  <div className='mt5'>
+                    <span className='gray mr5'>{row.GoodsCode}</span>
+                    <strong className={ZPCN}>{row.SkuID}</strong>
+                    <span className='gray ml5'>{row.Norm}</span>
+                  </div>
+                </div>
+              )
+            }
+          }, {
+            title: '数量(回车保存)',
+            width: 98,
+            dataIndex: 'Qty',
+            render: (value, record, index) => {
+              return <Input min={0} type='number' defaultValue={value} placeholder={`原设：${value}`} onPressEnter={(e) => this.handleUpdateQty(record.ID, e)} />
+            }
+          }, {
+            title: '单价(回车保存)',
+            width: 98,
+            dataIndex: 'RealPrice',
+            render: (value, record, index) => {
+              return <Input min={0} type='number' defaultValue={value} placeholder={`原设：${value}`} onPressEnter={(e) => this.handleUpdatePrice(record.ID, e)} />
+            }
+          }, {
+            title: '原价',
+            width: 62,
+            className: 'tc',
+            dataIndex: 'SalePrice'
+          }, {
+            title: '成交金额',
+            width: 88,
+            className: 'tc',
+            render: function(text, row, index) {
+              const price = row.RealPrice * row.Qty
+              return <span>{price}</span>
+            }
+          }, {
+            title: '可配库存',
+            width: 85,
+            className: 'tc',
+            dataIndex: 'InvQty'
+          }, {
+            title: '操作',
+            dataIndex: '',
+            render: (text, row, index) => {
+              return (
+                <Popconfirm title='确定要删除吗' onConfirm={() => this.handleRemove(row.ID)}>
+                  <Button size='small' type='ghost'>删除</Button>
+                </Popconfirm>
+              )
+            }
+          }]} dataSource={items} pagination={false} rowKey='ID' />
+          <Row className={styles.items_c}>
+            <Col span={14}>
+              <div className='tr'>
+                <span className={styles._ppap}>商品总数量:</span><span className={styles.tQty}>{itemQty}</span>
+              </div>
+            </Col>
+            <Col span={10}>
+              <div className='tr'>
+                <div><span className={styles._ppap}>商品总金额:</span><span className={styles.bPrice}>{order.SkuAmount}</span></div>
+                <div className='hide'><span className={styles._ppap}>-优惠及抵扣金额:</span><span className={styles.bPrice}>0</span></div>
+                <div className='hide'><span className={styles._ppap}>取消商品总金额:</span><span className={styles.bPrice}>0</span></div>
+                <div><span className={styles._ppap}>+运费:</span><span className={styles.bPrice}>{order.ExAmount}</span></div>
+                <div className={styles.hr}>
+                  <div><span className={styles._ppap}>应付总金额:</span><span className={styles.rPrice}>{order.Amount}</span></div>
+                  <div><span className={styles._ppap}>实际已付（支付已审核）:</span><span className={styles.rPrice}>{order.PaidAmount}</span></div>
+                </div>
+              </div>
+            </Col>
+          </Row>
+        </div>
+      )
+    }
+    return (
+      <div className={styles.items}>
+        <h3>订单商品</h3>
+        <Table columns={[{
+          title: '图片',
+          width: 68,
+          className: 'tc',
+          dataIndex: 'img',
+          render: function(img, record, index) {
+            return (
+              <div className={styles._poster} style={{backgroundImage: img ? `url(${img})` : 'none'}} />
+            )
+          }
+        }, {
+          title: '名称',
+          width: 280,
+          dataIndex: 'SkuID',
+          render: function(text, row, index) {
+            const ZPCN = classNames({
+              [`${styles._zp}`]: row.IsGift
+            })
+            return (
+              <div className={styles._info}>
+                <div>({row.ID})<a>{row.SkuName}</a></div>
+                <div className='mt5'>
+                  <span className='gray mr5'>{row.GoodsCode}</span>
+                  <strong className={ZPCN}>{row.SkuID}</strong>
+                  <span className='gray ml5'>{row.Norm}</span>
+                </div>
+              </div>
+            )
+          }
+        }, {
+          title: '数量(回车保存)',
+          width: 98,
+          dataIndex: 'Qty'
+        }, {
+          title: '单价(回车保存)',
+          width: 98,
+          dataIndex: 'RealPrice'
+        }, {
+          title: '原价',
+          width: 62,
+          className: 'tc',
+          dataIndex: 'SalePrice'
+        }, {
+          title: '成交金额',
+          width: 88,
+          className: 'tc',
+          render: function(text, row, index) {
+            const price = row.RealPrice * row.Qty
+            return <span>{price}</span>
+          }
+        }, {
+          title: '可配库存',
+          width: 85,
+          className: 'tc',
+          dataIndex: 'InvQty'
+        }, {
+          title: '操作',
+          dataIndex: '',
+          render: () => {
+            return <div className='gray'>不可修改</div>
+          }
+        }]} dataSource={items} pagination={false} rowKey='ID' />
+        <Row className={styles.items_c}>
+          <Col span={14}>
+            <div className='tr'>
+              <span className={styles._ppap}>商品总数量:</span><span className={styles.tQty}>{itemQty}</span>
+            </div>
+          </Col>
+          <Col span={10}>
+            <div className='tr'>
+              <div><span className={styles._ppap}>商品总金额:</span><span className={styles.bPrice}>{order.SkuAmount}</span></div>
+              <div className='hide'><span className={styles._ppap}>-优惠及抵扣金额:</span><span className={styles.bPrice}>0</span></div>
+              <div className='hide'><span className={styles._ppap}>取消商品总金额:</span><span className={styles.bPrice}>0</span></div>
+              <div><span className={styles._ppap}>+运费:</span><span className={styles.bPrice}>{order.ExAmount}</span></div>
+              <div className={styles.hr}>
+                <div><span className={styles._ppap}>应付总金额:</span><span className={styles.rPrice}>{order.Amount}</span></div>
+                <div><span className={styles._ppap}>实际已付（支付已审核）:</span><span className={styles.rPrice}>{order.PaidAmount}</span></div>
+              </div>
+            </div>
+          </Col>
+        </Row>
+      </div>
+    )
+  },
+  render() {
+    const {order} = this.state
+    const formData = {
+      areas: parseArea(order.RecLogistics, order.RecCity, order.RecDistrict),
+      address: order.RecAddress,
+      tel: order.RecTel,
+      phone: order.RecPhone,
+      name: order.RecName,
+      sendMessage: order.SendMessage,
+      invoiceTitle: order.InvoiceTitle,
+      freight: order.ExAmount,
+      oid: order.ID,
+      status: order.Status
+    }
+    //todo 异常单
+    return (
+      <Modal title='查看或编辑备注' confirmLoading={this.state.loading} visible={this.state.visible} onCancel={this.hideModal} width={980} footer=''>
+        <Steps current={order.Status}>
+          <Step title='待付款' />
+          <Step title='已付款待审核' />
+          <Step title='已审核待配快递' />
+          <Step title='发货中' />
+          <Step title='已发货' />
+        </Steps>
+        <div className='flex-row mt25'>
+          <div className='flex-grow'>
+            <h3>订单基本信息</h3>
+            <div className={styles.formD}>
+              <Row>
+                <Col span={3}><div className={styles.label}>订单编号</div></Col>
+                <Col span={6}><div className={styles.inpt}>{order.ID}</div></Col>
+                <Col span={3}><div className={styles.label}>店铺</div></Col>
+                <Col span={12}><div className={styles.inpt}>{order.ShopName}</div></Col>
+              </Row>
+              <Row className='mt5'>
+                <Col span={3}><div className={styles.label}>下单时间</div></Col>
+                <Col span={6}><div className={styles.inpt}>{order.ODate}</div></Col>
+                <Col span={3}><div className={styles.label}>订单来源</div></Col>
+                <Col span={12}><div className={styles.inpt}>{order.OSource}</div></Col>
+              </Row>
+              <Row className='mt5'>
+                <Col span={3}><div className={styles.label}>线上单号</div></Col>
+                <Col span={21}><div className={styles.inpt}>{order.SoID}</div></Col>
+              </Row>
+              <Row className='mt5'>
+                <Col span={3}><div className={styles.label}>买家帐号</div></Col>
+                <Col span={6}><div className={styles.inpt}>{order.BuyerShopID}</div></Col>
+                <Col span={3}><div className={styles.label}>付款时间</div></Col>
+                <Col span={12}><div className={styles.inpt}>{order.PayDate}</div></Col>
+              </Row>
+              <Row className='mt5'>
+                <Col span={3}><div className={styles.label}>买家留言</div></Col>
+                <Col span={21}><div className={styles.inpt}>{order.RecMessage || '(无)'}</div></Col>
+              </Row>
+              <Row className='mt5'>
+                <Col span={3}><div className={styles.label}>快递公司</div></Col>
+                <Col span={6}><div className={styles.inpt}>{order.Express}</div></Col>
+                <Col span={3}><div className={styles.label}>快递单号</div></Col>
+                <Col span={12}><div className={styles.inpt}>{order.ExCode}</div></Col>
+              </Row>
+            </div>
+            <_ComDetailForm1 data={formData} updateStates={this._updateStates} />
+          </div>
+          <div className={styles.opsArea}>
+            <div><Button type='ghost' size='small'>标记异常</Button></div>
+            <div className='mt20'><Button type='ghost' size='small'>取消订单</Button></div>
+          </div>
+        </div>
+        {this._renderPays()}
+        {this._renderItems()}
+        <div className={styles.logs}>
+          <h3>订单操作进程及日志</h3>
+          {this.state.logs && this.state.logs.length ? this.state.logs.map(x => (
+            <Row key={x.ID} className='mb5'>
+              <Col span={4}><div><time>{x.LogDate}</time></div></Col>
+              <Col span={3}><div>{x.UserName}</div></Col>
+              <Col span={3}><div>{x.Title}</div></Col>
+              <Col span={12}><div>{x.Remark}</div></Col>
+            </Row>
+          )) : <div className='mt10 gray tc'>(无)</div>}
+        </div>
+      </Modal>
+    )
+  }
+})))
+//const PAYMENT_WAYS = ['支付宝']
+const ManualOrderPay = connect(state => ({
+  doge: state.order_list_do_pay_1
+}))(createForm()(createClass({
+  getInitialState() {
+    return {
+      loading: false
+    }
+  },
+  hideModal() {
+    this.props.dispatch({ type: 'ORDER_LIST_DO_PAY_1_SET', payload: null })
     this.props.form.resetFields()
   },
   handleOK() {
-    console.log(this.props.form)
     this.props.form.validateFields((errors, values) => {
-      console.log(values)
       if (errors) {
         return false
       }
-      // this.setState({ loading: true })
-      // const node = this.props.zch.grid.api.getModel().getRow(this.props.doge)
-      // const p1 = Areas.filter(x => x.value === values.s6[0])[0]
-      // const p2 = values.s6[1] ? p1.children.filter(x => x.value === values.s6[1])[0] : null
-      // const p3 = values.s6[2] && p2 ? p2.children.filter(x => x.value === values.s6[2])[0] : null
-      // const data = {
-      //   RecName: values.s8 || '',
-      //   RecLogistics: p1 ? p1.label : '',
-      //   RecCity: p2 ? p2.label : '',
-      //   RecDistrict: p3 ? p3.label : '',
-      //   RecAddress: values.s7 || '',
-      //   RecPhone: values.s10 || '',
-      //   RecTel: values.s9 || ''
-      // }
-      // ZPost('Order/ModifyAddress', {
-      //   OID: node.data.ID,
-      //   ...data
-      // }, () => {
-      //   this.hideModal()
-      //   Object.assign(node.data, data)
-      //   this.props.zch.grid.api.refreshCells([node], ['RecAddress'])
-      // }).then(() => {
-      //   this.setState({ loading: false })
-      // })
+      const data = Object.assign({}, values, {
+        PayDate: values.PayDate.format(),
+        OID: this.props.doge
+      })
+      this.setState({ loading: true })
+      ZPost('Order/InsertManualPay', data, ({d}) => {
+        this.hideModal()
+        this.props.updateStates(d)
+      }).then(() => {
+        this.setState({ loading: false })
+      })
     })
   },
   render() {
@@ -939,35 +1436,64 @@ const ComDetail1 = connect(state => ({
       wrapperCol: { span: 18 }
     }
     return (
-      <Modal title='查看或编辑备注' confirmLoading={this.state.loading} visible={this.state.visible}onCancel={this.hideModal} width={900} footer=''>
-        <Steps current={1}>
-          <Step title='待付款' />
-          <Step title='已付款待审核' />
-          <Step title='已审核待配快递' />
-          <Step title='发货中' />
-          <Step title='已发货' />
-        </Steps>
-        <div className='flex-row mt25'>
-          <div className='flex-grow'><_ComDetailForm1 /></div>
-          <div className={styles.opsArea}>
-            <div><Button type='ghost' size='small'>标记异常</Button></div>
-            <div className='mt20'><Button type='ghost' size='small'>取消订单</Button></div>
-          </div>
-        </div>
-        <div className='hr' />
-        <Form>
-          <FormItem {...formItemLayout} label='手机号码'>
-            <Col span={8}>
-              <FormItem>
-                {getFieldDecorator('s101', {
-                  rules: [
-                    {required: true, whitespace: true, message: '必填'}
-                  ]
-                })(
-                  <Input size='small' />
-                )}
-              </FormItem>
-            </Col>
+      <Modal title='添加新的支付' confirmLoading={this.state.loading} visible={this.props.doge !== null} onOk={this.handleOK} onCancel={this.hideModal} width={478}>
+        <Form horizontal className='pos-form'>
+          <FormItem {...formItemLayout} label='支付方式'>
+            <FormItem>
+              {getFieldDecorator('Payment', {
+                initialValue: '支付宝',
+                rules: [
+                  {required: true, whitespace: true, message: '必选'}
+                ]
+              })(
+                <Select>
+                  <Option value='支付宝'>支付宝</Option>
+                  <Option value='快钱'>快钱</Option>
+                  <Option value='招行直连'>招行直连</Option>
+                  <Option value='财付通'>财付通</Option>
+                  <Option value='现金支付'>现金支付</Option>
+                  <Option value='银行转帐'>银行转帐</Option>
+                  <Option value='其它'>其它</Option>
+                  <Option value='供销支付'>供销支付</Option>
+                  <Option value='快速支付'>快速支付</Option>
+                  <Option value='微信支付'>微信支付</Option>
+                  <Option value='授信'>授信</Option>
+                  <Option value='预支付'>预支付</Option>
+                </Select>
+              )}
+            </FormItem>
+          </FormItem>
+          <FormItem {...formItemLayout} label='支付日期'>
+            {getFieldDecorator('PayDate', {
+              rules: [
+                {required: true, whitespace: true, message: '必填', type: 'object'}
+              ]
+            })(
+              <DatePicker showTime placeholder='点击设置' format='YYYY-MM-DD HH:mm:ss' />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout} label='支付单号'>
+            {getFieldDecorator('PayNbr', {
+              rules: [
+                {required: this.props.form.getFieldValue('Payment') !== '现金支付', whitespace: true, message: '必填'}
+              ]
+            })(
+              <Input placeholder='除现金支付外必填' />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout} label='支付金额'>
+            {getFieldDecorator('PayAmount', {
+              rules: [
+                {required: true, whitespace: true, message: '必填'}
+              ]
+            })(
+              <Input />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout} label='买家帐号'>
+            {getFieldDecorator('PayAccount')(
+              <Input />
+            )}
           </FormItem>
         </Form>
       </Modal>
@@ -975,19 +1501,80 @@ const ComDetail1 = connect(state => ({
   }
 })))
 const _ComDetailForm1 = createForm()(createClass({
+  getInitialState() {
+    return {
+      loading: false
+    }
+  },
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps)
+    if (JSON.stringify(nextProps.data) !== JSON.stringify(this.props.data)) {
+      this.props.form.setFieldsValue({
+        s1: nextProps.data.freight,
+        s2: nextProps.data.sendMessage,
+        s3: nextProps.data.invoiceTitle,
+        s6: nextProps.data.areas.length ? nextProps.data.areas : undefined,
+        s7: nextProps.data.address,
+        s8: nextProps.data.name,
+        s9: nextProps.data.tel,
+        s10: nextProps.data.phone
+      })
+    }
+  },
+  handleOK() {
+    this.props.form.validateFields((errors, values) => {
+      if (errors) {
+        return false
+      }
+      this.setState({ loading: true })
+      const p1 = Areas.filter(x => x.value === values.s6[0])[0]
+      const p2 = values.s6[1] ? p1.children.filter(x => x.value === values.s6[1])[0] : null
+      const p3 = values.s6[2] && p2 ? p2.children.filter(x => x.value === values.s6[2])[0] : null
+      const data = {
+        OID: this.props.data.oid,
+        ExAmount: values.s1,
+        SendMessage: values.s2,
+        InvoiceTitle: values.s3,
+        RecName: values.s8 || '',
+        RecLogistics: p1 ? p1.label : '',
+        RecCity: p2 ? p2.label : '',
+        RecDistrict: p3 ? p3.label : '',
+        RecAddress: values.s7 || '',
+        RecPhone: values.s10 || '',
+        RecTel: values.s9 || ''
+      }
+      ZPost('Order/UpdateOrder', data, ({d}) => {
+        this.props.updateStates(d)
+      }).then(() => {
+        this.setState({ loading: false })
+      })
+    })
   },
   render() {
     const {getFieldDecorator} = this.props.form
     const formItemLayout = {
-      labelCol: { span: 4 },
+      labelCol: { span: 3 },
       wrapperCol: { span: 18 }
     }
+    const disabledAll = [0, 1, 7].indexOf(this.props.data.status) === -1
     return (
-      <div>
+      <div className={styles.noMBForm}>
         <Form horizontal className='pos-form'>
-          <h3>订单基本信息</h3>
+          <FormItem {...formItemLayout} label='运费'>
+            {getFieldDecorator('s1')(
+              <Input size='small' disabled={disabledAll} style={{width: 100}} />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout} label='卖家备注'>
+            {getFieldDecorator('s2')(
+              <Input size='small' type='textarea' disabled={disabledAll} autosize={{minRows: 2, maxRows: 5}} />
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout} label='发票抬头'>
+            {getFieldDecorator('s3')(
+              <Input size='small' disabled={disabledAll} />
+            )}
+          </FormItem>
+          <h3>收货地址信息</h3>
           <FormItem {...formItemLayout} label='收货地址'>
             <Col span={8}>
               <FormItem>
@@ -996,7 +1583,7 @@ const _ComDetailForm1 = createForm()(createClass({
                     {required: true, whitespace: true, message: '必填', type: 'array'}
                   ]
                 })(
-                  <Cascader options={Areas} placeholder='选择省/市/区' />
+                  <Cascader size='small' options={Areas} disabled={disabledAll} placeholder='选择省/市/区' />
                 )}
               </FormItem>
             </Col>
@@ -1007,7 +1594,7 @@ const _ComDetailForm1 = createForm()(createClass({
                     {required: true, whitespace: true, message: '必填'}
                   ]
                 })(
-                  <Input placeholder='详细地址：街区/门牌号' className='ml10' />
+                  <Input size='small' disabled={disabledAll} placeholder='详细地址：街区/门牌号' className='ml10' />
                 )}
               </FormItem>
             </Col>
@@ -1020,7 +1607,7 @@ const _ComDetailForm1 = createForm()(createClass({
                     {required: true, whitespace: true, message: '必填'}
                   ]
                 })(
-                  <Input />
+                  <Input size='small' disabled={disabledAll} />
                 )}
               </FormItem>
             </Col>
@@ -1029,7 +1616,7 @@ const _ComDetailForm1 = createForm()(createClass({
             <Col span={8}>
               <FormItem>
                 {getFieldDecorator('s9')(
-                  <Input />
+                  <Input size='small' disabled={disabledAll} />
                 )}
               </FormItem>
             </Col>
@@ -1042,11 +1629,15 @@ const _ComDetailForm1 = createForm()(createClass({
                     {required: true, whitespace: true, message: '必填'}
                   ]
                 })(
-                  <Input />
+                  <Input size='small' disabled={disabledAll} />
                 )}
               </FormItem>
             </Col>
           </FormItem>
+          <div className='hr' />
+          <div className='clearfix'>
+            <Button size='small' loading={this.state.loading} type='primary' className='pull-right' onClick={this.handleOK} disabled={disabledAll}>保存订单基本信息</Button>
+          </div>
         </Form>
       </div>
     )
@@ -1337,23 +1928,20 @@ const ComExpr1 = connect(state => ({
     } else {
       ExpName = DATA_EXPR_TYPE_EDNTEDS[value][0]
     }
-    startLoading()
     const node = this.props.zch.grid.api.getModel().getRow(this.props.doge)
     const data = {
       OID: [node.data.ID],
       ExpID: value,
       ExpName
     }
-    ZPost('Order/SetExp', data, ({d}) => {
+    const nodes = [node]
+    this.props.zch.grid.x0pCall(ZPost('Order/SetExp', data, ({d}) => {
       this.hideModal()
-      if (d.length) {
-        node.data.ExID = data.ExpID
-        node.data.Express = data.ExpName
-        this.props.zch.grid.api.refreshCells([node], ['Express'])
-      } else {
-        message.error('订单快递更新失败，请重新尝试')
-      }
-    }).then(endLoading)
+      parseBatchOperatorResult.call(this, d, function(x, qq) {
+        x.data.ExID = qq.ExID
+        x.data.Express = qq.Express
+      }, ['Express'], nodes)
+    }))
   },
   render() {
     return (
@@ -1460,51 +2048,59 @@ const ExpressModal = connect(state => ({
     } else {
       ExpName = DATA_EXPR_TYPE_EDNTEDS[value][0]
     }
-    startLoading()
     const data = {
       OID: this.props.doge,
       ExpID: value,
       ExpName
     }
-    ZPost('Order/SetExp', data, ({d}) => {
+    const nodes = this.props.zch.grid.api.getSelectedNodes()
+    this.props.zch.grid.x0pCall(ZPost('Order/SetExp', data, ({d}) => {
       this.hideModal()
-      if (d.length) {
-        const nodes = this.props.zch.grid.api.getSelectedNodes()
-        let failIDs = []
-        let i = 0
-        nodes.forEach(x => {
-          if (d.indexOf(x.data.ID) !== -1) {
-            x.data.ExID = data.ExpID
-            x.data.Express = data.ExpName
-            i++
-          } else {
-            failIDs.push(x.data.ID)
-          }
-        })
-        if (i > 0) {
-          this.props.zch.grid.api.refreshCells(nodes, ['Express'])
-        }
-        if (failIDs.length) {
-          const description = (<div>
-            {failIDs.map(x => {
-              return (
-                <div key={x}>
-                  订单内部号：{x}
-                </div>
-              )
-            })}
-          </div>)
-          notification.error({
-            message: '订单快递更新失败ID',
-            description,
-            icon: <Icon type='meh-o' />,
-            duration: 30
-          })
-        }
-      } else {
-        message.error('订单快递更新失败，请重新尝试')
-      }
-    }).then(endLoading)
+      parseBatchOperatorResult.call(this, d, function(x, qq) {
+        x.data.ExID = qq.ExID
+        x.data.Express = qq.Express
+      }, ['Express'], nodes)
+    }))
+    //startLoading()
+    //ZPost('Order/SetExp', data, ({d}) => {
+    //  this.hideModal()
+      // if (d.length) {
+      //   const nodes = this.props.zch.grid.api.getSelectedNodes()
+      //   let failIDs = []
+      //   let i = 0
+      //   nodes.forEach(x => {
+      //     if (d.indexOf(x.data.ID) !== -1) {
+      //       x.data.ExID = data.ExpID
+      //       x.data.Express = data.ExpName
+      //       i++
+      //     } else {
+      //       failIDs.push(x.data.ID)
+      //     }
+      //   })
+      //   if (i > 0) {
+      //     this.props.zch.grid.api.refreshCells(nodes, ['Express'])
+      //   }
+      //   if (failIDs.length) {
+      //     const description = (<div>
+      //       {failIDs.map(x => {
+      //         return (
+      //           <div key={x}>
+      //             订单内部号：{x}
+      //           </div>
+      //         )
+      //       })}
+      //     </div>)
+      //     notification.error({
+      //       message: '订单快递更新失败ID',
+      //       description,
+      //       icon: <Icon type='meh-o' />,
+      //       duration: 30
+      //     })
+      //   }
+      // } else {
+      //   message.error('订单快递更新失败，请重新尝试')
+      // }
+    //}).then(endLoading)
   },
   render() {
     return (
@@ -1551,31 +2147,21 @@ const gridOptions = {
       },
       {
         name: '转正常单',
-        disabled: data.Status === 7, //todo
+        disabled: data.Status !== 7,
         action: function() {
-          params.api.gridOptionsWrapper.gridOptions.grid.grid.x0pCall(ZPost('Order/TransferNormal', {OID: [data.ID]}, ({d}) => {
-            if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
-              const SuccessID = d.SuccessIDs[0]
-              if (SuccessID && SuccessID.ID === data.ID) {
-                params.node.data.Status = SuccessID.Status
-                params.node.data.StatusDec = SuccessID.StatusDec
-                this.props.zch.grid.api.refreshCells([params.node], ['Status'])
-              }
-            }
-            if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
-              const FailID = d.FailIDs[0]
-              notification.error({
-                message: `订单[${FailID.ID}]转正常失败`,
-                description: <div>{FailID.Reason}</div>,
-                duration: 10
-              })
-            }
+          const grid = params.api.gridOptionsWrapper.gridOptions.grid.grid
+          console.log(grid)
+          grid.x0pCall(ZPost('Order/TransferNormal', {OID: [data.ID]}, ({d}) => {
+            parseBatchOperatorResult.call(this, d, function(x, qq) {
+              x.data.Status = qq.Status
+              x.data.StatusDec = qq.StatusDec
+            }, ['Status'], [params.node], grid)
           }))
         }
       },
       {
         name: '转异常单',
-        disabled: [0, 1, 2, 3].indexOf(data.Status) !== -1
+        disabled: [0, 1, 2, 3].indexOf(data.Status) === -1
       },
       // {
       //   name: '打标签'
@@ -1720,7 +2306,8 @@ const SkuItemsForm = createForm()(createClass({
     startLoading()
     ZPost('Order/DeleteOrderDetail', {
       OID: this.props.oid,
-      ID: this.props.x.ID
+      ID: this.props.x.ID,
+      isQuick: true
     }, ({d}) => {
       this.props.onChange(d)
     }).then(endLoading)
@@ -2129,6 +2716,43 @@ const ModalNewEgg = connect(state => ({
     )
   }
 })))
-export default connect(state => ({
-  conditions: state.order_list_conditions
-}), null, null, { withRef: true })(Table)
+const parseBatchOperatorResult = function(d, cb, fields, nodes, grid, errmsg) {
+  if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
+    const successIDs = {}
+    const IDs = []
+    for (let v of d.SuccessIDs) {
+      successIDs[`${v.ID}`] = v
+      IDs.push(v.ID)
+    }
+    const _nodes = nodes || (grid ? grid.api.getSelectedNodes() : this.props.zch.grid.api.getSelectedNodes())
+    _nodes.forEach(x => {
+      if (IDs.indexOf(x.data.ID) !== -1) {
+        cb(x, successIDs[`${x.data.ID}`])
+      }
+    })
+    if (grid) {
+      grid.api.refreshCells(_nodes, fields)
+    } else {
+      this.props.zch.grid.api.refreshCells(_nodes, fields)
+    }
+  }
+  if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
+    const description = (<div>
+      {d.FailIDs.map(x => {
+        return (
+          <div key={x.ID}>
+            订单号({x.ID}): {x.Reason}
+          </div>
+        )
+      })}
+      <div className='hr' />
+      <div className='mt5'><small>请检查相关订单或刷新</small></div>
+    </div>)
+    notification.error({
+      message: errmsg || '处理结果问题反馈',
+      description,
+      icon: <Icon type='meh-o' />,
+      duration: 30
+    })
+  }
+}
