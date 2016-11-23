@@ -230,7 +230,7 @@ const ModifyModal = connect(state => ({
           success: ({d}) => {
             this.autoIndex = 0
             //console.log(d)
-            this.props.form.setFieldsValue({
+            const formData = {
               GoodsCode: d.main.GoodsCode,
               GoodsName: d.main.GoodsName,
               KindID: {
@@ -257,7 +257,7 @@ const ModifyModal = connect(state => ({
                 id: d.main.Brand,
                 name: d.main.BrandName
               }
-            })
+            }
             const _skuProps = {}
             if (d.skuprops && d.skuprops instanceof Array && d.skuprops.length) {
               for (let sku of d.skuprops) {
@@ -340,7 +340,7 @@ const ModifyModal = connect(state => ({
               skuProps: Object.values(skuProps),
               GoodsCode: d.main.GoodsCode
             }, () => {
-              console.log(this.state)
+              this.props.form.setFieldsValue(formData)
             })
           },
           error: () => {

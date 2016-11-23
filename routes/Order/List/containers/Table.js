@@ -14,6 +14,7 @@
 import React, {
   createClass
 } from 'react'
+import update from 'react-addons-update'
 import Areas from 'json/AreaCascader'
 import classNames from 'classnames'
 import SkuAppendPicker from 'components/SkuPicker/append'
@@ -720,7 +721,6 @@ const ToExceptions = connect(state => ({
     this.setState({
       confirmLoading: true
     })
-    //const valueName = this.state.dataList.filter(x => x.value === value)[0].label
     const nodes = this.props.zch.grid.api.getSelectedNodes()
     this.props.zch.grid.x0pCall(ZPost('Order/SetExp', {OID: this.props.doge, WarehouseID: value}, ({d}) => {
       this.hideModal()
@@ -744,22 +744,30 @@ const ToExceptions = connect(state => ({
   handleModify() {
     ModalPrompt({
       onPrompt: ({value}) => {
+        const OrderAbnormal = value !== '' ? value.split(/,|，/).join(',') : ''
         return new Promise((resolve, reject) => {
-          ZPost('Warehouse/editRemark', {
-            remark: value,
-            id: this.props.data.id
-          }, () => {
+          startLoading()
+          ZPost('Order/InsertOrderAbnormal', {
+            OrderAbnormal
+          }, ({d}) => {
             resolve()
-            this.props.data.myremark = value
-            this.props.api.refreshRows([this.props.node])
-          }, reject)
+            this.setState({
+              dataList: d
+            })
+          }, reject).then(endLoading)
         })
       },
       children: (
         <div className='mb10'>
           请输入自定义异常，逗号分隔多个异常。<br />请不要输入特殊字符，单个异常长度不能超过20。<br />灰色带下划线为自定义异常。
         </div>
-      )
+      ),
+      value: this.state.dataList.length ? this.state.dataList.reduce(function(a, b) {
+        if (b.iscustom) {
+          a.push(b.label)
+        }
+        return a
+      }, []).join(',') : ''
     })
   },
   rendFooter() {
@@ -776,7 +784,12 @@ const ToExceptions = connect(state => ({
         <div className={styles.hua1}>
           <div className='flex-grow'>
             <RadioGroup onChange={this.handleRadio} value={this.state.value}>
-              {this.state.dataList.map(x => <Radio key={x.ID} value={x.ID}>{x.Name}</Radio>)}
+              {this.state.dataList.map(x => {
+                if (x.iscustom) {
+                  return <Radio key={x.value} value={x.value} className={styles.customExcecption}>{x.label}</Radio>
+                }
+                return <Radio key={x.value} value={x.value}>{x.label}</Radio>
+              })}
             </RadioGroup>
           </div>
           <div className='flex-row' style={{height: 30}}>
@@ -788,6 +801,227 @@ const ToExceptions = connect(state => ({
     )
   }
 }))
+
+const ToExceptions3 = createClass({
+  getInitialState: function() {
+    return {
+      visible: false,
+      value: this.props.AbnormalStatus,
+      dataList: [],
+      confirmLoading: false
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.visible) {
+      startLoading()
+      ZGet({
+        uri: 'Order/GetAbnormalList',
+        success: ({d}) => {
+          const lst = d && d instanceof Array ? d : []
+          this.setState({
+            visible: true,
+            dataList: lst,
+            value: nextProps.AbnormalStatus
+          })
+        }
+      }).then(endLoading)
+    }
+  },
+  handleOK() {
+    const {value} = this.state
+    if (!value) {
+      return message.warning('请选择异常状态')
+    }
+    this.setState({
+      confirmLoading: true
+    })
+    const AbnormalStatusDec = this.refs.zch.refs.input.value
+    //const index = this.state.dataList.findIndex(x => x.value === value)
+    //const name = this.state.dataList[index].label
+    ZPost('Order/TransferAbnormal', {OID: [this.props.OID], AbnormalStatus: value, AbnormalStatusDec}, ({d}) => {
+      this.handleok()
+      if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
+        const obj = d.SuccessIDs[0]
+        this.props.onChange({
+          Status: obj.Status,
+          StatusDec: obj.StatusDec,
+          AbnormalStatus: obj.AbnormalStatus,
+          AbnormalStatusDec: obj.AbnormalStatusDec
+        })
+        // this.props.onChange({
+        //   Status: 7,
+        //   AbnormalStatus: value,
+        //   AbnormalStatusDec: name
+        // })
+      } else {
+        if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
+          message.error(d.FailIDs[0].Reason)
+        }
+      }
+    }).then(() => {
+      this.setState({
+        confirmLoading: false
+      })
+    })
+  },
+  handleok() {
+    this.setState({
+      visible: false,
+      value: null,
+      dataList: [],
+      confirmLoading: false
+    })
+  },
+  handleRadio(e) {
+    this.setState({
+      value: e.target.value
+    })
+  },
+  handleModify() {
+    ModalPrompt({
+      onPrompt: ({value}) => {
+        const OrderAbnormal = value !== '' ? value.split(/,|，/).join(',') : ''
+        return new Promise((resolve, reject) => {
+          startLoading()
+          ZPost('Order/InsertOrderAbnormal', {
+            OrderAbnormal
+          }, ({d}) => {
+            resolve()
+            this.setState({
+              dataList: d
+            })
+          }, reject).then(endLoading)
+        })
+      },
+      children: (
+        <div className='mb10'>
+          请输入自定义异常，逗号分隔多个异常。<br />请不要输入特殊字符，单个异常长度不能超过20。<br />灰色带下划线为自定义异常。
+        </div>
+      ),
+      value: this.state.dataList.length ? this.state.dataList.reduce(function(a, b) {
+        if (b.iscustom) {
+          a.push(b.label)
+        }
+        return a
+      }, []).join(',') : ''
+    })
+  },
+  rendFooter() {
+    return (
+      <div className='clearfix tl'>
+        <Button type='primary' className='pull-right' onClick={this.handleOK} loading={this.state.confirmLoading}>确认</Button>
+        <Button type='ghost' size='small' onClick={this.handleModify}>维护自定义异常</Button>
+      </div>
+    )
+  },
+  render() {
+    return (
+      <Modal title='请输入标记异常的类型,输入相关说明' footer={this.rendFooter()} visible={this.state.visible} onCancel={this.handleok} width={666}>
+        <div className={styles.hua1}>
+          <div className='flex-grow'>
+            <RadioGroup onChange={this.handleRadio} value={this.state.value}>
+              {this.state.dataList.map(x => {
+                if (x.iscustom) {
+                  return <Radio key={x.value} value={x.value} className={styles.customExcecption}>{x.label}</Radio>
+                }
+                return <Radio key={x.value} value={x.value}>{x.label}</Radio>
+              })}
+            </RadioGroup>
+          </div>
+          <div className='flex-row' style={{height: 30}}>
+            <div style={{ lineHeight: '28px' }}><span>异常描述：</span></div>
+            <div className='flex-grow'><Input ref='zch' /></div>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+})
+const ToCancel3 = createClass({
+  getInitialState: function() {
+    return {
+      visible: false,
+      value: null,
+      dataList: [],
+      confirmLoading: false
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.visible) {
+      startLoading()
+      ZGet({
+        uri: 'Order/GetCancleList',
+        success: ({d}) => {
+          const lst = d && d instanceof Array ? d : []
+          this.setState({
+            visible: true,
+            dataList: lst
+          })
+        }
+      }).then(endLoading)
+    }
+  },
+  handleOK() {
+    const {value} = this.state
+    if (!value) {
+      return message.warning('请选择取消原因')
+    }
+    this.setState({
+      confirmLoading: true
+    })
+    const Remark = this.refs.zch.refs.input.value
+    ZPost('Order/CancleOrder', {OID: [this.props.OID], CancleReason: value, Remark}, ({d}) => {
+      this.handleok()
+      if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
+        const obj = d.SuccessIDs[0]
+        this.props.onChange({
+          Status: obj.Status,
+          StatusDec: obj.StatusDec,
+          AbnormalStatus: obj.AbnormalStatus,
+          AbnormalStatusDec: obj.AbnormalStatusDec
+        })
+      } else {
+        if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
+          message.error(d.FailIDs[0].Reason)
+        }
+      }
+    }).then(() => {
+      this.setState({
+        confirmLoading: false
+      })
+    })
+  },
+  handleok() {
+    this.setState({
+      visible: false,
+      value: null,
+      dataList: [],
+      confirmLoading: false
+    })
+  },
+  handleRadio(e) {
+    this.setState({
+      value: e.target.value
+    })
+  },
+  render() {
+    return (
+      <Modal title='请输入标记异常的类型,输入相关说明' confirmLoading={this.state.confirmLoading} onOk={this.handleOK} visible={this.state.visible} onCancel={this.handleok} width={666}>
+        <div className={styles.hua1}>
+          <div className='flex-grow'>
+            <RadioGroup onChange={this.handleRadio} value={this.state.value}>
+              {this.state.dataList.map(x => <Radio key={x.value} value={x.value}>{x.label}</Radio>)}
+            </RadioGroup>
+          </div>
+          <div className='flex-row' style={{height: 30}}>
+            <div style={{ lineHeight: '28px' }}><span>取消原因：</span></div>
+            <div className='flex-grow'><Input ref='zch' /></div>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+})
 const Whouse = connect(state => ({
   doge: state.order_list_whouse_1
 }))(createClass({
@@ -907,36 +1141,41 @@ const ComDetail1 = connect(state => ({
       order: {},
       logs: [],
       payments: [],
-      items: []
+      items: [],
+      expr_vis: false,
+      toe_vis: false
     }
   },
-  // componentDidMount() {
-  //   this.setState({
-  //     visible: true
-  //   }, () => {
-  //     this.componentWillReceiveProps({doge: 10873})
-  //   })
-  // },
+  componentDidMount() {
+    this.setState({
+      visible: true
+    }, () => {
+      this.componentWillReceiveProps({doge: 10873})
+    })
+  },
   componentWillReceiveProps(nextProps) {
-    if (this.props.doge !== nextProps.doge) {
+    //if (this.props.doge !== nextProps.doge) {
       if (nextProps.doge === null) {
         this.setState({
           visible: false
         })
       } else {
-        startLoading()
-        ZGet('Order/GetOrderSingle', {OID: nextProps.doge}, ({d}) => {
-          console.log(d)
-          this.setState({
-            visible: true,
-            order: d.Order,
-            logs: d.Log,
-            payments: d.Pay,
-            items: d.OrderItem
-          })
-        }).then(endLoading)
+        this.loadDetail(nextProps.doge)
       }
-    }
+    //}
+  },
+  loadDetail(OID) {
+    startLoading()
+    ZGet('Order/GetOrderSingle', {OID}, ({d}) => {
+      console.log(d)
+      this.setState({
+        visible: true,
+        order: d.Order,
+        logs: d.Log,
+        payments: d.Pay,
+        items: d.OrderItem
+      })
+    }).then(endLoading)
   },
   hideModal() {
     if (this.__dirtied) {
@@ -1313,6 +1552,119 @@ const ComDetail1 = connect(state => ({
       </div>
     )
   },
+  _handleExceptionOrder() {
+    this.setState({
+      toe_vis: true
+    })
+  },
+  _handleCancelOrder() {
+    this.props.dispatch({type: 'ORDER_LIST_TO_CANCEL_1_SET', payload: [this.state.order.ID]})
+  },
+  _handleConfirmOrder() {
+    startLoading()
+    ZPost('Order/ConfirmOrder', {OID: [this.state.order.ID]}, () => {
+      this.loadDetail(this.state.order.ID)
+    }).then(endLoading)
+  },
+  _handleExpressOrder() {
+    this.setState({
+      expr_vis: true
+    })
+  },
+  _handleCancelException() {
+    startLoading()
+    ZPost('Order/TransferNormal', {OID: [this.state.order.ID]}, ({d}) => {
+      if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
+        const obj = d.SuccessIDs[0]
+        this.setState(update(this.state, {
+          order: {
+            $merge: {
+              Status: obj.Status,
+              StatusDec: obj.StatusDec
+            }
+          }
+        }), () => {
+          this._dirtied = true
+        })
+      } else {
+        if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
+          message.error(d.FailIDs[0].Reason)
+        }
+      }
+    }).then(endLoading)
+  },
+  _renderOps() {
+    const {order} = this.state
+    if (!order || typeof order.Status === 'undefined') {
+      return (
+        <div>
+          &nbsp;
+        </div>
+      )
+    }
+    const status = order.Status
+    switch (status) {
+      case 1: {
+        return (
+          <div>
+            <div><Button type='primary' onClick={this._handleConfirmOrder}>审核确认</Button></div>
+            <div className='mt10'><Button type='ghost' size='small' onClick={this._handleExpressOrder}>设定快递公司</Button></div>
+            <div className='mt10'><Button type='ghost' size='small' onClick={this._handleExceptionOrder}>标记异常</Button></div>
+            <div className='mt10'><Button type='ghost' size='small' onClick={this._handleCancelOrder}>取消订单</Button></div>
+            <div className='mt25 hide'>todo print order</div>
+          </div>
+        )
+      }
+      case 0: {
+        return (
+          <div>
+            <div><Button type='ghost' size='small' onClick={this._handleExceptionOrder}>标记异常</Button></div>
+            <div className='mt20'><Button type='ghost' size='small' onClick={this._handleCancelOrder}>取消订单</Button></div>
+          </div>
+        )
+      }
+      case 7: {
+        return (
+          <div>
+            <div className='mt10'><Button type='ghost' size='small' onClick={this._handleExpressOrder}>设定快递公司</Button></div>
+            <div className='mt25'>
+              (当前异常:{order.AbnormalStatusDec})
+            </div>
+            <div className='mt5'><Button type='primary' size='small' onClick={this._handleCancelException}>取消异常标记</Button></div>
+          </div>
+        )
+      }
+    }
+  },
+  _renderProcesses() {
+    const {order} = this.state
+    if (!order || typeof order.Status === 'undefined') {
+      return (
+        <div className={styles.process}>
+          <div className='mt10 tc'>...</div>
+        </div>
+      )
+    }
+    const status = order.Status
+    if (status === 7) {
+      return (
+        <div className={styles.process}>
+          <div className={styles.exception}>
+            {order.AbnormalStatusDec}
+          </div>
+        </div>
+      )
+    }
+    return (
+      <Steps current={order.Status}>
+        <Step title='待付款' />
+        <Step title='已付款待审核' />
+        <Step title='已审核待配快递' />
+        <Step title='发货中' />
+        <Step title='已发货' />
+      </Steps>
+    )
+  },
   render() {
     const {order} = this.state
     const formData = {
@@ -1327,16 +1679,17 @@ const ComDetail1 = connect(state => ({
       oid: order.ID,
       status: order.Status
     }
+    const expr3Address = {
+      RecAddress: this.state.order.RecAddress,
+      RecCity: this.state.order.RecCity,
+      RecDistrict: this.state.order.RecDistrict,
+      RecLogistics: this.state.order.RecLogistics,
+      ExID: this.state.order.ExID
+    }
     //todo 异常单
     return (
       <Modal title='查看或编辑备注' confirmLoading={this.state.loading} visible={this.state.visible} onCancel={this.hideModal} width={980} footer=''>
-        <Steps current={order.Status}>
-          <Step title='待付款' />
-          <Step title='已付款待审核' />
-          <Step title='已审核待配快递' />
-          <Step title='发货中' />
-          <Step title='已发货' />
-        </Steps>
+        {this._renderProcesses()}
         <div className='flex-row mt25'>
           <div className='flex-grow'>
             <h3>订单基本信息</h3>
@@ -1377,8 +1730,7 @@ const ComDetail1 = connect(state => ({
             <_ComDetailForm1 data={formData} updateStates={this._updateStates} />
           </div>
           <div className={styles.opsArea}>
-            <div><Button type='ghost' size='small'>标记异常</Button></div>
-            <div className='mt20'><Button type='ghost' size='small'>取消订单</Button></div>
+            {this._renderOps()}
           </div>
         </div>
         {this._renderPays()}
@@ -1394,6 +1746,30 @@ const ComDetail1 = connect(state => ({
             </Row>
           )) : <div className='mt10 gray tc'>(无)</div>}
         </div>
+        <ComExpr3 visible={this.state.expr_vis} OID={this.state.order.ID} address={expr3Address} onChange={(d) => {
+          this.setState(update(this.state, {
+            order: {
+              $merge: d
+            },
+            expr_vis: {
+              $set: false
+            }
+          }), () => {
+            this.__dirtied = true
+          })
+        }} />
+        <ToExceptions3 visible={this.state.toe_vis} OID={this.state.order.ID} AbnormalStatus={this.state.order.AbnormalStatus} onChange={(d) => {
+          this.setState(update(this.state, {
+            order: {
+              $merge: d
+            },
+            toe_vis: {
+              $set: false
+            }
+          }), () => {
+            this.__dirtied = true
+          })
+        }} />
       </Modal>
     )
   }
@@ -1950,7 +2326,7 @@ const ComExpr1 = connect(state => ({
           <div className={styles.exps}>
             <Alert message={this.state.address} type='warning' />
             <Collapse>
-              {this.state.expers.length ? this.state.expers.map((x, i) => (
+              {this.state.expers && this.state.expers.length ? this.state.expers.map((x, i) => (
                 <Panel header={`${x.name} (${x.count})`} key={i}>
                   <div className={styles.pch}>
                     {x.children && x.children.length ? x.children.map((y, j) => (
@@ -1998,6 +2374,154 @@ const ComExpr1 = connect(state => ({
     )
   }
 }))
+const ComExpr3 = createClass({
+  getInitialState() {
+    return {
+      visible: false,
+      loading: false,
+      address: '',
+      value: '',
+      exps: [],
+      expers: []
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.visible) {
+      startLoading()
+      const u = nextProps.address
+      ZGet('Order/GetExp', {
+        Logistics: u.RecLogistics,
+        City: u.RecCity,
+        District: u.RecDistrict,
+        IsQuick: false
+      }, ({d}) => {
+        const address = `${u.RecLogistics} ${u.RecCity} ${u.RecDistrict} ${u.RecAddress}`
+        if (d.LogisticsNetwork && d.LogisticsNetwork.length) {
+          const expers = {}
+          for (let er of d.LogisticsNetwork) {
+            if (!expers[er.kd_name]) {
+              expers[er.kd_name] = {
+                count: 0,
+                name: er.kd_name,
+                children: []
+              }
+            }
+            expers[er.kd_name].count ++
+            expers[er.kd_name].children.push({
+              cp_name: er.cp_name_raw,
+              cp_loc: er.cp_location,
+              delivery_area_1: er.delivery_area_1,
+              delivery_area_0: er.delivery_area_0,
+              delivery_contact: er.delivery_contact
+            })
+          }
+          this.setState({ visible: true, value: u.ExID, exps: d.Express, expers: Object.values(expers), address })
+        } else {
+          this.setState({ visible: true, value: u.ExID, exps: d.Express, expers: null, address })
+        }
+      }).then(endLoading)
+    }
+  },
+  hideModal() {
+    this.setState({
+      visible: false,
+      address: '',
+      value: '',
+      exps: [],
+      expers: []
+    })
+  },
+  handleOK() {
+    const value = this.state.value
+    if (!value) {
+      return message.error('请选择快递方式')
+    }
+    let ExpName = ''
+    if (Object.keys(DATA_EXPR_TYPE_EDNTEDS).indexOf(value) === -1) {
+      const index = this.state.exps.findIndex(x => x.ID === value)
+      if (index === -1) {
+        return message.error('不存在的快递方式')
+      }
+      ExpName = this.state.exps[index].Name
+    } else {
+      ExpName = DATA_EXPR_TYPE_EDNTEDS[value][0]
+    }
+    const data = {
+      OID: [this.props.OID],
+      ExpID: value,
+      ExpName
+    }
+    ZPost('Order/SetExp', data, ({d}) => {
+      this.hideModal()
+      if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
+        const obj = d.SuccessIDs[0]
+        this.props.onChange({
+          ExID: obj.ExID,
+          ExpNamePinyin: obj.ExpNamePinyin,
+          Express: obj.Express
+        })
+      } else {
+        if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
+          message.error(d.FailIDs[0].Reason)
+        }
+      }
+    })
+  },
+  render() {
+    return (
+      <Modal title='请选择需要设定的物流(快递)公司' confirmLoading={this.state.loading} visible={this.state.visible} onOk={this.handleOK} onCancel={this.hideModal} width={820}>
+        <div className={styles.experWrapper}>
+          <div className={styles.exps}>
+            <Alert message={this.state.address} type='warning' />
+            <Collapse>
+              {this.state.expers && this.state.expers.length ? this.state.expers.map((x, i) => (
+                <Panel header={`${x.name} (${x.count})`} key={i}>
+                  <div className={styles.pch}>
+                    {x.children && x.children.length ? x.children.map((y, j) => (
+                      <div className={styles.row} key={j}>
+                        <Row>
+                          <Col span={4} className='tr'>网店名：</Col>
+                          <Col span={20}><strong>{y.cp_name}</strong></Col>
+                        </Row>
+                        <Row>
+                          <Col span={4} className='tr'>地址：</Col>
+                          <Col span={20}>{y.cp_loc}</Col>
+                        </Row>
+                        <Row>
+                          <Col span={4} className='tr'>联系：</Col>
+                          <Col span={20}>{y.delivery_contact}</Col>
+                        </Row>
+                        <Row>
+                          <Col span={4} className='tr'>到达区域：</Col>
+                          <Col span={20}><span className='green'>{y.delivery_area_1}</span></Col>
+                        </Row>
+                        <Row>
+                          <Col span={4} className='tr'>不达区域：</Col>
+                          <Col span={20}>{y.delivery_area_0}</Col>
+                        </Row>
+                      </div>
+                    )) : null}
+                  </div>
+                </Panel>
+              )) : null}
+            </Collapse>
+          </div>
+          <div className={styles.radios}>
+            <RadioGroup onChange={(e) => {
+              this.setState({
+                value: e.target.value
+              })
+            }} value={`${this.state.value}`}>
+              {this.state.exps.length ? this.state.exps.map(x => <Radio key={x.ID} value={x.ID}>{x.Name}</Radio>) : null}
+              <div className='hr' />
+              {Object.keys(DATA_EXPR_TYPE_EDNTEDS).map(k => <Radio key={k} value={k}><span className={DATA_EXPR_TYPE_EDNTEDS[k][1]}>{DATA_EXPR_TYPE_EDNTEDS[k][0]}</span></Radio>)}
+            </RadioGroup>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+})
 const ExpressModal = connect(state => ({
   doge: state.order_list_expr_2
 }))(createClass({

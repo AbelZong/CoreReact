@@ -25,7 +25,8 @@ const defProps = {
   // }，
   title: '请输入内容',
   children: undefined,
-  placeholder: 'please enter'
+  placeholder: 'please enter',
+  value: ''
 }
 // const Promiser = function() {
 //   const p = new Promise((resolve, reject) => {
@@ -37,7 +38,8 @@ const defProps = {
 const PP = React.createClass({
   getInitialState() {
     return {
-      confirmLoading: false
+      confirmLoading: false,
+      value: this.props.value
     }
   },
   handleOk() {
@@ -68,12 +70,23 @@ const PP = React.createClass({
       }
     }
   },
+  handleChange(e) {
+    const value = e.target.value
+    this.setState({
+      value
+    }, () => {
+      if (this.props.onChange) {
+        this.props.onChange(value)
+      }
+    })
+  },
   render() {
     const {children, placeholder, ...props} = this.props
+    const {value} = this.state
     return (
       <Modal maskClosable={false} onOk={this.handleOk} {...props}>
         {children}
-        <Input ref='hua' placeholder={placeholder} onPressEnter={this.handleOk} />
+        <Input ref='hua' placeholder={placeholder} value={value} onChange={this.handleChange} onPressEnter={this.handleOk} />
       </Modal>
     )
   }

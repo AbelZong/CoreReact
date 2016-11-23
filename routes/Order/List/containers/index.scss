@@ -590,6 +590,7 @@ height: 100%;
   .inpt {
     font-size: 13px;
     border-bottom: 1px dotted #ccc;
+    cursor: text;
     &:before {
       content: '_';
       color:#fff;
@@ -705,5 +706,18 @@ height: 100%;
     margin: 10px 0;
     border-top: 1px dotted #f5f5f5;
     padding: 5px 0;
+  }
+}
+
+.customExcecption {
+  color:#999;
+  text-decoration: underline;
+}
+
+.process {
+  .exception {
+    background-color: #0094ff;
+    color: #fff;
+    padding: 5px 10px;
   }
 }
