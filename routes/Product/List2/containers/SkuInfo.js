@@ -17,37 +17,18 @@ import {
   connect
 } from 'react-redux'
 import {
-  Input, Tag, Button
+  Input, Tag, Button, Table, InputNumber
 } from 'antd'
 import styles from './index.scss'
-// let item = {
-//   Color: '',
-//   Size: '',
-//   SalePrice: 0,
-//   PurPrice: 0,
-//   Weight: 0,
-//   SkuID: '',
-//   BarCode: '',
-//   UniqueCode: '',
-//   ColorMapping: '',
-//   SizeMapping: '',
-//   Pid1: '',
-//   val_id1: 0,
-//   Pid2: '',
-//   val_id2: ''
-// }
 
-// {
-//   skuprops: this.props.value.skuprops,
-//   items: this.props.value.items,
-//   display: this.props.value.display,
-//   goodscode: this.props.value.goodscode
-// }
+const NUM = new RegExp(/^(0|[1-9]\d*)(\.\d{0,2})?$/)
 const SkuInfo = React.createClass({
   getInitialState() {
     return {
       skuprops: this.props.value.skuprops,
-      items: []
+      items: this.props.value.items,
+      catalogs: [],
+      goodscode: this.props.value.goodscode
     }
   },
   componentDidMount() {
@@ -55,8 +36,7 @@ const SkuInfo = React.createClass({
     //this._firstl()
   },
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps)
-    this._firstl(nextProps.value)
+    this._firstload(nextProps.value)
   },
   componentWillUpdate(nextProps, nextState) {
     return false
@@ -65,249 +45,227 @@ const SkuInfo = React.createClass({
     let items = this.state.items
     let keys = Object.keys(items)
     for (let id of keys) {
-      items[id].SkuID = this.props.value.fieldv.GoodsCode + id
+      items[id].SkuID = this.state.goodscode + id
+      items[id].isedit = true
     }
     this.setState({
-      //reflash: false,
       items: items
-    })
-    // this.props.onChange && this.props.onChange({
-    //   fieldv: this.props.value.fieldv,
-    //   items: items
-    // })
+    }, () => this.props.callbackParent(this.state.items))
   },
   handleCreateSku() {
     let items = this.state.items
     let keys = Object.keys(items)
+    let l = this.state.catalogs.length
     for (let id of keys) {
-      items[id].SkuID = this.props.value.fieldv.GoodsCode + items[id].Color + items[id].Size
+      items[id].SkuID = this.state.goodscode
+      for (let i = 0; i < l; i++) {
+        items[id].SkuID += items[id][`sku${i}`]
+      }
+      items[id].isedit = true
     }
     this.setState({
-      reflash: false,
       items: items
-    })
+    }, () => this.props.callbackParent(this.state.items))
   },
   handleCreateMap() {
     let items = this.state.items
     let keys = Object.keys(items)
-    let Cm = ''
-    let Sm = ''
+    let l = this.state.catalogs.length
     for (let id of keys) {
-      items[id].ColorMapping === 0 ? Cm = items[id].Color : Cm = items[id].ColorMapping
-      items[id].SizeMapping === 0 ? Sm = items[id].Size : Sm = items[id].SizeMapping
-      items[id].SkuID = this.props.value.fieldv.GoodsCode + Cm + Sm
+      items[id].SkuID = this.state.goodscode
+      for (let i = 0; i < l; i++) {
+        const Cm = items[id][`mapping${i}`] === 0 ? items[id][`sku${i}`] : items[id][`mapping${i}`]
+        items[id].SkuID += Cm
+      }
+      items[id].isedit = true
     }
     this.setState({
-      reflash: false,
       items: items
-    })
-    this.props.onChange && this.props.onChange({
-      fieldv: this.props.value.fieldv,
-      items: items
-    })
+    }, () => this.props.callbackParent(this.state.items))
   },
   handleCleanSku() {
-    this.props.onChange && this.props.onChange({
-      items: [],
-      fieldv: this.props.value.fieldv
-    })
+    let items = this.state.items
+    for (let i of items) {
+      i.SkuID = ''
+    }
+    this.setState({
+      items: items
+    }, () => this.props.callbackParent(this.state.items))
   },
   inputChange(e, field, i) {
     let items = this.state.items
-    items[i][field] = e.target.value
-    items[i]['isedit'] = true
-    this.setState({
-      items: items
-    })
-  },
-  _loopitem(items, item, skuprops, l, a) {
-    let _items = []
-    if (items.length > 0) {
-      for (let it of items) {
-        for (let prop of skuprops[a].children0) {
-          if (prop.Enable === 1) {
-            const _it = Object.assign({}, it, {
-              [`sku${a}`]: prop.val_name,
-              [`pid${a}`]: prop.pid,
-              [`val_id${a}`]: prop.val_id
-            })
-            _items.push(_it)
-          }
-        }
-      }
-      console.log('_items', _items)
-      if (a < l - 1) {
-        a++
-        this._loopitem(_items, item, skuprops, l, a)
-      } else {
-        items = _items
-      }
+    let iIndex = items.findIndex(x => Object.is(x, i))
+    if (e.target.value === '' || NUM.test(e.target.value)) {
+      items[iIndex][field] = e.target.value
     } else {
-      for (let prop of skuprops[a].children0) {
-        if (prop.Enable === 1) {
-          item[`sku${a}`] = prop.val_name
-          item[`pid${a}`] = prop.pid
-          item[`val_id${a}`] = prop.val_id
-        }
-      }
-      items.push(item)
-      if (a < l - 1) {
-        a++
-        this._loopitem(items, item, skuprops, l, a)
-      }
+      items[iIndex][field] = 0.00
     }
-    return items
-  },
-  _firstload() {
-    let items = []
-    let skuprops = this.state.skuprops
-    let catalogNum = skuprops.length
-    let a = 0
-    let item = {}
-    items = this._loopitem(items, item, skuprops, catalogNum, a)
-    //items.push(item)
-    console.log('items', items)
-  },
-  _firstl(_v) {
-    console.log('_firstl', _v)
-    const vv = Object.assign({}, this.props.value || {}, _v || {})
-    const v = vv.fieldv
-    const keys1 = Object.keys(v)
-    let skuprops = []
-    for (let id of keys1) {
-      if (v[id] === undefined) continue
-      let cc = v[id]
-      if (typeof cc === 'object') {
-        let a = id.split('-')
-        if (a[0] === 'sku') {
-          if (!cc.checked) continue
-          if (id.indexOf('--') > -1) { //自定义规格
-            let selfSku = id.split('-')
-            skuprops.push({
-              pid: selfSku[3],
-              val_id: 0,
-              mapping: 0,
-              fname: cc.fname,
-              val_name: cc.value
-            })
-          } else {
-            skuprops.push({
-              pid: a[2],
-              val_id: a[1],
-              mapping: a[3],
-              fname: cc.fname,
-              val_name: cc.value
-            })
-          }
-        }
-      }
-    }
-
-    //console.log(skuprops)
-    let items = []
-    let catalog = []
-    for (let sku of skuprops) {
-      for (let s2 of skuprops) {
-        if (sku.pid !== s2.pid) {
-          catalog.findIndex(x => x === s2.pid) > -1 ? null : (catalog.push(s2.pid))
-          if (items.findIndex(x => (x.Pid1 === s2.pid && x.Pid2 === sku.pid)) === -1) {
-            let skuid = ''
-            if (vv.cmd === 'handleCreateMap') {
-              skuid = v.GoodsCode + sku.mapping + s2.mapping
-            }
-            let lt = this.state.items.find(x => x.Color === sku.val_name && x.Size === s2.val_name)
-            let item = { }
-            if (lt !== undefined) {
-              item = {
-                Color: sku.val_name,
-                Size: s2.val_name,
-                SalePrice: lt.SalePrice !== undefined && lt.isedit ? lt.SalePrice : v.SalePrice,
-                PurPrice: lt.PurPrice !== undefined && lt.isedit ? lt.PurPrice : v.PurPrice,
-                Weight: lt.Weight !== undefined && lt.isedit ? lt.Weight : v.Weight,
-                SkuID: skuid,
-                BarCode: lt.BarCode !== undefined && lt.isedit ? lt.BarCode : '',
-                UniqueCode: lt.UniqueCode !== undefined && lt.isedit ? lt.UniqueCode : '',
-                ColorMapping: sku.mapping,
-                SizeMapping: s2.mapping,
-                Pid1: sku.pid,
-                val_id1: sku.val_id,
-                Pid2: s2.pid,
-                val_id2: s2.val_id,
-                isedit: lt.isedit
-              }
-            } else {
-              item = {
-                Color: sku.val_name,
-                Size: s2.val_name,
-                SalePrice: v.SalePrice,
-                PurPrice: v.PurPrice,
-                Weight: v.Weight,
-                SkuID: skuid,
-                BarCode: '',
-                UniqueCode: '',
-                ColorMapping: sku.mapping,
-                SizeMapping: s2.mapping,
-                Pid1: sku.pid,
-                val_id1: sku.val_id,
-                Pid2: s2.pid,
-                val_id2: s2.val_id,
-                isedit: false
-              }
-            }
-            items.push(item)
-          }
-        }
-      }
-    }
-    // if (this.props.value.skupid !== 0 && this.props.value.skupid === catalog.length) {
-    //   this.setState({
-    //     display: 'block'
-    //   })
-    // }
+    items[iIndex]['isedit'] = true
     this.setState({
       items: items
     })
-
-    //console.log(this.state.display)
+  },
+  descartes(args) {
+    var rs = []
+    // A. 校验并转换为JS数组
+    for (var i = 0; i < args.length; i++) {
+      if (!(args[i] instanceof Array)) {
+        return false  // 参数必须为数组
+      }
+    }
+    // 两个笛卡尔积换算
+    var bothDescartes = function(m, n) {
+      var r = []
+      for (let i = 0; i < m.length; i++) {
+        for (var ii = 0; ii < n.length; ii++) {
+          var t = []
+          if (m[i] instanceof Array) {
+            t = m[i].slice(0)  //此处使用slice目的为了防止t变化，导致m也跟着变化
+          } else {
+            t.push(m[i])
+          }
+          t.push(n[ii])
+          r.push(t)
+        }
+      }
+      return r
+    }
+    // 多个笛卡尔基数换算
+    for (let i = 0; i < args.length; i++) {
+      if (i === 0) {
+        rs = args[i]
+      } else {
+        rs = bothDescartes(rs, args[i])
+      }
+    }
+    return rs
+  },
+  ObjectEqual(item, source) {
+    let index = 0
+    for (let key in source) {
+      if (item[key] && source[key] === item[key]) {
+        index++
+      }
+    }
+    return index === Object.keys(source).length
+  },
+  _firstload(_v) {
+    const v = Object.assign({}, this.props.value || {}, _v || {})
+    let items = []
+    let beforeItems = this.state.items
+    let itemsDecar = []
+    let catalogs = [] //sku 栏位
+    let skuprops = v.skuprops
+    //.console.log('this.props.value', skuprops)
+    for (let prop in skuprops) {
+      catalogs.push({
+        title: skuprops[prop].name,
+        dataIndex: 'sku' + prop,
+        key: 'sku' + prop
+      })
+      const item = []
+      for (let p of skuprops[prop].children0) {
+        if (p.Enable === 1 || p.Enable === true) {
+          item.push({
+            val_name: p.val_name,
+            val_id: p.val_id,
+            pid: p.pid,
+            mapping: p.mapping
+          })
+        }
+      }
+      for (let p of skuprops[prop].children1) {
+        if (p.Enable === 1 || p.Enable === true) {
+          item.push({
+            val_name: p.val_name,
+            val_id: p.val_id,
+            pid: p.pid,
+            mapping: p.mapping
+          })
+        }
+      }
+      itemsDecar.push(item)
+    }
+    let _descartes = this.descartes(itemsDecar)
+    for (let decar of _descartes) {
+      let _it
+      for (let id in decar) {
+        _it = Object.assign({}, _it, {
+          [`sku${id}`]: decar[id].val_name,
+          [`pid${id}`]: decar[id].pid,
+          [`val_id${id}`]: decar[id].val_id,
+          [`mapping${id}`]: decar[id].mapping
+        })
+      }
+      items.push(_it)
+    }
+    for (let it in items) {
+      let beforeItem = beforeItems.length > 0 ? beforeItems.find(x => this.ObjectEqual(x, items[it])) : undefined
+      if (beforeItem !== undefined) {
+        items[it]['SalePrice'] = beforeItem.isedit ? beforeItem.SalePrice : 0.00
+        items[it]['PurPrice'] = beforeItem.isedit ? beforeItem.PurPrice : 0.00
+        items[it]['Weight'] = beforeItem.isedit ? beforeItem.Weight : 0.00
+        items[it]['SkuID'] = ''
+        items[it]['BarCode'] = ''
+        items[it]['UniqueCode'] = ''
+        items[it]['isedit'] = true
+      } else {
+        items[it]['SalePrice'] = 0.00
+        items[it]['PurPrice'] = 0.00
+        items[it]['Weight'] = 0.00
+        items[it]['SkuID'] = ''
+        items[it]['BarCode'] = ''
+        items[it]['UniqueCode'] = ''
+      }
+    }
+    this.setState({
+      catalogs: catalogs,
+      items: items
+    }, () => this.props.callbackParent(this.state.items))
   },
   render() {
+    const columns = this.state.catalogs.concat([{
+      title: '基本售价',
+      dataIndex: 'SalePrice',
+      key: 'SalePrice',
+      width: 80,
+      render: (text, index) => (<Input value={text} width={100} onChange={e => this.inputChange(e, 'SalePrice', index)} />)
+    }, {
+      title: '采购成本价',
+      dataIndex: 'PurPrice',
+      key: 'PurPrice',
+      width: 100,
+      render: (text, index) => (<Input value={text} width={100} onChange={e => this.inputChange(e, 'PurPrice', index)} />)
+    }, {
+      title: '重量',
+      dataIndex: 'Weight',
+      key: 'Weight',
+      width: 80,
+      render: (text, index) => (<Input value={text} width={100} onChange={e => this.inputChange(e, 'Weight', index)} />)
+    }, {
+      title: '商品编码',
+      dataIndex: 'SkuID',
+      key: 'SkuID'
+    }, {
+      title: '条形码',
+      dataIndex: 'BarCode',
+      key: 'BarCode'
+    }, {
+      title: '唯一码前缀',
+      dataIndex: 'UniqueCode',
+      key: 'UniqueCode'
+    }, {
+      title: '操作',
+      key: 'action',
+      render: text => (<a href='' target='_blank'>查看线上</a>)
+    }])
     return (
-      <div>
-        <table className={styles.items}>
-          <thead className={styles.right}>
-            <tr className={styles.zhang}>
-              <th className={styles.op10}>颜色分类</th>
-              <th className={styles.op5}>尺码</th>
-              <th className={styles.op10}>基本售价</th>
-              <th className={styles.op10}>采购成本价</th>
-              <th className={styles.op5}>重量</th>
-              <th className={styles.op20}>商品编码</th>
-              <th className={styles.op20}>商品条形码</th>
-              <th className={styles.op10}>唯一码前缀</th>
-              <th className={styles.op15}>操作</th>
-            </tr>
-          </thead>
-          <tbody className={styles.right}>
-            {this.props.value.skupid && this.state.items.map((y, index) =>
-              <tr key={`tr+${index}`} className={styles.chun}>
-                <td><Input value={`${y.Color === undefined ? y.Norm.split(';')[0] : y.Color}`} /></td>
-                <td><Input value={`${y.Size === undefined ? y.Norm.split(';')[1] : y.Size}`} /></td>
-                <td><Input value={`${y.SalePrice}`} onChange={(e) => this.inputChange(e, 'SalePrice', index)} /></td>
-                <td><Input value={`${y.PurPrice}`} onChange={(e) => this.inputChange(e, 'PurPrice', index)} /></td>
-                <td><Input value={`${y.Weight}`} onChange={(e) => this.inputChange(e, 'Weight', index)} /></td>
-                <td><Input value={`${y.SkuID === undefined ? '' : y.SkuID}`} /></td>
-                <td><Input value={`${y.BarCode === undefined ? '' : y.BarCode}`} /></td>
-                <td><Input value={`${y.UniqueCode === undefined ? '' : y.UniqueCode}`} /></td>
-                <td style={{textAlign: 'center'}}><Tag><a href='' target='_blank'>查看</a></Tag></td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-        <Button type='ghost' onClick={this.handleCreateNO}>生成商品编码（流水号）</Button>
-        <Button type='ghost' onClick={this.handleCreateSku}>生成商品编码（颜色规格）</Button>
-        <Button type='ghost' onClick={this.handleCreateMap}>生成商品编码（颜色规格映射）</Button>
-        <Button type='ghost' onClick={this.handleCleanSku}>清空商品编码</Button>
-      </div>
+      <Table columns={columns} pagination={false} size='small' dataSource={this.state.items} footer={() => <div>
+        <Button className={styles.btn} type='ghost' onClick={this.handleCreateNO}>生成商品编码（流水号）</Button>
+        <Button className={styles.btn} type='ghost' onClick={this.handleCreateSku}>生成商品编码（颜色规格）</Button>
+        <Button className={styles.btn} type='ghost' onClick={this.handleCreateMap}>生成商品编码（颜色规格映射）</Button>
+        <Button className={styles.btn} type='ghost' onClick={this.handleCleanSku}>清空商品编码</Button>
+      </div>} />
     )
   }
 })
