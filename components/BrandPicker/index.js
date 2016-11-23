@@ -20,6 +20,7 @@ import styles from './index.scss'
 export default React.createClass({
   getInitialState: function() {
     const {initialValue} = this.props
+    console.log('this.props', this.props)
     return {
       visible: false,
       value: initialValue ? initialValue.id : null,
@@ -27,6 +28,7 @@ export default React.createClass({
     }
   },
   componentWillReceiveProps(nextProps) {
+    console.log('nextProps', nextProps)
     if (typeof nextProps.value === 'undefined') {
       if (this.state.value !== nextProps.value) {
         this._setValue(null, '')

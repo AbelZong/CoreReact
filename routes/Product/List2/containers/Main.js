@@ -229,21 +229,34 @@ const ModifyModal = connect(state => ({
           },
           success: ({d}) => {
             this.autoIndex = 0
-            console.log(d)
+            //console.log(d)
             this.props.form.setFieldsValue({
               GoodsCode: d.main.GoodsCode,
               GoodsName: d.main.GoodsName,
-              KindID: d.main.KindID,
-              ScoID: d.main.ScoID,
+              KindID: {
+                id: d.main.KindID,
+                name: d.main.KindName
+              },
+              ScoID: {
+                id: d.main.ScoID,
+                name: d.main.ScoName
+              },
               ScoGoodsCode: d.main.ScoGoodsCode,
               MarketPrice: d.main.MarketPrice,
               SalePrice: d.main.SalePrice,
               PurPrice: d.main.PurPrice,
               Weight: d.main.Weight,
-              TempShopID: d.main.TempShopID,
+              TempShopID: {
+                id: d.main.TempShopID,
+                name: d.main.TempShopName
+              },
               TempID: d.main.TempID,
               Remark: d.main.Remark,
-              Img: d.main.Img
+              Img: d.main.Img,
+              Brand: {
+                id: d.main.Brand,
+                name: d.main.BrandName
+              }
             })
             const _skuProps = {}
             if (d.skuprops && d.skuprops instanceof Array && d.skuprops.length) {
@@ -311,22 +324,18 @@ const ModifyModal = connect(state => ({
               }
             }
 
-            this.state.brandid = d.main.Brand
-            this.state.brandname = d.main.BrandName
-            this.forceUpdate()
-
             this.setState({
               title: `修改商品：[${d.main.ID}]`,
               visible: true,
               confirmLoading: false,
-              kindid: d.main.KindID,
-              kindname: d.main.KindName,
-              brandid: d.main.Brand,
-              brandname: d.main.BrandName,
-              scoid: d.main.ScoID,
-              sconame: d.main.ScoName,
-              tempshopid: d.main.TempShopID,
-              tempshopname: d.main.TempShopName,
+              // kindid: d.main.KindID,
+              // kindname: d.main.KindName,
+              // brandid: d.main.Brand,
+              // brandname: d.main.BrandName,
+              // scoid: d.main.ScoID,
+              // sconame: d.main.ScoName,
+              // tempshopid: d.main.TempShopID,
+              // tempshopname: d.main.TempShopName,
               itemProps: itemProps, //todo 数据清洗
               skuProps: Object.values(skuProps),
               GoodsCode: d.main.GoodsCode
@@ -676,10 +685,6 @@ const ModifyModal = connect(state => ({
             <Col sm={10}>
               <FormItem labelCol={{ span: 10 }} wrapperCol={{ span: 12 }} label='商品分类'>
                 {getFieldDecorator('KindID', {
-                  initialValue: {
-                    id: this.state.kindid,
-                    name: this.state.kindname
-                  },
                   rules: [
                     { required: true, type: 'object', message: '必选' }
                   ]
@@ -690,10 +695,7 @@ const ModifyModal = connect(state => ({
             </Col>
             <Col sm={10}>
               <FormItem labelCol={{ span: 7 }} wrapperCol={{ span: 12 }} label='品牌'>
-                {getFieldDecorator('Brand', {initialValue: {
-                  id: 1,
-                  name: '南极人'
-                }, rules: [
+                {getFieldDecorator('Brand', {rules: [
                     { required: true, type: 'object', message: '必选' }
                 ]
                 })(
@@ -706,10 +708,6 @@ const ModifyModal = connect(state => ({
             <Col sm={10}>
               <FormItem labelCol={{ span: 10 }} wrapperCol={{ span: 12 }} label='供应商'>
                 {getFieldDecorator('ScoID', {
-                  initialValue: {
-                    value: this.state.scoid,
-                    name: this.state.sconame
-                  },
                   rules: [
                     { required: true, type: 'object', message: '必选' }
                   ]
@@ -730,10 +728,6 @@ const ModifyModal = connect(state => ({
             <Col sm={10}>
               <FormItem labelCol={{ span: 10 }} wrapperCol={{ span: 12 }} label='淘宝模板店铺'>
                 {getFieldDecorator('TempShopID', {
-                  initialValue: {
-                    value: this.state.tempshopid,
-                    name: this.state.tempshopname
-                  },
                   rules: [{ required: true, message: '必填', type: 'object' }]
                 })(
                   <ShopPicker />
