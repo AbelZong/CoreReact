@@ -229,7 +229,6 @@ const ModifyModal = connect(state => ({
           },
           success: ({d}) => {
             this.autoIndex = 0
-            //console.log(d)
             const formData = {
               GoodsCode: d.main.GoodsCode,
               GoodsName: d.main.GoodsName,
@@ -312,33 +311,37 @@ const ModifyModal = connect(state => ({
                   itemprops_values: item.itemprops_values,
                   name: item.name,
                   pid: item.pid,
-                  checkedItem: itemChk
+                  is_input_prop: item.is_input_prop,
+                  id: itemChk.ID,
+                  def_val_id: itemChk.val_id,
+                  def_val_name: itemChk.val_name
                 })
               } else {
                 itemProps.push({
                   itemprops_values: item.itemprops_values,
                   name: item.name,
                   pid: item.pid,
-                  checkedItem: null
+                  is_input_prop: item.is_input_prop,
+                  id: '',
+                  def_val_id: '',
+                  def_val_name: ''
                 })
               }
             }
-
+            const items = []
+            for (let item of d.items) {
+              item['isedit'] = true
+              item['isSkuID'] = true
+              items.push(item)
+            }
             this.setState({
               title: `修改商品：[${d.main.ID}]`,
               visible: true,
               confirmLoading: false,
-              // kindid: d.main.KindID,
-              // kindname: d.main.KindName,
-              // brandid: d.main.Brand,
-              // brandname: d.main.BrandName,
-              // scoid: d.main.ScoID,
-              // sconame: d.main.ScoName,
-              // tempshopid: d.main.TempShopID,
-              // tempshopname: d.main.TempShopName,
-              itemProps: itemProps, //todo 数据清洗
+              itemProps: itemProps,
               skuProps: Object.values(skuProps),
-              GoodsCode: d.main.GoodsCode
+              items: items,
+              goodscode: d.main.GoodsCode
             }, () => {
               this.props.form.setFieldsValue(formData)
             })
@@ -349,46 +352,48 @@ const ModifyModal = connect(state => ({
         }).then(endLoading)
       }
     } else {
-      const skuProps = {}
+      const skuProps = []
       let stateSku = this.state.skuProps
-      for (let s of stateSku) {
-        skuProps[s.pid] = {
-          name: s.name,
-          pid: s.pid,
-          children1: [],
-          children0: []
-        }
-      }
-      let vObj = this.props.form.getFieldValue('skus')
-      let v = vObj !== undefined ? Object.keys(vObj).map(function(el) {
-        return vObj[el]
-      }) : null
-      if (stateSku !== undefined && stateSku.length > 0) {
-        for (let val of v) {
-          if (val.IsOther === 0) {
-            skuProps[val.pid].children0.push({
-              Enable: val.checked,
-              ID: val.id,
-              mapping: val.mapping,
-              pid: val.pid,
-              val_id: val.val_id,
-              val_name: val.value
-            })
-          } else {
-            skuProps[val.pid].children1.push({
-              Enable: val.checked,
-              ID: val.id,
-              mapping: val.mapping,
-              pid: val.pid,
-              val_id: val.val_id,
-              val_name: val.value
-            })
+      if (stateSku.length > 0) {
+        for (let s of stateSku) {
+          skuProps[s.pid] = {
+            name: s.name,
+            pid: s.pid,
+            children1: [],
+            children0: []
           }
         }
-      }
-      if (Object.values(skuProps).length > 0) {
-        this.state.skuProps = Object.values(skuProps)
-        this.forceUpdate()
+        let vObj = this.props.form.getFieldValue('skus')
+        let v = vObj !== undefined ? Object.keys(vObj).map(function(el) {
+          return vObj[el]
+        }) : null
+        if (stateSku !== undefined && stateSku.length > 0) {
+          for (let val of v) {
+            if (val.IsOther === 0) {
+              skuProps[val.pid].children0.push({
+                Enable: val.checked,
+                ID: val.id,
+                mapping: val.mapping,
+                pid: val.pid,
+                val_id: val.val_id,
+                val_name: val.value
+              })
+            } else {
+              skuProps[val.pid].children1.push({
+                Enable: val.checked,
+                ID: val.id,
+                mapping: val.mapping,
+                pid: val.pid,
+                val_id: val.val_id,
+                val_name: val.value
+              })
+            }
+          }
+        }
+        if (Object.values(skuProps).length > 0) {
+          this.state.skuProps = Object.values(skuProps)
+          this.forceUpdate()
+        }
       }
     }
   },
@@ -401,126 +406,166 @@ const ModifyModal = connect(state => ({
       this.setState({
         confirmLoading: true
       })
-      console.log(v)
-    //  const {doge} = this.props
       v.KindID = (v.KindID && v.KindID.id) ? v.KindID.id : ''
       v.Brand = (v.Brand && v.Brand.id) ? v.Brand.id : ''
       v.Supplier = (v.Supplier && v.Supplier.id) ? v.Supplier.id : ''
       const keys1 = Object.keys(v)
+      const {doge} = this.props
       let Coresku_main = {}
       let itemprops = []
+      let skuprops = []
       let items = []
-      for (let item of v.items.items) {
-        items.push({
+      let skulength = this.state.skuProps.length
+      for (let item of tempItems) {
+        let t = {}
+        if (item.SkuID === '') {
+          message.error('商品编码存在空值')
+          this.setState({
+            confirmLoading: false
+          })
+          return
+        }
+        let Norm = ''
+        t = {
+          ID: item.ID,
           SkuID: item.SkuID,
           SkuName: v.GoodsName,
           SkuSimple: v.GoodsName,
-          Norm: item.Color + ';' + item.Size,
           PurPrice: item.PurPrice,
           SalePrice: item.SalePrice,
-          Weight: item.Weight,
-          Pid1: item.Pid1,
-          val_id1: item.val_id1,
-          Pid2: item.Pid2,
-          val_id2: item.val_id2
-        })
+          Weight: item.Weight
+        }
+        for (let i = 0; i < skulength; i++) {
+          Norm += item[`sku${i}`] + ';'
+          t[`Pid${parseInt(i) + 1}`] = item[`pid${parseInt(i) + 1}`]
+          t[`val_id${parseInt(i) + 1}`] = item[`val_id${parseInt(i) + 1}`]
+        }
+        t['Norm'] = Norm.substring(0, Norm.length - 1)
+        items.push(t)
       }
 
       for (let id of keys1) {
         if (v[id] === undefined) continue
         let cc = v[id]
         if (typeof cc === 'object') {
-          let a = id.split('-')
-          if (cc.value === '') continue
-          if (a[0] === 'attr') {
-            itemprops.push({
-              pid: a[2],
-              val_id: a[1],
-              val_name: cc.value
-            })
-          } else {
-            if (!cc.checked) continue
+          if (id === 'ScoID' || id === 'TempShopID') {
+            Coresku_main[id] = cc.id
+          }
+          if (id === 'attr') {
+            for (let a of Object.values(cc)) {
+              itemprops.push({
+                pid: a.pid,
+                id: a.id === '' ? 0 : a.id,
+                val_id: a.val_id,
+                val_name: a.value
+              })
+            }
+          }
+          if (id === 'skus') {
+            for (let a of Object.values(cc)) {
+              if (a.checked) {
+                skuprops.push({
+                  pid: a.pid,
+                  val_id: a.val_id,
+                  val_name: a.value,
+                  mapping: a.mapping,
+                  IsOther: a.IsOther
+                })
+              }
+            }
           }
         } else {
           Coresku_main[id] = v[id]
         }
       }
-      console.log('items', items)
-      console.log('itemprops', itemprops)
-      console.log('skuprops', this.state.skuProps)
-      console.log('Coresku_main', Coresku_main)
-      // let uri = ''
-      // let data = {
-      //   main: Coresku_main,
-      //   itemprops: itemprops,
-      //   skuprops: skuprops,
-      //   items: items
-      // }
-      // if (doge === 0) {
-      //   uri = 'XyCore/CoreSku/InsertGoods'
-      // } else {
-      //   uri = 'XyCore/CoreSku/UpdateGoods'
-      // }
-      // ZPost(uri, data, () => {
-      //   this.hideModal()
-      // }, () => {
-      //   this.setState({
-      //     confirmLoading: false
-      //   })
-      // })
+
+      // console.log('items', items)
+      // console.log('itemprops', itemprops)
+      // console.log('skuprops', skuprops)
+      // console.log('Coresku_main', Coresku_main)
+      let uri = ''
+      if (doge === 0) {
+        uri = 'XyCore/CoreSku/InsertGoods'
+      } else {
+        uri = 'XyCore/CoreSku/UpdateGoods'
+        Coresku_main['ID'] = doge
+      }
+      let data = {
+        main: Coresku_main,
+        itemprops: itemprops,
+        skuprops: skuprops,
+        items: items
+      }
+
+      ZPost(uri, data, () => {
+        this.hideModal()
+      }, () => {
+        this.setState({
+          confirmLoading: false
+        })
+      })
     })
   },
   handleKind(e) {
     let kindid = this.state.kindid
+    let itemProps = []
+    const skuProps = {}
     if (kindid !== e.id) {
-      this.setState({
-        kindid: e.id
-      })
       ZGet({
-        uri: 'XyComm/Customkind/SkuKindProps',
-        data: {
-          ID: e.id,
-          Enable: true
-        },
-        success: ({d}) => {
-          this.setState({
-            itemprops: d
-          })
-          //console.log(JSON.parse(d[2].values).prop_value)
-        }
-      }).then(endLoading)
-      ZGet({
-        uri: 'XyComm/CustomKindSkuProps/SkuPropsByKind',
+        uri: 'XyComm/Customkind_props/ItemSkuPropsByKind',
         data: {
           KindID: e.id
         },
         success: ({d}) => {
-          let skus = []
-          let skupid = d.length
-          if (skupid > 0) {
-            for (let sp of d) {
-              let temps = {pid: sp.pid, name: sp.name, skuprops_values: []}
-              for (let spv of sp.skuprops_values) {
-                temps.skuprops_values.push({
-                  ischeck: 0,
-                  name: spv.name,
-                  fname: sp.name,
-                  id: spv.id,
-                  mapping: spv.mapping,
-                  IsOther: 0,
-                  pid: spv.pid
-                })
-              }
-              skus.push(temps)
+          if (d.itemprops_base.length > 0) {
+            for (let item of d.itemprops_base) {
+              itemProps.push({
+                itemprops_values: item.itemprops_values,
+                name: item.name,
+                pid: item.pid,
+                is_input_prop: item.is_input_prop,
+                id: '',
+                def_val_id: '',
+                def_val_name: ''
+              })
             }
           }
-
-          this.setState({
-            skuprops: skus,
-            skupid: skupid
-          })
+          if (d.skuprops_base.length > 0) {
+            for (let s of d.skuprops_base) {
+              skuProps[s.pid] = {
+                name: s.name,
+                pid: s.pid,
+                children1: [],
+                children0: []
+              }
+            }
+            for (let b of d.skuprops_base) {
+              for (let val of b.skuprops_values) {
+                skuProps[val.pid].children0.push({
+                  Enable: 0,
+                  ID: 0,
+                  mapping: val.mapping,
+                  pid: val.pid,
+                  val_id: val.id,
+                  val_name: val.name
+                })
+              }
+            }
+          }
+          if (Object.values(skuProps).length > 0) {
+            this.setState({
+              kindid: e.id,
+              skuProps: Object.values(skuProps),
+              itemProps: itemProps
+            }, () => console.log(this.state))
+          }
         }
       }).then(endLoading)
+      // this.setState({
+      //   kindid: e.id,
+      //   itemProps: itemProps,
+      //   skuProps: skuProps
+      // }, () => console.log(this.state.skuProps))
     }
   },
   hideModal() {
@@ -528,8 +573,9 @@ const ModifyModal = connect(state => ({
     this.setState({
       items: [],
       visible: false,
-      itemprops: [],
-      skuprops: []
+      goodscode: '',
+      itemProps: [],
+      skuProps: []
     }, () => {
       this.props.form.resetFields()
     })
@@ -539,11 +585,15 @@ const ModifyModal = connect(state => ({
       const getFieldDecorator = this.props.form.getFieldDecorator
       return vs.map((x, index) => {
         return (
-          <FormItem key={x.pid} className={styles.itemSelect} style={{ margin: '5px 0 0 0' }}>
+          <FormItem labelCol={{ span: 3 }} wrapperCol={{ span: 12 }} label={x.name} key={x.pid} className={styles.itemSelect} style={{ margin: '5px 0 0 0' }}>
             {getFieldDecorator(`attr.${x.pid}-${index}`, {initialValue: {
-              value: x.checkedItem !== null ? x.checkedItem.val_name : '',
+              value: x.def_val_name !== '' ? x.def_val_name : '',
+              val_id: x.def_val_id !== '' ? x.def_val_id : '',
+              id: x.id !== '' ? x.id : '',
+              pid: x.pid,
               values: x.itemprops_values,
-              name: x.name
+              name: x.name,
+              edit: x.is_input_prop
             }})(
               <AttrCC key={`${index}-${x.pid}`} />
             )}
@@ -615,12 +665,12 @@ const ModifyModal = connect(state => ({
     let items = Object.assign({}, tempItems)
     if (field === 'GoodsCode') {
       this.setState({
-        GoodsCode: this.props.form.getFieldValue(field)
-      }, () => { console.log('gd', this.state.goodscode) })
+        goodscode: e.target.value
+      }, () => {})
     }
     if (field === 'SalePrice') {
       for (let i in items) {
-        items[i][field] = this.props.form.getFieldValue(field)
+        items[i][field] = this.props.form.getFieldValue('SalePrice')
         items[i]['isedit'] = true
       }
       this.setState({
@@ -629,7 +679,7 @@ const ModifyModal = connect(state => ({
     }
     if (field === 'PurPrice') {
       for (let i in items) {
-        items[i]['PurPrice'] = this.props.form.getFieldValue(field)
+        items[i]['PurPrice'] = this.props.form.getFieldValue('PurPrice')
         items[i]['isedit'] = true
       }
       this.setState({
@@ -638,7 +688,7 @@ const ModifyModal = connect(state => ({
     }
     if (field === 'Weight') {
       for (let i in items) {
-        items[i]['Weight'] = this.props.form.getFieldValue(field)
+        items[i]['Weight'] = this.props.form.getFieldValue('Weight')
         items[i]['isedit'] = true
       }
       this.setState({
@@ -651,7 +701,6 @@ const ModifyModal = connect(state => ({
     //   items: newstate
     // })
     tempItems = newstate
-    console.log('newstate', tempItems)
   },
   render() {
     const { getFieldDecorator } = this.props.form
@@ -665,7 +714,7 @@ const ModifyModal = connect(state => ({
       wrapperCol: { span: 24 }
     }
     return (
-      <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={confirmLoading} width={800} maskClosable={false} closable={false}>
+      <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={confirmLoading} width={800} maskClosable={false}>
         <Form horizontal className='pos-form'>
           <FormItem {...formItemLayout2} label='款式编码(货号)'>
             {getFieldDecorator('GoodsCode', {
@@ -816,12 +865,12 @@ const ModifyModal = connect(state => ({
           <h3>商品规格</h3>
           <div className='hr' />
           <div className={styles.item}>
-            {this.props.form.getFieldValue('KindID') === 0 ? (<div style={{textAlign: 'center'}}>(无)</div>) : this.commSkus(this.state.skuProps)}
+            {this.state.skuProps.length > 0 ? this.commSkus(this.state.skuProps) : (<div style={{textAlign: 'center'}}>(无)</div>)}
           </div>
           <FormItem {...formItemLayout3} >
             {getFieldDecorator('items', {initialValue: {
               skuprops: this.state.skuProps,
-              goodscode: this.state.GoodsCode,
+              goodscode: this.state.goodscode,
               items: this.state.items
             }})(
               <SkuInfo callbackParent={this.onChildChanged} />
@@ -896,7 +945,7 @@ const columnDefs = [
     width: 70,
     cellStyle: {textAlign: 'center'},
     cellRenderer: function(params) {
-      //console.log(params)
+      console.log(params)
     },
     suppressMenu: true
     //pinned: 'right'
@@ -973,19 +1022,25 @@ const SkuCC = React.createClass({
 const AttrCC = React.createClass({
   getInitialState() {
     return {
+      def_val_id: this.props.value.val_id,
       value: this.props.value.value,
+      id: this.props.value.id,
       values: this.props.value.values,
-      name: this.props.value.name
+      name: this.props.value.name,
+      edit: this.props.value.edit,
+      pid: this.props.value.pid
     }
   },
   handleCheck(e) {
     this.setState({
       value: e.label,
-      id: e.key
+      val_id: e.key
     }, () => {
       this.props.onChange && this.props.onChange({
         value: this.state.value,
-        id: this.state.value
+        val_id: this.state.val_id,
+        id: this.state.id,
+        pid: this.state.pid
       })
     })
   },
@@ -995,16 +1050,18 @@ const AttrCC = React.createClass({
         value: e.target.value
       }, () => {
         this.props.onChange && this.props.onChange({
-          value: this.state.value
+          value: this.state.value,
+          val_id: this.state.val_id,
+          pid: this.state.pid
         })
       })
     }
   },
   render() {
-    if (this.state.value === '') {
+    if (this.state.edit === '0' || this.state.value === '') {
       return (
         <div className={styles.checked}>
-          <Select labelInValue placeholder={`-选择${this.state.name}-`} style={{ width: 200 }} onChange={this.handleCheck}>
+          <Select labelInValue placeholder={`-选择${this.state.name}-`} style={{ width: 200 }} defaultValue={{key: this.state.def_val_id}} onChange={this.handleCheck}>
             {this.state.values.length ? (this.state.values.map(y => <Option value={`${y.id}`} key={y.id}>{y.name}
             </Option>)
             ) : <Option key={0} />}
