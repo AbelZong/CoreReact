@@ -17,11 +17,13 @@ import {
   connect
 } from 'react-redux'
 import {
-  Input, Tag, Button, Table, InputNumber
+  Input, Button, Table, Tooltip, message
 } from 'antd'
 import styles from './index.scss'
 
+let DISPLAY = 'block'
 const NUM = new RegExp(/^(0|[1-9]\d*)(\.\d{0,2})?$/)
+const TIP = <span>必须，推荐为款式编码（货号）+流水号`如果为空将不保存或删除原有记录</span>
 const SkuInfo = React.createClass({
   getInitialState() {
     return {
@@ -33,7 +35,6 @@ const SkuInfo = React.createClass({
   },
   componentDidMount() {
     this._firstload()
-    //this._firstl()
   },
   componentWillReceiveProps(nextProps) {
     this._firstload(nextProps.value)
@@ -43,10 +44,17 @@ const SkuInfo = React.createClass({
   },
   handleCreateNO() {
     let items = this.state.items
+    let goodscode = this.state.goodscode
+    if (goodscode === undefined || goodscode === '') {
+      message.error('请先填写款式编码(货号)')
+      return
+    }
     let keys = Object.keys(items)
     for (let id of keys) {
-      items[id].SkuID = this.state.goodscode + id
-      items[id].isedit = true
+      if (!items[id].isSkuID) {
+        items[id].SkuID = goodscode + id
+        items[id].isSkuID = true
+      }
     }
     this.setState({
       items: items
@@ -56,12 +64,19 @@ const SkuInfo = React.createClass({
     let items = this.state.items
     let keys = Object.keys(items)
     let l = this.state.catalogs.length
+    let goodscode = this.state.goodscode
+    if (goodscode === undefined || goodscode === '') {
+      message.error('请先填写款式编码(货号)')
+      return
+    }
     for (let id of keys) {
-      items[id].SkuID = this.state.goodscode
-      for (let i = 0; i < l; i++) {
-        items[id].SkuID += items[id][`sku${i}`]
+      if (!items[id].isSkuID) {
+        items[id].SkuID = goodscode
+        for (let i = 0; i < l; i++) {
+          items[id].SkuID += items[id][`sku${i}`]
+        }
+        items[id].isSkuID = true
       }
-      items[id].isedit = true
     }
     this.setState({
       items: items
@@ -71,13 +86,20 @@ const SkuInfo = React.createClass({
     let items = this.state.items
     let keys = Object.keys(items)
     let l = this.state.catalogs.length
+    let goodscode = this.state.goodscode
+    if (goodscode === undefined || goodscode === '') {
+      message.error('请先填写款式编码(货号)')
+      return
+    }
     for (let id of keys) {
-      items[id].SkuID = this.state.goodscode
-      for (let i = 0; i < l; i++) {
-        const Cm = items[id][`mapping${i}`] === 0 ? items[id][`sku${i}`] : items[id][`mapping${i}`]
-        items[id].SkuID += Cm
+      if (!items[id].isSkuID) {
+        items[id].SkuID = goodscode
+        for (let i = 0; i < l; i++) {
+          const Cm = items[id][`mapping${parseInt(i) + 1}`] === 0 ? items[id][`sku${i}`] : items[id][`mapping${parseInt(i) + 1}`]
+          items[id].SkuID += Cm
+        }
+        items[id].isSkuID = true
       }
-      items[id].isedit = true
     }
     this.setState({
       items: items
@@ -87,6 +109,8 @@ const SkuInfo = React.createClass({
     let items = this.state.items
     for (let i of items) {
       i.SkuID = ''
+      i.isedit = false
+      i.isSkuID = false
     }
     this.setState({
       items: items
@@ -95,11 +119,17 @@ const SkuInfo = React.createClass({
   inputChange(e, field, i) {
     let items = this.state.items
     let iIndex = items.findIndex(x => Object.is(x, i))
-    if (e.target.value === '' || NUM.test(e.target.value)) {
+    if (field === 'SkuID' || field === 'BarCode') {
       items[iIndex][field] = e.target.value
+      items[iIndex]['isSkuID'] = true
     } else {
-      items[iIndex][field] = 0.00
+      if (e.target.value === '' || NUM.test(e.target.value)) {
+        items[iIndex][field] = e.target.value
+      } else {
+        items[iIndex][field] = 0.00
+      }
     }
+
     items[iIndex]['isedit'] = true
     this.setState({
       items: items
@@ -140,23 +170,39 @@ const SkuInfo = React.createClass({
     }
     return rs
   },
-  ObjectEqual(item, source) {
-    let index = 0
-    for (let key in source) {
-      if (item[key] && source[key] === item[key]) {
-        index++
+  ItemEqual(item, source) {
+    if (item.Norm === undefined) {
+      let index = 0
+      for (let key in source) {
+        if (item[key] && source[key] === item[key]) {
+          index++
+        }
+      }
+      return index === Object.keys(source).length
+    } else {
+      let NormT = ''
+      for (let i = 0; i < this.state.skuprops.length; i++) {
+        NormT += source[`sku${i}`] + ';'
+      }
+      if (NormT.substring(0, NormT.length - 1) === item.Norm) {
+        return true
+      } else {
+        return false
       }
     }
-    return index === Object.keys(source).length
   },
   _firstload(_v) {
     const v = Object.assign({}, this.props.value || {}, _v || {})
-    let items = []
-    let beforeItems = this.state.items
+    let beforeItems = this.state.items.length === 0 ? v.items : this.state.items
     let itemsDecar = []
     let catalogs = [] //sku 栏位
     let skuprops = v.skuprops
-    //.console.log('this.props.value', skuprops)
+
+    if (skuprops.length === 0) {
+      DISPLAY = 'none'
+    } else {
+      DISPLAY = 'block'
+    }
     for (let prop in skuprops) {
       catalogs.push({
         title: skuprops[prop].name,
@@ -187,28 +233,35 @@ const SkuInfo = React.createClass({
       itemsDecar.push(item)
     }
     let _descartes = this.descartes(itemsDecar)
+    let items = []
     for (let decar of _descartes) {
-      let _it
+      let _ite = {}
       for (let id in decar) {
-        _it = Object.assign({}, _it, {
+        _ite = Object.assign({}, _ite, {
           [`sku${id}`]: decar[id].val_name,
-          [`pid${id}`]: decar[id].pid,
-          [`val_id${id}`]: decar[id].val_id,
-          [`mapping${id}`]: decar[id].mapping
+          [`pid${parseInt(id) + 1}`]: decar[id].pid,
+          [`val_id${parseInt(id) + 1}`]: decar[id].val_id,
+          [`mapping${parseInt(id) + 1}`]: decar[id].mapping
         })
       }
-      items.push(_it)
+      items.push(_ite)
     }
     for (let it in items) {
-      let beforeItem = beforeItems.length > 0 ? beforeItems.find(x => this.ObjectEqual(x, items[it])) : undefined
+      let beforeItem = beforeItems.length > 0 ? beforeItems.find(x => this.ItemEqual(x, items[it])) : undefined
       if (beforeItem !== undefined) {
         items[it]['SalePrice'] = beforeItem.isedit ? beforeItem.SalePrice : 0.00
         items[it]['PurPrice'] = beforeItem.isedit ? beforeItem.PurPrice : 0.00
         items[it]['Weight'] = beforeItem.isedit ? beforeItem.Weight : 0.00
-        items[it]['SkuID'] = ''
-        items[it]['BarCode'] = ''
+        items[it]['SkuID'] = beforeItem.isSkuID ? beforeItem.SkuID : ''
+        items[it]['BarCode'] = beforeItem.isSkuID ? beforeItem.BarCode : ''
         items[it]['UniqueCode'] = ''
-        items[it]['isedit'] = true
+        items[it]['isedit'] = beforeItem.isedit
+        items[it]['isSkuID'] = beforeItem.isSkuID
+        items[it]['ID'] = beforeItem.ID !== undefined ? beforeItem.ID : 0
+        items[it]['Norm'] = beforeItem.Norm
+        for (let i = 0; i < this.state.skuprops.length; i++) {
+          items[it][`val_id${parseInt(i) + 1}`] = beforeItem[`val_id${parseInt(i) + 1}`]
+        }
       } else {
         items[it]['SalePrice'] = 0.00
         items[it]['PurPrice'] = 0.00
@@ -216,12 +269,16 @@ const SkuInfo = React.createClass({
         items[it]['SkuID'] = ''
         items[it]['BarCode'] = ''
         items[it]['UniqueCode'] = ''
+        items[it]['ID'] = 0
       }
     }
     this.setState({
       catalogs: catalogs,
-      items: items
-    }, () => this.props.callbackParent(this.state.items))
+      items: items,
+      goodscode: v.goodscode
+    }, () => {
+      this.props.callbackParent(this.state.items)
+    })
   },
   render() {
     const columns = this.state.catalogs.concat([{
@@ -229,27 +286,31 @@ const SkuInfo = React.createClass({
       dataIndex: 'SalePrice',
       key: 'SalePrice',
       width: 80,
-      render: (text, index) => (<Input value={text} width={100} onChange={e => this.inputChange(e, 'SalePrice', index)} />)
+      render: (text, index) => (<Input value={text} width={50} onChange={e => this.inputChange(e, 'SalePrice', index)} />)
     }, {
       title: '采购成本价',
       dataIndex: 'PurPrice',
       key: 'PurPrice',
-      width: 100,
-      render: (text, index) => (<Input value={text} width={100} onChange={e => this.inputChange(e, 'PurPrice', index)} />)
+      width: 80,
+      render: (text, index) => (<Input value={text} width={50} onChange={e => this.inputChange(e, 'PurPrice', index)} />)
     }, {
       title: '重量',
       dataIndex: 'Weight',
       key: 'Weight',
-      width: 80,
-      render: (text, index) => (<Input value={text} width={100} onChange={e => this.inputChange(e, 'Weight', index)} />)
+      width: 60,
+      render: (text, index) => (<Input value={text} width={50} onChange={e => this.inputChange(e, 'Weight', index)} />)
     }, {
       title: '商品编码',
       dataIndex: 'SkuID',
-      key: 'SkuID'
+      key: 'SkuID',
+      width: 120,
+      render: (text, index) => (<Tooltip placement='topLeft' title={TIP}><Input value={text} width={120} onChange={e => this.inputChange(e, 'SkuID', index)} /></Tooltip>)
     }, {
       title: '条形码',
       dataIndex: 'BarCode',
-      key: 'BarCode'
+      key: 'BarCode',
+      width: 100,
+      render: (text, index) => (<Input value={text} width={100} onChange={e => this.inputChange(e, 'BarCode', index)} />)
     }, {
       title: '唯一码前缀',
       dataIndex: 'UniqueCode',
@@ -257,16 +318,21 @@ const SkuInfo = React.createClass({
     }, {
       title: '操作',
       key: 'action',
+      width: 80,
       render: text => (<a href='' target='_blank'>查看线上</a>)
     }])
-    return (
-      <Table columns={columns} pagination={false} size='small' dataSource={this.state.items} footer={() => <div>
-        <Button className={styles.btn} type='ghost' onClick={this.handleCreateNO}>生成商品编码（流水号）</Button>
-        <Button className={styles.btn} type='ghost' onClick={this.handleCreateSku}>生成商品编码（颜色规格）</Button>
-        <Button className={styles.btn} type='ghost' onClick={this.handleCreateMap}>生成商品编码（颜色规格映射）</Button>
-        <Button className={styles.btn} type='ghost' onClick={this.handleCleanSku}>清空商品编码</Button>
-      </div>} />
-    )
+    if (DISPLAY === 'block') {
+      return (
+        <Table columns={columns} pagination={false} size='small' dataSource={this.state.items} footer={() => <div>
+          <Button className={styles.btn} type='ghost' onClick={this.handleCreateNO}>生成商品编码（流水号）</Button>
+          <Button className={styles.btn} type='ghost' onClick={this.handleCreateSku}>生成商品编码（颜色规格）</Button>
+          <Button className={styles.btn} type='ghost' onClick={this.handleCreateMap}>生成商品编码（颜色规格映射）</Button>
+          <Button className={styles.btn} type='ghost' onClick={this.handleCleanSku}>清空商品编码</Button>
+        </div>} />
+      )
+    } else {
+      return (<div />)
+    }
   }
 })
 export default connect()(SkuInfo)

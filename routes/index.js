@@ -64,10 +64,12 @@ import BusinessSettingRoute from './Admin/BusinessSetting'
 import ProductCatesRoute from './Product/Cates'
 import ProductListRoute from './Product/List'
 import ProductList2Route from './Product/List2'
+import ProductApproveRoute from './Product/Approve'
 import ProductNormMappingRoute from './Product/NormMapping'
 import Warehouse3rdRoute from './Warehouse/3rd'
 import SuperAnnounceRoute from './Super/Announce'
 import OrderListRoute from './Order/List'
+import StockInitRoute from './Stock/Init'
 //import AdminCompanyRoute from './Admin/Company'
 // const QQ = require.context('./__ENTERIES__', false, /\.js$/)
 // console.dir(QQ)
@@ -126,10 +128,12 @@ export const createRoutes = (store) => ([
       ProductCatesRoute(store),
       ProductListRoute(store),
       ProductList2Route(store),
+      ProductApproveRoute(store),
       BusinessSettingRoute(store),
       ProductNormMappingRoute(store),
       SuperAnnounceRoute(store),
       OrderListRoute(store),
+      StockInitRoute(store),
       NotFoundRoute
     ],
     ignoreScrollBehavior: true
