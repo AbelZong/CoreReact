@@ -297,6 +297,12 @@
 		color: green;
 	}
 
+	.break {
+    word-break: break-all;
+    white-space: normal;
+    word-wrap: break-word;
+	}
+
 	.mt5 {
 		margin-top: 5px;
 	}
@@ -319,6 +325,10 @@
 
 	.ml20 {
 		margin-left: 20px;
+	}
+
+	.ml25 {
+		margin-left: 25px;
 	}
 
 	.mr5 {

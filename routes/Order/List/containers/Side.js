@@ -25,12 +25,15 @@ import {
   Select,
   Radio,
   Row,
-  Col
+  Col,
+  DatePicker,
+  Dropdown,
+  Menu
 } from 'antd'
 import appStyles from 'components/App.scss'
 import classNames from 'classnames'
 import {
-  ZPost,
+  //ZPost,
   ZGet
 } from 'utils/Xfetch'
 const TB_STATUS = [
@@ -91,6 +94,7 @@ import SkuPicker from 'components/SkuPicker'
 import Scrollbar from 'components/Scrollbars/index'
 import styles from './index.scss'
 import Wrapper from 'components/MainWrapper'
+import moment from 'moment'
 const Option = Select.Option
 const RadioGroup = Radio.Group
 //const CheckboxGroup = Checkbox.Group
@@ -228,6 +232,13 @@ export default connect()(Wrapper(React.createClass({
       if (cds.IsRecMsgYN !== 'Y' && cds.RecMessage) {
         delete cds.RecMessage
       }
+      if (cds.DateStart || cds.Dateend) {
+        if (!cds.Datetype) {
+          cds.Datetype = 'ODate'
+        }
+        cds.DateStart = cds.DateStart ? cds.DateStart.format() : ''
+        cds.Dateend = cds.Dateend ? cds.Dateend.format() : ''
+      }
       console.log(cds)
       this.runS(cds)
     })
@@ -350,6 +361,13 @@ export default connect()(Wrapper(React.createClass({
                   this.mergeConditions('_cv2_', e.target.value)
                 }} /></div>
               </div>
+              <DateRangePanel onTypeChange={(e) => {
+                this.mergeConditions('Datetype', e)
+              }} onStartChange={(e) => {
+                this.mergeConditions('DateStart', e)
+              }} onEndChange={(e) => {
+                this.mergeConditions('Dateend', e)
+              }} />
               <Panel header='订单状态'>
                 <div className={styles.sColumn}>
                   {dt.OrdStatus && dt.OrdStatus.length ? (
@@ -781,3 +799,172 @@ const Panel = React.createClass({
     )
   }
 })
+class DateRangePanel extends React.Component {
+  state = {
+    closed: !!this.props.closed,
+    cType: 'ODate',
+    startValue: null,
+    endValue: null,
+    endOpen: false
+  }
+  handleCollege = () => {
+    this.setState({
+      closed: !this.state.closed
+    })
+  }
+
+  disabledStartDate = (startValue) => {
+    const endValue = this.state.endValue
+    if (!startValue || !endValue) {
+      return false
+    }
+    return startValue.valueOf() > endValue.valueOf()
+  }
+
+  disabledEndDate = (endValue) => {
+    const startValue = this.state.startValue
+    if (!endValue || !startValue) {
+      return false
+    }
+    return endValue.valueOf() <= startValue.valueOf()
+  }
+  onChange = (field, value) => {
+    this.setState({
+      [field]: value
+    })
+  }
+  onStartChange = (value) => {
+    this.setState({
+      startValue: value
+    }, () => {
+      this.props.onStartChange(value)
+    })
+  }
+  onEndChange = (value) => {
+    this.setState({
+      endValue: value
+    }, () => {
+      this.props.onEndChange(value)
+    })
+  }
+  handleStartOpenChange = (open) => {
+    if (!open) {
+      this.setState({ endOpen: true })
+    }
+  }
+
+  handleEndOpenChange = (open) => {
+    this.setState({ endOpen: open })
+  }
+
+  __updateDate = (startValue, endValue) => {
+    this.setState({
+      startValue, endValue
+    }, () => {
+      this.props.onStartChange(startValue)
+      this.props.onEndChange(endValue)
+    })
+  }
+  handleMenuClick = (e) => {
+    switch (e.key) {
+      case 'ODate':
+      case 'SendDate':
+      case 'PayDate':
+      case 'PlanDate': {
+        this.setState({
+          cType: e.key
+        }, () => {
+          this.props.onTypeChange(e.key)
+        })
+        return
+      }
+      case '1': {
+        return this.__updateDate(moment().startOf('day'), moment().endOf('day'))
+      }
+      case '2': {
+        return this.__updateDate(moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day'))
+      }
+      case '3': {
+        return this.__updateDate(moment().startOf('week'), moment().endOf('week'))
+      }
+      case '4': {
+        return this.__updateDate(moment().startOf('month'), moment().endOf('month'))
+      }
+      case '5': {
+        return this.__updateDate(moment().subtract(30, 'days').startOf('day'), moment().endOf('day'))
+      }
+      case '6': {
+        return this.__updateDate(moment().subtract(60, 'days').startOf('day'), moment().endOf('day'))
+      }
+    }
+  }
+
+  render() {
+    const { startValue, endValue, endOpen, cType } = this.state
+    const dateTypes = {
+      'ODate': '订单时间',
+      'SendDate': '发货时间',
+      'PayDate': '付款时间',
+      'PlanDate': '计划发货时间'
+    }
+    const CN = classNames(styles.box, {
+      [`${styles.closed}`]: this.state.closed
+    })
+    const menu = (
+      <Menu onClick={this.handleMenuClick}>
+        <Menu.Item key='ODate'>搜订单时间</Menu.Item>
+        <Menu.Item key='SendDate'>搜发货时间</Menu.Item>
+        <Menu.Item key='PayDate'>搜付款时间</Menu.Item>
+        <Menu.Item key='PlanDate'>计划发货时间</Menu.Item>
+        <Menu.Divider />
+        <Menu.Item key='1'>今天</Menu.Item>
+        <Menu.Item key='2'>昨天</Menu.Item>
+        <Menu.Item key='3'>本周</Menu.Item>
+        <Menu.Item key='4'>本月</Menu.Item>
+        <Menu.Item key='5'>最近30天</Menu.Item>
+        <Menu.Item key='6'>最近60天</Menu.Item>
+      </Menu>
+    )
+    return (
+      <div className={CN}>
+        <div className={styles.tt}>
+          <div className={styles.arrow} onClick={this.handleCollege} />
+          <Dropdown overlay={menu}>
+            <a className='ant-dropdown-link'>
+              按{dateTypes[cType]} <Icon type='down' />
+            </a>
+          </Dropdown>
+        </div>
+        <div className={styles.dd}>
+          <div className='tc'>
+            <div>
+              <DatePicker
+                disabledDate={this.disabledStartDate}
+                showTime
+                format='YYYY-MM-DD HH:mm:ss'
+                value={startValue}
+                placeholder='开始时间'
+                onChange={this.onStartChange}
+                onOpenChange={this.handleStartOpenChange}
+                size='small'
+              />
+            </div>
+            <div className='mt5'>
+              <DatePicker
+                disabledDate={this.disabledEndDate}
+                showTime
+                format='YYYY-MM-DD HH:mm:ss'
+                value={endValue}
+                placeholder='结束时间'
+                onChange={this.onEndChange}
+                open={endOpen}
+                onOpenChange={this.handleEndOpenChange}
+                size='small'
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
