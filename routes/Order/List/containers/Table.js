@@ -18,6 +18,8 @@ import update from 'react-addons-update'
 import Areas from 'json/AreaCascader'
 import classNames from 'classnames'
 import SkuAppendPicker from 'components/SkuPicker/append'
+import SkuPicker from 'components/SkuPicker'
+import SkuPickerModal from 'components/SkuPicker/Modal'
 import ShopPicker from 'components/ShopPicker'
 import BuyerModal from './BuyerModal'
 import {
@@ -269,7 +271,7 @@ const defColumns = [{
             <div className={styles.mAuto}>
               <div className='tc'>
                 <div>{data.StatusDec}</div>
-                {data.Status === 7 ? <div className='mt5'>{data.AbnormalStatusDec}</div> : null}
+                {data.Status === 7 ? <div className={styles.dtype}>{data.AbnormalStatusDec}</div> : null}
               </div>
             </div>
           </div>
@@ -331,24 +333,29 @@ const defColumns = [{
     headerName: '快递公司',
     field: 'Express',
     width: 100,
-    cellRendererFramework: createClass({
+    cellRendererFramework: connect()(createClass({
       render() {
-        const {data, api, rowIndex} = this.props
+        const {data, rowIndex, dispatch} = this.props
         return (
           <div className={styles.centerWrapper}>
             <div className={styles.mAuto}>
-              <div>{data.Express}</div>
-              <div>{data.ExCode}</div>
+              <div className='tc'>{data.Express}</div>
+              <div className='tc mt5'><a onClick={() => {
+                dispatch({type: 'ORDER_LIST_EXPR_S_1_SET', payload: {
+                  pp: data.ExpNamePinyin,
+                  ap: data.ExCode
+                }})
+              }}>{data.ExCode}</a></div>
             </div>
             <div className={`${styles.float} ${styles['float-2']}`} onClick={e => {
-              api.gridOptionsWrapper.gridOptions.grid.props.dispatch({type: 'ORDER_LIST_EXPR_1_SET', payload: rowIndex})
+              dispatch({type: 'ORDER_LIST_EXPR_1_SET', payload: rowIndex})
             }}>
               <span>设</span>
             </div>
           </div>
         )
       }
-    })
+    }))
   }, {
     headerName: '收货地址/人',
     field: 'RecAddress',
@@ -557,60 +564,70 @@ export default connect(state => ({
       }
       case '2': {
         const nodes = this.grid.api.getSelectedNodes()
-        this.props.zch.grid.x0pCall(ZPost('Order/TransferNormal', {OID: ids}, ({d}) => {
+        this.grid.x0pCall(ZPost('Order/TransferNormal', {OID: ids}, ({d}) => {
           parseBatchOperatorResult.call(this, d, function(x, qq) {
             x.data.Status = qq.Status
             x.data.StatusDec = qq.StatusDec
           }, ['Status'], nodes, this.grid)
         }))
-        // this.grid.x0pCall(ZPost('Order/TransferNormal', {OID: ids}, ({d}) => {
-        //   if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
-        //     const successIDs = {}
-        //     const IDs = []
-        //     for (let v of d.successIDs) {
-        //       successIDs[`${v.ID}`] = v
-        //       IDs.push(v.ID)
-        //     }
-        //     const nodes = this.grid.api.getSelectedNodes()
-        //     nodes.forEach(x => {
-        //       if (IDs.indexOf(x.data.ID) !== -1) {
-        //         let qq = successIDs[`${x.data.ID}`]
-        //         x.data.Status = qq.Status
-        //         x.data.StatusDec = qq.StatusDec
-        //       }
-        //     })
-        //     this.grid.api.refreshCells(nodes, ['Status'])
-        //   }
-        //   if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
-        //     const description = (<div>
-        //       {d.FailIDs.map(x => {
-        //         return (
-        //           <div key={x.ID}>
-        //             {x.ID}: {x.Reason}
-        //           </div>
-        //         )
-        //       })}
-        //       <div className='hr' />
-        //       <div>请检查相关订单或刷新</div>
-        //     </div>)
-        //     notification.error({
-        //       message: '订单转正常失败IDs',
-        //       description,
-        //       icon: <Icon type='meh-o' />,
-        //       duration: 30
-        //     })
-        //   }
-        // }))
         break
       }
     }
   },
   handleOrderMenuClick1(e) {
+    switch (e.key) {
+      case '4': {
+        return this.props.dispatch({type: 'ORDER_LIST_BATCH_CUSTOM_EXCEPTIONS_1_SET', payload: 1})
+      }
+      case '5': {
+        const ids = this.grid.api.getSelectedRows().map(x => x.ID)
+        return this.props.dispatch({type: 'ORDER_LIST_MERGE_RESTORE_1_SET', payload: ids})
+      }
+      case '6': {
+        const nodes = this.grid.api.getSelectedNodes()
+        const len = nodes.length
+        if (!len) {
+          return message.info('请先选择')
+        }
+        const T = nodes[0].data.Type
+        if ([0, 3].indexOf(T) === -1 || (len > 1 && !nodes.every(e => e.data.Type === T))) {
+          return Modal.error({
+            title: '选择订单的类型有误',
+            content: '转换仅允许统一选择【普通订单】或【天猫分销订单】'
+          })
+        }
+        const ids = nodes.map(x => x.data.ID)
+        const content = T === 0 ? '确定要从【普通订单】转化为【天猫分销订单】吗' : '确定要从【天猫分销订单】转化为【普通订单】吗'
+        Modal.confirm({
+          title: '订单类型转换确认',
+          content,
+          onOk: () => {
+            this.grid.x0pCall(ZPost('Order/ComDisExchange', {OID: ids}, ({d}) => {
+              parseBatchOperatorResult.call(this, d, function(x, qq) {
+                x.data.Status = qq.Status
+                x.data.StatusDec = qq.StatusDec
+                x.data.Type = qq.Type
+                x.data.TypeString = qq.TypeString
+              }, ['Status', 'Type'], nodes, this.grid)
+            }))
+          }
+        })
+        break
+      }
+    }
     const ids = this.grid.api.getSelectedRows().map(x => x.ID)
     if (!ids.length) {
       return message.info('请先选择')
     }
     switch (e.key) {
+      case '3': {
+        this.props.dispatch({type: 'ORDER_LIST_BATCH_GIFTS_1_SET', payload: ids})
+        break
+      }
+      case '2': {
+        this.props.dispatch({type: 'ORDER_LIST_BATCH_SKUS_1_SET', payload: ids})
+        break
+      }
       case '1': {
         ModalPrompt({
           onPrompt: ({value}) => {
@@ -638,26 +655,48 @@ export default connect(state => ({
       }
     }
   },
+  handleAudit() {
+    const nodes = this.grid.api.getSelectedNodes()
+    const ids = nodes.map(x => x.data.ID)
+    if (!ids.length) {
+      message.info('请先选择')
+      return
+    }
+    this.grid.x0pCall(ZPost('Order/ConfirmOrder', {OID: ids}, ({d}) => {
+      parseBatchOperatorResult.call(this, d, function(x, qq) {
+        x.data.Status = qq.Status
+        x.data.StatusDec = qq.StatusDec
+      }, ['Status'], nodes)
+    }))
+  },
   render() {
     return (
       <div className='flex-column flex-grow'>
         <ZGrid gridOptions={gridOptions} rowHeight='75' className={styles.zgrid} onReady={this.handleGridReady} storeConfig={{ prefix: 'order_list' }} columnDefs={defColumns} paged grid={this}>
           批量：
           <ButtonGroup>
-            <Button type='ghost' size='small'><Icon type='check' />审核</Button>
+            <Button type='ghost' size='small' onClick={this.handleAudit}><Icon type='check' />审核</Button>
             <Button type='ghost' size='small' onClick={this.handleSetExpr}>设快递</Button>
           </ButtonGroup>
           <span className={styles.sliver}>|</span>
           <Dropdown overlay={<Menu onClick={this.handleOrderMenuClick}>
             <Menu.Item key='1'><Icon type='exclamation-circle-o' className='red' /> 转异常单</Menu.Item>
-            <Menu.Item key='2'>转正常单</Menu.Item>
-            <Menu.Item key='3'>取消订单</Menu.Item>
+            <Menu.Item key='2'><Icon type='check-square-o' /> 转正常单</Menu.Item>
+            <Menu.Item key='3'><Icon type='check-square-o' /> 取消订单</Menu.Item>
           </Menu>}>
             <Button type='ghost' size='small'>订单设置<Icon type='down' /></Button>
           </Dropdown>
           &nbsp;
           <Dropdown overlay={<Menu onClick={this.handleOrderMenuClick1}>
-            <Menu.Item key='1'>改运费</Menu.Item>
+            <Menu.Item key='1'><Icon type='check-square-o' /> 改运费</Menu.Item>
+            <Menu.Item key='2'><Icon type='check-square-o' /> 改商品</Menu.Item>
+            <Menu.Item key='3'><Icon type='check-square-o' /> 添赠品</Menu.Item>
+            <Menu.Divider />
+            <Menu.Item key='6'><Icon type='check-square-o' /> 普通订单与天猫分销订单互相转换</Menu.Item>
+            <Menu.Divider />
+            <Menu.Item key='5'>合并订单还原成 合并前</Menu.Item>
+            <Menu.Item key='4'>按商品信息标识自定义异常</Menu.Item>
+            <Menu.Divider />
           </Menu>}>
             <Button type='ghost' size='small'>
               <Icon type='edit' />修改&标记<Icon type='down' />
@@ -674,12 +713,861 @@ export default connect(state => ({
            内部Test号 486741
         </ZGrid>
         <ModalNewEgg refreshRowData={this.refreshRowData} />
-        <ComSeller1 zch={this} /><ComRecAddress1 zch={this} /><ComDetail1 zch={this} /><ComExpr1 zch={this} /><ExpressModal zch={this} /><Whouse zch={this} /><ToExceptions zch={this} />
+        <ComSeller1 zch={this} /><ComRecAddress1 zch={this} /><ComDetail1 zch={this} /><ComExpr1 zch={this} /><ExpressModal zch={this} /><Whouse zch={this} /><ToExceptions zch={this} /><ToCancel1 zch={this} /><BatchSkus1 zch={this} /><OrderSplit zch={this} />
+        <ExprSearchModal /><BatchGift1 zch={this} /><BatchCustomException zch={this} /><OrderMerge zch={this} /><OrderMergeRestore zch={this} />
       </div>
     )
   }
 }))
 
+const OrderMergeRestore = connect(state => ({
+  doge: state.order_list_merge_restore_1
+}))(createClass({
+  contextTypes: {
+    store: React.PropTypes.object
+  },
+  getInitialState() {
+    return {
+      visible: false,
+      value: 'A',
+      confirmLoading: false
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    this._dirtied = false
+    if (nextProps.doge) {
+      this.setState({
+        value: nextProps.doge.length ? 'A' : 'B',
+        visible: true
+      })
+    } else {
+      this.setState({
+        visible: false,
+        value: 'A',
+        confirmLoading: false
+      })
+    }
+  },
+  handleOK() {
+    this.setState({
+      confirmLoading: true
+    })
+    const Conditions = this.context.store.getState().order_list_conditions
+    ZPost('Order/CancleOrdMerge', {OID: this.props.doge, Type: this.state.value, Conditions}, () => {
+      this._dirtied = true
+      this.handleok()
+    }).then(() => {
+      this.setState({
+        confirmLoading: false
+      })
+    })
+  },
+  handleok() {
+    if (this._dirtied === true) {
+      this.props.zch.refreshRowData()
+    }
+    this.props.dispatch({type: 'ORDER_LIST_MERGE_RESTORE_1_SET', payload: null})
+  },
+  handleChange(e) {
+    const value = e.target.value
+    this.setState({
+      value
+    })
+  },
+  render() {
+    const disabledA = this.props.doge !== null && this.props.doge.length === 0
+    return (
+      <Modal title='合并订单还原成合并前' confirmLoading={this.state.confirmLoading} onOk={this.handleOK} visible={this.state.visible} onCancel={this.handleok} width={666}>
+        <Alert message='请确认需要合并订单还原成合并前，该操作不可撤销，还原过程中请勿做审单以及拆分合并订单等其它操作' type='warning' />
+        <div className={styles.radios1}>
+          <div className='ml25'>
+            <RadioGroup value={this.state.value} onChange={this.handleChange}>
+              <Radio value='A' disabled={disabledA}>还原订单列表页勾选的订单</Radio>
+              <Radio value='B'>还原所有符合条件的订单（加入搜索条件过滤后，只允许还原待审核的订单）</Radio>
+            </RadioGroup>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+}))
+const OrderSplit = connect(state => ({
+  doge: state.order_list_split_1
+}))(createClass({
+  getInitialState() {
+    return {
+      visible: false,
+      dataList: null,
+      confirmLoading: false
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.doge) {
+      this._dirtied = {}
+      this.setState({
+        visible: true,
+        dataList: nextProps.doge.Skus
+      })
+    } else {
+      this._dirtied = false
+      this.setState({
+        visible: false,
+        dataList: null,
+        confirmLoading: false
+      })
+    }
+  },
+  handleOK() {
+    this.setState({
+      confirmLoading: true
+    })
+    const SplitOrd = []
+    for (let sku of this.state.dataList) {
+      SplitOrd.push({
+        Skuid: sku.ID,
+        Qty: sku.Qty,
+        QtyNew: this._dirtied[`${sku.ID}`] || 0,
+        Price: sku.RealPrice,
+        Weight: sku.Weight
+      })
+    }
+    ZPost('Order/OrdSplit', {OID: this.props.doge.OID, SplitOrd}, () => {
+      this._dirtied = true
+      this.handleok()
+    }).then(() => {
+      this.setState({
+        confirmLoading: false
+      })
+    })
+  },
+  handleok() {
+    if (this._dirtied === true) {
+      this.props.zch.refreshRowData()
+    }
+    this.props.dispatch({type: 'ORDER_LIST_SPLIT_1_SET', payload: null})
+  },
+  handleChange(v, k) {
+    this._dirtied[`${k}`] = v
+  },
+  render() {
+    const {dataList} = this.state
+    return (
+      <Modal title='请在需要拆分成新订单的商品中输入拆分的数量' confirmLoading={this.state.confirmLoading} onOk={this.handleOK} visible={this.state.visible} onCancel={this.handleok} width={866}>
+        <Alert message='拆分订单后请勿线上发货或其它ERP发货，拆分订单线上发货，线下不会同步发货' type='warning' />
+        <div className={styles.mergeOTable}>
+          <Table size='middle' rowKey='ID' columns={[{
+            title: '图片',
+            dataIndex: 'Img',
+            width: 100,
+            render: function(value, record, index) {
+              return (
+                <div className={styles.img} style={{backgroundImage: value ? `url(${value})` : ''}}>
+                  <span>{record.Qty}</span>
+                </div>
+              )
+            }
+          }, {
+            title: '商品编码/货号',
+            dataIndex: 'SkuID',
+            width: 150,
+            render: function(value, record, index) {
+              return (
+                <div>
+                  <div>{value}</div>
+                  <div className='gray'>{record.GoodsCode}</div>
+                </div>
+              )
+            }
+          }, {
+            title: '名称',
+            dataIndex: 'SkuName',
+            width: 220
+          }, {
+            title: '颜色规格',
+            width: 100,
+            dataIndex: 'Norm'
+          }, {
+            title: '原有数量',
+            width: 90,
+            dataIndex: 'Qty'
+          }, {
+            title: '可配货库存',
+            width: 100,
+            dataIndex: 'InvQty'
+          }, {
+            title: '拆分数量',
+            width: 120,
+            render: (value, record) => {
+              return <Input type='number' size='small' min={0} max={record.Qty} onChange={(e) => this.handleChange(e.target.value, record.ID)} />
+            }
+          }]} dataSource={dataList} pagination={false} />
+        </div>
+      </Modal>
+    )
+  }
+}))
+const OrderMerge = connect(state => ({
+  doge: state.order_list_merge_1
+}))(createClass({
+  getInitialState() {
+    return {
+      selectedRowKeys: null,
+      visible: false,
+      dataList: [],
+      confirmLoading: false
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.doge) {
+      this._dirtied = false
+      this._getData(nextProps.doge)
+    } else {
+      this.setState({
+        visible: false,
+        selectedRowKeys: null,
+        dataList: [],
+        confirmLoading: false
+      })
+    }
+  },
+  _getData(OID) {
+    startLoading()
+    ZGet({
+      uri: 'Order/GetMergeOrd',
+      data: {OID},
+      success: ({d}) => {
+        const lst = d && d instanceof Array ? d : []
+        const zch = []
+        for (let mod of lst) {
+          let type = 0
+          switch (mod.type) {
+            case 'A': {
+              type = 1
+              break
+            }
+            case 'L': {
+              type = 2
+              break
+            }
+            case 'M': {
+              type = 3
+              break
+            }
+            case 'H': {
+              type = 4
+              break
+            }
+          }
+          if (mod.MOrd instanceof Array && mod.MOrd.length) {
+            for (let ord of mod.MOrd) {
+              ord._zch_ = type
+              zch.push(ord)
+            }
+          }
+        }
+        if (zch.length) {
+          zch.sort(function(a, b) {
+            return a._zch_ > b._zch_ ? 1 : -1
+          })
+        }
+        this.setState({
+          visible: true,
+          dataList: zch
+        })
+      }
+    }).then(endLoading)
+  },
+  handleToNormal(OID) {
+    startLoading()
+    ZPost('Order/TransferNormal', {OID: [OID]}, ({d}) => {
+      if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
+        //const obj = d.SuccessIDs[0]
+        this._dirtied = true
+        this._getData(this.props.doge)
+        // this.setState(update(this.state, {
+        //   dataList: {
+        //     [`${index}`]: {
+        //       $merge: {
+        //         Status: obj.Status,
+        //         StatusDec: obj.StatusDec
+        //       }
+        //     }
+        //   }
+        // }))
+      } else {
+        if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
+          message.error(d.FailIDs[0].Reason)
+        }
+      }
+    }).then(endLoading)
+  },
+  handleOK() {
+    const ids = this.state.selectedRowKeys
+    if (!ids || !ids.length || !ids.some(x => x === this.props.doge)) {
+      return message.error('请确保【主订单】有选中')
+    }
+    this.setState({
+      confirmLoading: true
+    })
+    ZPost('Order/OrdMerger', {OID: this.props.doge, MerID: ids}, () => {
+      this._dirtied = true
+      this.handleok()
+    }).then(() => {
+      this.setState({
+        confirmLoading: false
+      })
+    })
+  },
+  handleok() {
+    this.props.dispatch({type: 'ORDER_LIST_MERGE_1_SET', payload: null})
+    if (this._dirtied) {
+      this.props.zch.refreshRowData()
+    }
+  },
+  render() {
+    return (
+      <Modal title='请选择需要被合并的订单，即被合并到当前选择的备选订单' confirmLoading={this.state.confirmLoading} onOk={this.handleOK} visible={this.state.visible} onCancel={this.handleok} width={996}>
+        <div className={styles.mergeOtip}>
+          <span className={styles.s1}>当前订单</span>&nbsp;
+          <span className={styles.s2}><strong>推荐合并项</strong>(客户及收货地址均相同且已支付)</span>&nbsp;
+          <span className={styles.s3}><strong>中风险合并项</strong>(收货地址不相同且已支付或者收货地址相同但不是同一买家)</span>&nbsp;
+          <span className={styles.s4}><strong>高风险不能合并</strong>(没支付)</span>
+        </div>
+        <div className={styles.mergeOTable}>
+          <Table size='middle' rowKey='ID' columns={[{
+            title: '订单号',
+            dataIndex: 'ID',
+            width: 100,
+            render: function(value, record, index) {
+              return (
+                <div className=''>
+                  {value}
+                  {record._zch_ === 1 ? (
+                    <div><span className={styles.tag}>主订单</span></div>
+                  ) : null}
+                </div>
+              )
+            }
+          }, {
+            title: '线上订单号',
+            dataIndex: 'SoID',
+            width: 150,
+            render: function(value, record, index) {
+              return (
+                <div>
+                  <div>{value}</div>
+                  <div className='mt5 red' title='应付款（运费）'>{record.Amount}({record.ExAmount})</div>
+                </div>
+              )
+            }
+          }, {
+            title: '店铺&买家账号',
+            dataIndex: 'ShopName',
+            width: 220,
+            render: function(value, record, index) {
+              return (
+                <div>
+                  <div>{value}</div>
+                  <div>{record.BuyerShopID}</div>
+                </div>
+              )
+            }
+          }, {
+            title: '付款时间',
+            width: 100,
+            dataIndex: 'PayDate'
+          }, {
+            title: '收货地址',
+            width: 300,
+            dataIndex: 'RecAddress',
+            render: function(value, record, index) {
+              return (
+                <div>
+                  {record.RecLogistics} {record.RecCity} {record.RecDistrict} {record.RecAddress} {record.RecPhone}
+                </div>
+              )
+            }
+          }, {
+            title: '收货人',
+            width: 100,
+            dataIndex: 'RecName'
+          }, {
+            title: '支付',
+            dataIndex: 'IsPaid',
+            width: 70,
+            render: function(value) {
+              return value ? <Icon type='check-circle-o' /> : <Icon type='close-circle-o' />
+            }
+          }, {
+            title: '订单状态',
+            width: 120,
+            dataIndex: 'StatusDec'
+          }, {
+            title: '商品',
+            width: 460,
+            dataIndex: 'Sku',
+            render: function(value) {
+              if (value instanceof Array && value.length) {
+                return (
+                  <div className={styles.imgs}>
+                    {value.map(x => <div key={x.ID} className={styles.img} style={{backgroundImage: x.Img ? `url(${x.Img})` : ''}}><span>{x.Qty}</span></div>)}
+                  </div>
+                )
+              }
+              return null
+            }
+          }, {
+            title: '操作',
+            width: 120,
+            fixed: 'right',
+            render: (value, record) => {
+              return record.Status === 7 ? (
+                <div className='tc'>
+                  <Button type='primary' size='small' onClick={() => this.handleToNormal(record.ID)}>转正常单</Button>
+                </div>
+              ) : null
+            }
+          }]} rowClassName={OMergeClassName} rowSelection={{
+            selectedRowKeys: this.state.selectedRowKeys,
+            onChange: (selectedRowKeys) => {
+              this.setState({ selectedRowKeys })
+            },
+            getCheckboxProps: function(record) {
+              return {
+                checked: record._zch_ === 1,
+                disabled: record._zch_ === 4
+              }
+            }
+          }} dataSource={this.state.dataList} pagination={false} scroll={{x: 1620}} />
+        </div>
+      </Modal>
+    )
+  }
+}))
+const OMergeClassName = function(record) {
+  return styles[`s${record._zch_}`]
+}
+const BatchCustomException = connect(state => ({
+  doge: state.order_list_batch_custom_exceptions_1
+}))(createForm()(createClass({
+  getInitialState: function() {
+    return {
+      visible: false,
+      confirmLoading: false
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.doge) {
+      this.setState({
+        visible: true
+      })
+    } else {
+      this.setState({
+        visible: false
+      })
+    }
+  },
+  handleOK() {
+    this.props.form.validateFields((errors, values) => {
+      if (errors) {
+        return false
+      }
+      const data = Object.assign({}, values, {
+        OrdDateStart: data.OrdDate[0].format(),
+        OrdDateEnd: data.OrdDate[1].format(),
+        Status: data.Status instanceof Array && data.Status.length ? data.Status : ''
+      })
+      delete data.OrdDate
+      this.setState({
+        confirmLoading: true
+      })
+      ZPost('Order/MarkCustomAbnormal', data, () => {
+        this.handleok()
+        this.props.zch.refreshRowData()
+      }).then(() => {
+        this.setState({
+          confirmLoading: false
+        })
+      })
+    })
+  },
+  handleok() {
+    this.props.dispatch({type: 'ORDER_LIST_BATCH_CUSTOM_EXCEPTIONS_1_SET', payload: null})
+    this.props.form.resetFields()
+  },
+  render() {
+    const {getFieldDecorator} = this.props.form
+    const formItemLayout = {
+      labelCol: { span: 4 },
+      wrapperCol: { span: 18 }
+    }
+    return (
+      <Modal title='按商品信息标识自定义异常' confirmLoading={this.state.confirmLoading} onOk={this.handleOK} visible={this.state.visible} onCancel={this.handleok} width={646}>
+        <Alert message={<div>本身异常类型为：<strong>特殊单</strong>，<strong>用户已申请退款</strong>，<strong>等待订单合并</strong> ，<strong>线上锁定</strong> 等异常类型的订单将不参与标识，如需标识，请先转正常单。其它异常类型均可能被转异常。</div>} type='info' />
+        <div className={styles.noMBForm}>
+          <Form horizontal className='pos-form'>
+            <div className={styles.sChks}>
+              <FormItem {...formItemLayout} label='订单状态'>
+                {getFieldDecorator('Status')(
+                  <Checkbox.Group options={[
+                    {label: '待付款', value: '0'},
+                    {label: '已付款待审核', value: '1'},
+                    {label: '已审核待配快递', value: '2'},
+                    {label: '异常', value: '7'}
+                  ]} size='small' />
+                )}
+              </FormItem>
+            </div>
+            <FormItem {...formItemLayout} label='下单时间'>
+              {getFieldDecorator('OrdDate', {
+                rules: [
+                  {required: true, message: '必选', type: 'array'}
+                ]
+              })(
+                <DatePicker.RangePicker size='small' />
+              )}
+            </FormItem>
+            <FormItem {...formItemLayout} label='款号（货号）'>
+              {getFieldDecorator('GoodsCode')(
+                <Input size='small' placeholder='多个逗号分隔，包含其中一个编码即标异常' />
+              )}
+            </FormItem>
+            <FormItem {...formItemLayout} label='商品编码'>
+              {getFieldDecorator('SkuID')(
+                <Input size='small' placeholder='多个逗号分隔，包含其中一个编码即标异常。款码（货号）自动失效' />
+              )}
+            </FormItem>
+            <FormItem {...formItemLayout} label='商品名称关键字'>
+              {getFieldDecorator('SkuName')(
+                <Input size='small' />
+              )}
+            </FormItem>
+            <FormItem {...formItemLayout} label='规格关键字'>
+              {getFieldDecorator('Norm')(
+                <Input size='small' />
+              )}
+            </FormItem>
+            <FormItem {...formItemLayout} label='买家留言关键字'>
+              {getFieldDecorator('RecMessage')(
+                <Input size='small' />
+              )}
+            </FormItem>
+            <FormItem {...formItemLayout} label='卖家备注关键字'>
+              {getFieldDecorator('SendMessage')(
+                <Input size='small' />
+              )}
+            </FormItem>
+            <div className='hr' />
+            <FormItem {...formItemLayout} label='标记异常'>
+              {getFieldDecorator('Abnormal', {
+                rules: [
+                  {required: true, whitespace: true, message: '必填'}
+                ]
+              })(
+                <Input />
+              )}
+            </FormItem>
+          </Form>
+        </div>
+      </Modal>
+    )
+  }
+})))
+const BatchGift1 = connect(state => ({
+  doge: state.order_list_batch_gifts_1
+}))(createClass({
+  handleModalOk(selecter) {
+    const nodes = this.props.zch.grid.api.getSelectedNodes()
+    this.props.zch.grid.x0pCall(ZPost('Order/InsertGiftMulti', {OID: this.props.doge, SkuIDList: [selecter.ID]}, ({d}) => {
+      this.handleModalCancel()
+      parseBatchOperatorResult.call(this, d, function(x, qq) {
+        Object.assign(x.data, qq)
+      }, null, nodes, this.props.zch.grid)
+    }))
+  },
+  handleModalCancel() {
+    this.props.dispatch({type: 'ORDER_LIST_BATCH_GIFTS_1_SET', payload: null})
+  },
+  render() {
+    const doge = this.props.doge === null ? '0' : '1'
+    return (
+      <SkuPickerModal doge={doge} onOk={this.handleModalOk} onCancel={this.handleModalCancel} />
+    )
+  }
+}))
+const BatchSkus1 = connect(state => ({
+  doge: state.order_list_batch_skus_1
+}))(createForm()(createClass({
+  getInitialState: function() {
+    return {
+      visible: false,
+      confirmLoading: false
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.doge) {
+      this.setState({
+        visible: true
+      })
+    } else {
+      this.setState({
+        visible: false
+      })
+    }
+  },
+  handleOK() {
+    this.props.form.validateFields((errors, values) => {
+      console.log(values)
+      if (errors) {
+        return false
+      }
+      const data = Object.assign({}, values, {
+        AddSku: values.AddSku && values.AddSku.id ? values.AddSku.id : '',
+        ModifySku: values.ModifySku && values.ModifySku.id ? values.ModifySku.id : '',
+        DeleteSku: values.DeleteSku && values.DeleteSku.id ? values.DeleteSku.id : '',
+        OID: this.props.doge
+      })
+      if (!data.AddSku && !data.ModifySku && !data.DeleteSku) {
+        return message.error('请设置批量修改商品')
+      }
+      if (data.ModifySku && (typeof data.ModifyPrice === 'undefined' || data.ModifyPrice === '')) {
+        return message.error('请设置【修改商品单价】的【目标单价】')
+      }
+      if (data.AddSku && (typeof data.AddPrice === 'undefined' || data.AddPrice === '')) {
+        return message.error('请设置【添加指定商品】的【目标单价】')
+      }
+      const des = (
+        <div>
+          {data.AddSku ? (
+            <div className='mt5'>新增商品：{values.AddSku.data.SkuID}</div>
+          ) : null}
+          {data.ModifySku ? (
+            <div className='mt5'>修改商品：{values.ModifySku.data.SkuID}</div>
+          ) : null}
+          {data.DeleteSku ? (
+            <div className='mt5'>删除商品：{values.DeleteSku.data.SkuID}</div>
+          ) : null}
+        </div>
+      )
+      Modal.confirm({
+        title: '确认商品批量修改',
+        content: des,
+        onOk: () => {
+          this.setState({ loading: true })
+          const nodes = this.props.zch.grid.api.getSelectedNodes()
+          ZPost('Order/ModifySku', data, ({d}) => {
+            this.handleok()
+            parseBatchOperatorResult.call(this, d, function(x, qq) {
+              Object.assign(x.data, qq)
+            }, null, nodes, this.props.zch.grid)
+          }).then(() => {
+            this.setState({ loading: false })
+          })
+        },
+        onCancel() {}
+      })
+    })
+  },
+  handleok() {
+    this.props.dispatch({type: 'ORDER_LIST_BATCH_SKUS_1_SET', payload: null})
+    this.props.form.resetFields()
+  },
+  render() {
+    const {getFieldDecorator} = this.props.form
+    const chkFieldRequired = (field) => {
+      const value = this.props.form.getFieldValue('ModifySku')
+      return value && value.id
+    }
+    return (
+      <Modal title='批量修改订单商品' confirmLoading={this.state.confirmLoading} onOk={this.handleOK} visible={this.state.visible} onCancel={this.handleok} width={646}>
+        <div className={styles.noMBForm}>
+          <Form horizontal className='pos-form'>
+            <div className='flex-row'>
+              <div className='tc' style={{width: 96}}>
+                修改商品单价
+              </div>
+              <FormItem>
+                {getFieldDecorator('ModifySku')(
+                  <SkuPicker width={260} size='small' placeholder='指定商品' nameField='SkuID' />
+                )}
+              </FormItem>
+              <div className='flex-grow'>
+                <div className='ml5'>
+                  <FormItem>
+                    {getFieldDecorator('ModifyPrice', {
+                      rules: [
+                        {required: chkFieldRequired('ModifySku'), pattern: NUM_PATTERN, message: '错'}
+                      ]
+                    })(
+                      <Input size='small' placeholder='目标单价' />
+                    )}
+                  </FormItem>
+                </div>
+              </div>
+            </div>
+            <div className='flex-row mt10'>
+              <div className='tc' style={{width: 96}}>
+                删除指定商品
+              </div>
+              <FormItem>
+                {getFieldDecorator('DeleteSku')(
+                  <SkuPicker width={260} size='small' placeholder='指定商品' nameField='SkuID' />
+                )}
+              </FormItem>
+              <div className='flex-grow'>
+                &nbsp;
+              </div>
+            </div>
+            <div className='flex-row mt10'>
+              <div className='tc' style={{width: 96}}>
+                添加指定商品
+              </div>
+              <FormItem>
+                {getFieldDecorator('AddSku')(
+                  <SkuPicker width={260} size='small' placeholder='指定商品' nameField='SkuID' />
+                )}
+              </FormItem>
+              <div className='flex-grow'>
+                <div className='flex-row'>
+                  <div className='ml5'>
+                    <FormItem>
+                      {getFieldDecorator('AddPrice', {
+                        rules: [
+                          {required: chkFieldRequired('AddSku'), message: '必填'}
+                        ]
+                      })(
+                        <Input size='small' placeholder='目标单价' title='如果单价为0，则直接添加赠品;如果单价为-1，则添加实际单价为0且不标记为赠品的普通商品' />
+                      )}
+                    </FormItem>
+                  </div>
+                  <div className='ml5'>
+                    <FormItem>
+                      {getFieldDecorator('AddQty', {
+                        rules: [
+                          {required: chkFieldRequired('AddSku'), pattern: NUM_PATTERN, message: '必填'}
+                        ]
+                      })(
+                        <Input size='small' placeholder='数量默认1' />
+                      )}
+                    </FormItem>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className='flex-row mt10'>
+              <div className='tc' style={{width: 96}}>
+                添加商品规则
+              </div>
+              <div className='flex-grow'>
+                <div className={styles.sColumn}>
+                  <FormItem>
+                    {getFieldDecorator('AddType', {
+                      initialValue: 'A',
+                      rules: [
+                        {required: true, whitespace: true, message: '必选'}
+                      ]
+                    })(
+                      <RadioGroup>
+                        <Radio key='A' value='A'>订单已存在该商品则不添加</Radio>
+                        <Radio key='B' value='B'>直接添加,如果重复,数量累加</Radio>
+                      </RadioGroup>
+                    )}
+                  </FormItem>
+                </div>
+              </div>
+            </div>
+          </Form>
+        </div>
+        <div className='mt20 clearfix' />
+        <Alert message={<div>如果订单中不存在需要[修改单价]或[删除]的商品,则该订单不操作<br />所有操作都可能改变订单的应付总金额,一些原来已付款的订单可能变成[等待付款]</div>} type='warning' />
+      </Modal>
+    )
+  }
+})))
+const ToCancel1 = connect(state => ({
+  doge: state.order_list_to_cancel_1
+}))(createClass({
+  getInitialState: function() {
+    return {
+      visible: false,
+      value: null,
+      dataList: [],
+      confirmLoading: false
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.doge) {
+      startLoading()
+      ZGet({
+        uri: 'Order/GetCancleList',
+        success: ({d}) => {
+          const lst = d && d instanceof Array ? d : []
+          this.setState({
+            visible: true,
+            dataList: lst
+          })
+        }
+      }).then(endLoading)
+    } else {
+      this.setState({
+        visible: false,
+        value: null,
+        dataList: [],
+        confirmLoading: false
+      })
+    }
+  },
+  handleOK() {
+    const {value} = this.state
+    if (!value) {
+      return message.warning('请选择取消原因')
+    }
+    this.setState({
+      confirmLoading: true
+    })
+    const nodes = this.props.zch.grid.api.getSelectedNodes()
+    const Remark = this.refs.zch.refs.input.value
+    ZPost('Order/CancleOrder', {OID: this.props.doge, CancleReason: value, Remark}, ({d}) => {
+      this.handleok()
+      parseBatchOperatorResult.call(this, d, function(x, qq) {
+        x.data.Status = qq.Status
+        x.data.StatusDec = qq.StatusDec
+        x.data.AbnormalStatus = qq.AbnormalStatus
+        x.data.AbnormalStatusDec = qq.AbnormalStatusDec
+      }, ['Status'], nodes)
+    }).then(() => {
+      this.setState({
+        confirmLoading: false
+      })
+    })
+  },
+  handleok() {
+    this.props.dispatch({type: 'ORDER_LIST_TO_CANCEL_1_SET', payload: null})
+  },
+  handleRadio(e) {
+    this.setState({
+      value: e.target.value
+    })
+  },
+  render() {
+    return (
+      <Modal title='取消描述' confirmLoading={this.state.confirmLoading} onOk={this.handleOK} visible={this.state.visible} onCancel={this.handleok} width={676}>
+        <Alert message='您正在取消订单,注意订单一旦取消将会同步到线上,请仔细考虑操作' type='warning' />
+        <div className={styles.hua1}>
+          <div className='flex-grow'>
+            <RadioGroup onChange={this.handleRadio} value={this.state.value}>
+              {this.state.dataList.map(x => <Radio key={x.value} value={x.value}>{x.label}</Radio>)}
+            </RadioGroup>
+          </div>
+          <div className='flex-row' style={{height: 30}}>
+            <div style={{ lineHeight: '28px' }}><span>取消原因：</span></div>
+            <div className='flex-grow'><Input ref='zch' /></div>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+}))
 const ToExceptions = connect(state => ({
   doge: state.order_list_to_exception_1
 }))(createClass({
@@ -706,125 +1594,11 @@ const ToExceptions = connect(state => ({
             this.setState({
               visible: true,
               dataList: lst,
-              value: nextProps.value
+              value: null
             })
           }
         }).then(endLoading)
       }
-    }
-  },
-  handleOK() {
-    const {value} = this.state
-    if (!value) {
-      return message.warning('取消了异常设置')
-    }
-    this.setState({
-      confirmLoading: true
-    })
-    const nodes = this.props.zch.grid.api.getSelectedNodes()
-    this.props.zch.grid.x0pCall(ZPost('Order/SetExp', {OID: this.props.doge, WarehouseID: value}, ({d}) => {
-      this.hideModal()
-      parseBatchOperatorResult.call(this, d, function(x, qq) {
-        Object.assign(x.data, qq)
-      }, ['Status'], nodes)
-    }).then(() => {
-      this.setState({
-        confirmLoading: false
-      })
-    }))
-  },
-  handleok() {
-    this.props.dispatch({type: 'ORDER_LIST_TO_EXCEPTION_1_SET', payload: null})
-  },
-  handleRadio(e) {
-    this.setState({
-      value: e.target.value
-    })
-  },
-  handleModify() {
-    ModalPrompt({
-      onPrompt: ({value}) => {
-        const OrderAbnormal = value !== '' ? value.split(/,|，/).join(',') : ''
-        return new Promise((resolve, reject) => {
-          startLoading()
-          ZPost('Order/InsertOrderAbnormal', {
-            OrderAbnormal
-          }, ({d}) => {
-            resolve()
-            this.setState({
-              dataList: d
-            })
-          }, reject).then(endLoading)
-        })
-      },
-      children: (
-        <div className='mb10'>
-          请输入自定义异常，逗号分隔多个异常。<br />请不要输入特殊字符，单个异常长度不能超过20。<br />灰色带下划线为自定义异常。
-        </div>
-      ),
-      value: this.state.dataList.length ? this.state.dataList.reduce(function(a, b) {
-        if (b.iscustom) {
-          a.push(b.label)
-        }
-        return a
-      }, []).join(',') : ''
-    })
-  },
-  rendFooter() {
-    return (
-      <div className='clearfix tl'>
-        <Button type='primary' className='pull-right' onClick={this.handleSubmit} loading={this.state.confirmLoading}>确认</Button>
-        <Button type='ghost' size='small' onClick={this.handleModify}>维护自定义异常</Button>
-      </div>
-    )
-  },
-  render() {
-    return (
-      <Modal title='请输入标记异常的类型,输入相关说明' footer={this.rendFooter()} visible={this.state.visible} onOk={this.handleOK} onCancel={this.handleok} width={666}>
-        <div className={styles.hua1}>
-          <div className='flex-grow'>
-            <RadioGroup onChange={this.handleRadio} value={this.state.value}>
-              {this.state.dataList.map(x => {
-                if (x.iscustom) {
-                  return <Radio key={x.value} value={x.value} className={styles.customExcecption}>{x.label}</Radio>
-                }
-                return <Radio key={x.value} value={x.value}>{x.label}</Radio>
-              })}
-            </RadioGroup>
-          </div>
-          <div className='flex-row' style={{height: 30}}>
-            <div style={{ lineHeight: '28px' }}><span>异常描述：</span></div>
-            <div className='flex-grow'><Input /></div>
-          </div>
-        </div>
-      </Modal>
-    )
-  }
-}))
-
-const ToExceptions3 = createClass({
-  getInitialState: function() {
-    return {
-      visible: false,
-      value: this.props.AbnormalStatus,
-      dataList: [],
-      confirmLoading: false
-    }
-  },
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.visible) {
-      startLoading()
-      ZGet({
-        uri: 'Order/GetAbnormalList',
-        success: ({d}) => {
-          const lst = d && d instanceof Array ? d : []
-          this.setState({
-            visible: true,
-            dataList: lst,
-            value: nextProps.AbnormalStatus
-          })
-        }
-      }).then(endLoading)
     }
   },
   handleOK() {
@@ -835,29 +1609,13 @@ const ToExceptions3 = createClass({
     this.setState({
       confirmLoading: true
     })
+    const nodes = this.props.zch.grid.api.getSelectedNodes()
     const AbnormalStatusDec = this.refs.zch.refs.input.value
-    //const index = this.state.dataList.findIndex(x => x.value === value)
-    //const name = this.state.dataList[index].label
-    ZPost('Order/TransferAbnormal', {OID: [this.props.OID], AbnormalStatus: value, AbnormalStatusDec}, ({d}) => {
+    ZPost('Order/TransferAbnormal', {OID: this.props.doge, AbnormalStatus: value, AbnormalStatusDec}, ({d}) => {
       this.handleok()
-      if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
-        const obj = d.SuccessIDs[0]
-        this.props.onChange({
-          Status: obj.Status,
-          StatusDec: obj.StatusDec,
-          AbnormalStatus: obj.AbnormalStatus,
-          AbnormalStatusDec: obj.AbnormalStatusDec
-        })
-        // this.props.onChange({
-        //   Status: 7,
-        //   AbnormalStatus: value,
-        //   AbnormalStatusDec: name
-        // })
-      } else {
-        if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
-          message.error(d.FailIDs[0].Reason)
-        }
-      }
+      parseBatchOperatorResult.call(this, d, function(x, qq) {
+        Object.assign(x.data, qq)
+      }, ['Status'], nodes)
     }).then(() => {
       this.setState({
         confirmLoading: false
@@ -865,12 +1623,7 @@ const ToExceptions3 = createClass({
     })
   },
   handleok() {
-    this.setState({
-      visible: false,
-      value: null,
-      dataList: [],
-      confirmLoading: false
-    })
+    this.props.dispatch({type: 'ORDER_LIST_TO_EXCEPTION_1_SET', payload: null})
   },
   handleRadio(e) {
     this.setState({
@@ -936,8 +1689,151 @@ const ToExceptions3 = createClass({
       </Modal>
     )
   }
-})
-const ToCancel3 = createClass({
+}))
+
+const ToExceptions3 = connect(state => ({
+  doge: state.order_list_to_2
+}))(createClass({
+  getInitialState: function() {
+    return {
+      visible: false,
+      value: this.props.AbnormalStatus,
+      dataList: [],
+      confirmLoading: false
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.doge) {
+      startLoading()
+      ZGet({
+        uri: 'Order/GetAbnormalList',
+        success: ({d}) => {
+          const lst = d && d instanceof Array ? d : []
+          this.setState({
+            visible: true,
+            dataList: lst,
+            value: nextProps.AbnormalStatus
+          })
+        }
+      }).then(endLoading)
+    } else {
+      this.setState({
+        visible: false,
+        value: null,
+        dataList: [],
+        confirmLoading: false
+      })
+    }
+  },
+  handleOK() {
+    const {value} = this.state
+    if (!value) {
+      return message.warning('请选择异常状态')
+    }
+    this.setState({
+      confirmLoading: true
+    })
+    const AbnormalStatusDec = this.refs.zch.refs.input.value
+    ZPost('Order/TransferAbnormal', {OID: [this.props.doge], AbnormalStatus: value, AbnormalStatusDec}, ({d}) => {
+      this.handleok()
+      if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
+        const obj = d.SuccessIDs[0]
+        this.props.onChange({
+          Status: obj.Status,
+          StatusDec: obj.StatusDec,
+          AbnormalStatus: obj.AbnormalStatus,
+          AbnormalStatusDec: obj.AbnormalStatusDec
+        })
+      } else {
+        if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
+          message.error(d.FailIDs[0].Reason)
+        }
+      }
+    }).then(() => {
+      this.setState({
+        confirmLoading: false
+      })
+    })
+  },
+  handleok() {
+    this.props.dispatch({type: 'ORDER_LIST_TO_2_SET', payload: null})
+    // this.setState({
+    //   visible: false,
+    //   value: null,
+    //   dataList: [],
+    //   confirmLoading: false
+    // }, () => {
+    //   this.props.onCancel()
+    // })
+  },
+  handleRadio(e) {
+    this.setState({
+      value: e.target.value
+    })
+  },
+  handleModify() {
+    ModalPrompt({
+      onPrompt: ({value}) => {
+        const OrderAbnormal = value !== '' ? value.split(/,|，/).join(',') : ''
+        return new Promise((resolve, reject) => {
+          startLoading()
+          ZPost('Order/InsertOrderAbnormal', {
+            OrderAbnormal
+          }, ({d}) => {
+            resolve()
+            this.setState({
+              dataList: d
+            })
+          }, reject).then(endLoading)
+        })
+      },
+      children: (
+        <div className='mb10'>
+          请输入自定义异常，逗号分隔多个异常。<br />请不要输入特殊字符，单个异常长度不能超过20。<br />灰色带下划线为自定义异常。
+        </div>
+      ),
+      value: this.state.dataList.length ? this.state.dataList.reduce(function(a, b) {
+        if (b.iscustom) {
+          a.push(b.label)
+        }
+        return a
+      }, []).join(',') : ''
+    })
+  },
+  rendFooter() {
+    return (
+      <div className='clearfix tl'>
+        <Button type='primary' className='pull-right' onClick={this.handleOK} loading={this.state.confirmLoading}>确认</Button>
+        <Button type='ghost' size='small' onClick={this.handleModify}>维护自定义异常</Button>
+      </div>
+    )
+  },
+  render() {
+    return (
+      <Modal title='请输入标记异常的类型,输入相关说明' footer={this.rendFooter()} visible={this.state.visible} onCancel={this.handleok} width={666}>
+        <div className={styles.hua1}>
+          <div className='flex-grow'>
+            <RadioGroup onChange={this.handleRadio} value={this.state.value}>
+              {this.state.dataList.map(x => {
+                if (x.iscustom) {
+                  return <Radio key={x.value} value={x.value} className={styles.customExcecption}>{x.label}</Radio>
+                }
+                return <Radio key={x.value} value={x.value}>{x.label}</Radio>
+              })}
+            </RadioGroup>
+          </div>
+          <div className='flex-row' style={{height: 30}}>
+            <div style={{ lineHeight: '28px' }}><span>异常描述：</span></div>
+            <div className='flex-grow'><Input ref='zch' /></div>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+}))
+const ToCancel3 = connect(state => ({
+  doge: state.order_list_to_1
+}))(createClass({
   getInitialState: function() {
     return {
       visible: false,
@@ -947,7 +1843,7 @@ const ToCancel3 = createClass({
     }
   },
   componentWillReceiveProps(nextProps) {
-    if (nextProps.visible) {
+    if (nextProps.doge) {
       startLoading()
       ZGet({
         uri: 'Order/GetCancleList',
@@ -959,6 +1855,13 @@ const ToCancel3 = createClass({
           })
         }
       }).then(endLoading)
+    } else {
+      this.setState({
+        visible: false,
+        value: null,
+        dataList: [],
+        confirmLoading: false
+      })
     }
   },
   handleOK() {
@@ -992,12 +1895,15 @@ const ToCancel3 = createClass({
     })
   },
   handleok() {
-    this.setState({
-      visible: false,
-      value: null,
-      dataList: [],
-      confirmLoading: false
-    })
+    this.props.dispatch({type: 'ORDER_LIST_TO_1_SET', payload: null})
+    // this.setState({
+    //   visible: false,
+    //   value: null,
+    //   dataList: [],
+    //   confirmLoading: false
+    // }, () => {
+    //   this.props.onCancel()
+    // })
   },
   handleRadio(e) {
     this.setState({
@@ -1006,7 +1912,8 @@ const ToCancel3 = createClass({
   },
   render() {
     return (
-      <Modal title='请输入标记异常的类型,输入相关说明' confirmLoading={this.state.confirmLoading} onOk={this.handleOK} visible={this.state.visible} onCancel={this.handleok} width={666}>
+      <Modal title='取消描述' confirmLoading={this.state.confirmLoading} onOk={this.handleOK} visible={this.state.visible} onCancel={this.handleok} width={676}>
+        <Alert message='您正在取消订单,注意订单一旦取消将会同步到线上,请仔细考虑操作' type='warning' />
         <div className={styles.hua1}>
           <div className='flex-grow'>
             <RadioGroup onChange={this.handleRadio} value={this.state.value}>
@@ -1021,7 +1928,7 @@ const ToCancel3 = createClass({
       </Modal>
     )
   }
-})
+}))
 const Whouse = connect(state => ({
   doge: state.order_list_whouse_1
 }))(createClass({
@@ -1143,18 +2050,19 @@ const ComDetail1 = connect(state => ({
       payments: [],
       items: [],
       expr_vis: false,
-      toe_vis: false
+      toe_vis: false,
+      tca_vis: false
     }
   },
-  componentDidMount() {
-    this.setState({
-      visible: true
-    }, () => {
-      this.componentWillReceiveProps({doge: 10873})
-    })
-  },
+  // componentDidMount() {
+  //   this.setState({
+  //     visible: true
+  //   }, () => {
+  //     this.componentWillReceiveProps({doge: 10873})
+  //   })
+  // },
   componentWillReceiveProps(nextProps) {
-    //if (this.props.doge !== nextProps.doge) {
+    if (this.props.doge !== nextProps.doge) {
       if (nextProps.doge === null) {
         this.setState({
           visible: false
@@ -1162,7 +2070,7 @@ const ComDetail1 = connect(state => ({
       } else {
         this.loadDetail(nextProps.doge)
       }
-    //}
+    }
   },
   loadDetail(OID) {
     startLoading()
@@ -1553,12 +2461,16 @@ const ComDetail1 = connect(state => ({
     )
   },
   _handleExceptionOrder() {
-    this.setState({
-      toe_vis: true
-    })
+    // this.setState({
+    //   toe_vis: true
+    // })
+    this.props.dispatch({type: 'ORDER_LIST_TO_2_SET', payload: this.state.order.ID})
   },
   _handleCancelOrder() {
-    this.props.dispatch({type: 'ORDER_LIST_TO_CANCEL_1_SET', payload: [this.state.order.ID]})
+    // this.setState({
+    //   tca_vis: true
+    // })
+    this.props.dispatch({type: 'ORDER_LIST_TO_1_SET', payload: this.state.order.ID})
   },
   _handleConfirmOrder() {
     startLoading()
@@ -1567,9 +2479,7 @@ const ComDetail1 = connect(state => ({
     }).then(endLoading)
   },
   _handleExpressOrder() {
-    this.setState({
-      expr_vis: true
-    })
+    this.props.dispatch({type: 'ORDER_LIST_TO_3_SET', payload: this.state.order.ID})
   },
   _handleCancelException() {
     startLoading()
@@ -1591,6 +2501,100 @@ const ComDetail1 = connect(state => ({
           message.error(d.FailIDs[0].Reason)
         }
       }
+    }).then(endLoading)
+  },
+  _handleReOrder() {
+    startLoading()
+    ZPost('Order/RestoreCancleOrder', {OID: [this.state.order.ID]}, ({d}) => {
+      if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
+        const obj = d.SuccessIDs[0]
+        this.setState(update(this.state, {
+          order: {
+            $merge: {
+              Status: obj.Status,
+              StatusDec: obj.StatusDec
+            }
+          }
+        }), () => {
+          this._dirtied = true
+        })
+      } else {
+        if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
+          message.error(d.FailIDs[0].Reason)
+        }
+      }
+    }).then(endLoading)
+  },
+  _handleSendOrder() {
+    const value = this.refs.senderIpt.refs.input.value
+    if (!value) {
+      return message.warn('请输入快递单号')
+    }
+    startLoading()
+    ZPost('Order/DirectShip', {OID: this.state.order.ID, ExCode: value}, ({d}) => {
+      this.setState(update(this.state, {
+        order: {
+          $merge: d
+        }
+      }), () => {
+        this._dirtied = true
+      })
+    }).then(endLoading)
+  },
+  _handleUnAuditOrder() {
+    startLoading()
+    ZPost('Order/CancleConfirmOrder', {OID: [this.state.order.ID]}, ({d}) => {
+      if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
+        const obj = d.SuccessIDs[0]
+        this.setState(update(this.state, {
+          order: {
+            $merge: {
+              Status: obj.Status,
+              StatusDec: obj.StatusDec
+            }
+          }
+        }), () => {
+          this._dirtied = true
+        })
+      } else {
+        if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
+          message.error(d.FailIDs[0].Reason)
+        }
+      }
+    }).then(endLoading)
+  },
+  _handleReSendOrder() {
+    startLoading()
+    ZPost('Order/', {OID: [this.state.order.ID]}, ({d}) => {
+      if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
+        const obj = d.SuccessIDs[0]
+        this.setState(update(this.state, {
+          order: {
+            $merge: {
+              Status: obj.Status,
+              StatusDec: obj.StatusDec
+            }
+          }
+        }), () => {
+          this._dirtied = true
+        })
+      } else {
+        if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
+          message.error(d.FailIDs[0].Reason)
+        }
+      }
+    }).then(endLoading)
+  },
+  _handleCancelSendOrder() {
+    startLoading()
+    ZPost('Order/CancleShip', {OID: this.state.order.ID}, ({d}) => {
+      this.setState(update(this.state, {
+        order: {
+          $merge: d
+        }
+      }), () => {
+        this._dirtied = true
+      })
     }).then(endLoading)
   },
   _renderOps() {
@@ -1615,11 +2619,54 @@ const ComDetail1 = connect(state => ({
           </div>
         )
       }
+      case 2: {
+        return (
+          <div>
+            <div className='gray'>当前订单已审核，如需要修改订单，请先取消确认状态</div>
+            <div className='mt10'><Button type='primary' size='small' onClick={this._handleExpressOrder}>设定快递公司</Button></div>
+            <div className='mt10'><Button type='ghost' size='small' onClick={this._handleUnAuditOrder}>取消审核</Button></div>
+            <div className='mt10'><Button type='ghost' size='small' onClick={this._handleExceptionOrder}>标记异常</Button></div>
+            <div className='mt15'><Button type='ghost' size='small' onClick={this._handleCancelOrder}>取消订单</Button></div>
+            <div className='mt25'>
+              <div className='gray'>输入快递单号，直接发货</div>
+              <div><Input placeholder='输入快递单号' ref='senderIpt' /></div>
+              <div className='tr'><Button type='primary' size='small' onClick={this._handleSendOrder}>直接发货</Button></div>
+            </div>
+          </div>
+        )
+      }
+      case 3: {
+        return (
+          <div>
+            <div className='mt10'><Button type='ghost' size='small' onClick={this._handleExceptionOrder}>标记异常</Button></div>
+            <div className='mt25'>
+              <div className='gray'>输入快递单号，直接发货</div>
+              <div><Input placeholder='输入快递单号' ref='senderIpt' /></div>
+              <div className='tr'><Button type='primary' size='small' onClick={this._handleSendOrder}>直接发货</Button></div>
+            </div>
+          </div>
+        )
+      }
+      case 4: {
+        return (
+          <div>
+            <div className='mt10'><Button type='ghost' size='small' onClick={this._handleReSendOrder}>重新发货</Button></div>
+            <div className='mt10'><Button type='dashed' size='small' onClick={this._handleCancelSendOrder}>撤销已发货</Button></div>
+          </div>
+        )
+      }
       case 0: {
         return (
           <div>
             <div><Button type='ghost' size='small' onClick={this._handleExceptionOrder}>标记异常</Button></div>
             <div className='mt20'><Button type='ghost' size='small' onClick={this._handleCancelOrder}>取消订单</Button></div>
+          </div>
+        )
+      }
+      case 6: {
+        return (
+          <div>
+            <div className='mt10 clearfix'><Button type='dashed' className='pull-right' size='small' onClick={this._handleReOrder}>反取消订单</Button></div>
           </div>
         )
       }
@@ -1646,24 +2693,37 @@ const ComDetail1 = connect(state => ({
       )
     }
     const status = order.Status
-    if (status === 7) {
-      return (
-        <div className={styles.process}>
-          <div className={styles.exception}>
-            {order.AbnormalStatusDec}
+    switch (status) {
+      case 7: {
+        return (
+          <div className={styles.process}>
+            <div className={styles.exception}>
+              {order.AbnormalStatusDec}
+            </div>
           </div>
-        </div>
-      )
+        )
+      }
+      case 6: {
+        return (
+          <div className={styles.process}>
+            <div className={styles.exception}>
+              {order.StatusDec}
+            </div>
+          </div>
+        )
+      }
+      default: {
+        return (
+          <Steps current={order.Status}>
+            <Step title='待付款' />
+            <Step title='已付款待审核' />
+            <Step title='已审核待配快递' />
+            <Step title='发货中' />
+            <Step title='已发货' />
+          </Steps>
+        )
+      }
     }
-    return (
-      <Steps current={order.Status}>
-        <Step title='待付款' />
-        <Step title='已付款待审核' />
-        <Step title='已审核待配快递' />
-        <Step title='发货中' />
-        <Step title='已发货' />
-      </Steps>
-    )
   },
   render() {
     const {order} = this.state
@@ -1724,7 +2784,12 @@ const ComDetail1 = connect(state => ({
                 <Col span={3}><div className={styles.label}>快递公司</div></Col>
                 <Col span={6}><div className={styles.inpt}>{order.Express}</div></Col>
                 <Col span={3}><div className={styles.label}>快递单号</div></Col>
-                <Col span={12}><div className={styles.inpt}>{order.ExCode}</div></Col>
+                <Col span={12}><div className={styles.inpt}><a onClick={() => {
+                  this.props.dispatch({type: 'ORDER_LIST_EXPR_S_1_SET', payload: {
+                    pp: order.ExpNamePinyin,
+                    ap: order.ExCode
+                  }})
+                }}>{order.ExCode}</a></div></Col>
               </Row>
             </div>
             <_ComDetailForm1 data={formData} updateStates={this._updateStates} />
@@ -1746,28 +2811,38 @@ const ComDetail1 = connect(state => ({
             </Row>
           )) : <div className='mt10 gray tc'>(无)</div>}
         </div>
-        <ComExpr3 visible={this.state.expr_vis} OID={this.state.order.ID} address={expr3Address} onChange={(d) => {
+        <ComExpr3 address={expr3Address} onChange={(d) => {
           this.setState(update(this.state, {
             order: {
               $merge: d
-            },
-            expr_vis: {
-              $set: false
             }
           }), () => {
             this.__dirtied = true
           })
         }} />
-        <ToExceptions3 visible={this.state.toe_vis} OID={this.state.order.ID} AbnormalStatus={this.state.order.AbnormalStatus} onChange={(d) => {
+        <ToExceptions3 AbnormalStatus={this.state.order.AbnormalStatus} onChange={(d) => {
+          this.setState(update(this.state, {
+            order: {
+              $merge: d
+            }
+          }), () => {
+            this.__dirtied = true
+          })
+        }} />
+        <ToCancel3 visible={this.state.tca_vis} OID={this.state.order.ID} onChange={(d) => {
           this.setState(update(this.state, {
             order: {
               $merge: d
             },
-            toe_vis: {
+            tca_vis: {
               $set: false
             }
           }), () => {
             this.__dirtied = true
+          })
+        }} onCancel={() => {
+          this.setState({
+            tca_vis: false
           })
         }} />
       </Modal>
@@ -1882,19 +2957,25 @@ const _ComDetailForm1 = createForm()(createClass({
       loading: false
     }
   },
+  componentDidMount() {
+    this._refresh(this.props.data)
+  },
   componentWillReceiveProps(nextProps) {
     if (JSON.stringify(nextProps.data) !== JSON.stringify(this.props.data)) {
-      this.props.form.setFieldsValue({
-        s1: nextProps.data.freight,
-        s2: nextProps.data.sendMessage,
-        s3: nextProps.data.invoiceTitle,
-        s6: nextProps.data.areas.length ? nextProps.data.areas : undefined,
-        s7: nextProps.data.address,
-        s8: nextProps.data.name,
-        s9: nextProps.data.tel,
-        s10: nextProps.data.phone
-      })
+      this._refresh(nextProps.data)
     }
+  },
+  _refresh(data) {
+    this.props.form.setFieldsValue({
+      s1: data.freight,
+      s2: data.sendMessage,
+      s3: data.invoiceTitle,
+      s6: data.areas.length ? data.areas : undefined,
+      s7: data.address,
+      s8: data.name,
+      s9: data.tel,
+      s10: data.phone
+    })
   },
   handleOK() {
     this.props.form.validateFields((errors, values) => {
@@ -2374,7 +3455,9 @@ const ComExpr1 = connect(state => ({
     )
   }
 }))
-const ComExpr3 = createClass({
+const ComExpr3 = connect(state => ({
+  doge: state.order_list_to_3
+}))(createClass({
   getInitialState() {
     return {
       visible: false,
@@ -2386,7 +3469,7 @@ const ComExpr3 = createClass({
     }
   },
   componentWillReceiveProps(nextProps) {
-    if (nextProps.visible) {
+    if (nextProps.doge) {
       startLoading()
       const u = nextProps.address
       ZGet('Order/GetExp', {
@@ -2420,16 +3503,27 @@ const ComExpr3 = createClass({
           this.setState({ visible: true, value: u.ExID, exps: d.Express, expers: null, address })
         }
       }).then(endLoading)
+    } else {
+      this.setState({
+        visible: false,
+        address: '',
+        value: '',
+        exps: [],
+        expers: []
+      })
     }
   },
   hideModal() {
-    this.setState({
-      visible: false,
-      address: '',
-      value: '',
-      exps: [],
-      expers: []
-    })
+    // this.setState({
+    //   visible: false,
+    //   address: '',
+    //   value: '',
+    //   exps: [],
+    //   expers: []
+    // }, () => {
+    //   this.props.onCancel()
+    // })
+    this.props.dispatch({type: 'ORDER_LIST_TO_3_SET', payload: null})
   },
   handleOK() {
     const value = this.state.value
@@ -2447,7 +3541,7 @@ const ComExpr3 = createClass({
       ExpName = DATA_EXPR_TYPE_EDNTEDS[value][0]
     }
     const data = {
-      OID: [this.props.OID],
+      OID: [this.props.doge],
       ExpID: value,
       ExpName
     }
@@ -2521,7 +3615,24 @@ const ComExpr3 = createClass({
       </Modal>
     )
   }
-})
+}))
+const ExprSearchModal = connect(state => ({
+  doge: state.order_list_expr_s_1
+}))(createClass({
+  hideModal() {
+    this.props.dispatch({ type: 'ORDER_LIST_EXPR_S_1_SET', payload: null })
+  },
+  render() {
+    const {doge} = this.props
+    const visible = doge !== null
+    const src = doge ? `http://m.kuaidi100.com/index_all.html?type=${doge.pp}&postid=${doge.ap}#result` : 'about:blank'
+    return (
+      <Modal className={styles.iframeModal} title='物流状态（快递100）' visible={visible} width={350} onCancel={this.hideModal} footer=''>
+        <iframe frameBorder='0' src={src} />
+      </Modal>
+    )
+  }
+}))
 const ExpressModal = connect(state => ({
   doge: state.order_list_expr_2
 }))(createClass({
@@ -2653,7 +3764,10 @@ const gridOptions = {
     const data = params.node.data
     return [
       {
-        name: '订单 ' + data.ID + ' 详情'
+        name: '订单 ' + data.ID + ' 详情',
+        action: function() {
+          params.api.gridOptionsWrapper.gridOptions.grid.props.dispatch({type: 'ORDER_LIST_DETAIL_1_SET', payload: data.ID})
+        }
       },
       {
         name: '查看线上订单，多店铺请注意当前登陆',
@@ -2685,7 +3799,7 @@ const gridOptions = {
       },
       {
         name: '转异常单',
-        disabled: [0, 1, 2, 3].indexOf(data.Status) === -1
+        disabled: [0, 1, 2, 3, 8].indexOf(data.Status) === -1
       },
       // {
       //   name: '打标签'
@@ -2694,10 +3808,15 @@ const gridOptions = {
       //   name: '改标签'
       // },
       {
-        name: '取消订单'
+        name: '取消订单',
+        disabled: [0, 1, 2, 3, 7, 8].indexOf(data.Status) === -1,
+        action: function() {
+          params.api.gridOptionsWrapper.gridOptions.grid.props.dispatch({type: 'ORDER_LIST_TO_CANCEL_1_SET', payload: [data.ID]})
+        }
       },
       {
         name: '设快递',
+        disabled: [0, 1, 2, 7].indexOf(data.Status) === -1,
         action: function() {
           params.api.gridOptionsWrapper.gridOptions.grid.props.dispatch({type: 'ORDER_LIST_EXPR_1_SET', payload: params.node.childIndex})
         }
@@ -2707,10 +3826,21 @@ const gridOptions = {
       },
       'separator',
       {
-        name: '合并订单'
+        name: '合并订单',
+        disabled: [1, 2].indexOf(data.Status) === -1,
+        action: function() {
+          params.api.gridOptionsWrapper.gridOptions.grid.props.dispatch({type: 'ORDER_LIST_MERGE_1_SET', payload: data.ID})
+        }
       },
       {
-        name: '拆分订单'
+        name: '拆分订单',
+        disabled: [1, 2].indexOf(data.Status) === -1,
+        action: function() {
+          params.api.gridOptionsWrapper.gridOptions.grid.props.dispatch({type: 'ORDER_LIST_SPLIT_1_SET', payload: {
+            OID: data.ID,
+            Skus: data.SkuList
+          }})
+        }
       },
       'separator',
       {
@@ -2784,7 +3914,7 @@ const ItemSKUWrapper = createClass({
     const {item} = this.props
     return (
       <div className={styles.itemSKUsWrapper}>
-        {[0, 1].indexOf(item.Status) !== -1 ? (
+        {[0, 1, 7].indexOf(item.Status) !== -1 ? (
           <div className={styles.quickModify}>
             <div className={styles.skus}>
               {item.SkuList && item.SkuList.length ? item.SkuList.map(x => <SkuItemsForm key={x.ID} x={x} oid={item.ID} onChange={this.props.onChange} />) : null}
@@ -3031,6 +4161,10 @@ const ModalNewEgg = connect(state => ({
       }, () => {
         this.props.refreshRowData()
         this.hideModal()
+      }).then(() => {
+        this.setState({
+          confirmLoading: false
+        })
       })
     })
   },
@@ -3254,29 +4388,48 @@ const parseBatchOperatorResult = function(d, cb, fields, nodes, grid, errmsg) {
         cb(x, successIDs[`${x.data.ID}`])
       }
     })
-    if (grid) {
-      grid.api.refreshCells(_nodes, fields)
+    if (fields === null) {
+      if (grid) {
+        grid.api.refreshRows(_nodes)
+      } else {
+        this.props.zch.grid.api.refreshRows(_nodes)
+      }
     } else {
-      this.props.zch.grid.api.refreshCells(_nodes, fields)
+      if (grid) {
+        grid.api.refreshCells(_nodes, fields)
+      } else {
+        this.props.zch.grid.api.refreshCells(_nodes, fields)
+      }
     }
+    //const refresh = fields === null ? (grid ? grid.api.refreshRows : this.props.zch.grid.api.refreshRows) : (grid ? grid.api.refreshCells : this.props.zch.grid.api.refreshCells)
+    //refresh(_nodes, fields)
   }
   if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
-    const description = (<div>
-      {d.FailIDs.map(x => {
-        return (
-          <div key={x.ID}>
-            订单号({x.ID}): {x.Reason}
-          </div>
-        )
-      })}
+    const description = (<div className={styles.processDiv}>
+      <ul>
+        {d.FailIDs.map(x => {
+          return (
+            <li key={x.ID}>
+              订单号(<strong>{x.ID}</strong>)<span>{x.Reason}</span>
+            </li>
+          )
+        })}
+      </ul>
       <div className='hr' />
-      <div className='mt5'><small>请检查相关订单或刷新</small></div>
+      <div className='mt5 tr'><small className='gray'>请检查相关订单或刷新</small></div>
     </div>)
-    notification.error({
-      message: errmsg || '处理结果问题反馈',
-      description,
-      icon: <Icon type='meh-o' />,
-      duration: 30
+    Modal.warning({
+      title: errmsg || '处理结果问题反馈',
+      content: description,
+      width: 480,
+      onOk: function() {
+        notification.error({
+          message: '异常订单号',
+          description: <div className='break'>{d.FailIDs.map(x => x.ID).join(',')}</div>,
+          icon: <Icon type='meh-o' />,
+          duration: null
+        })
+      }
     })
   }
 }

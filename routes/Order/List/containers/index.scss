@@ -98,6 +98,94 @@ height: 100%;
     }
   }
 }
+.sChks {
+  :global{
+    .ant-checkbox-group-item {
+      display: block;
+      margin-left:0;
+      user-select: none;
+      line-height:22px;
+      &:first-child {
+        margin-top: 4px;
+      }
+    }
+  }
+}
+
+.mergeOtip {
+  margin-bottom: 10px;
+  .s1 {
+    padding: 4px;
+    background-color: #ffffff;
+    color: #0000ff;
+  }
+  .s2 {
+    padding: 4px;
+    background-color: #a8d59d;
+  }
+  .s3 {
+    padding: 4px;
+    background-color: #fffbbd;
+  }
+  .s4 {
+    background-color: #efefef;
+    color: #999;
+      padding: 4px;
+  }
+}
+
+.img {
+  position: relative;
+  width: 36px;
+  height:36px;
+  display: inline-block;
+  background-size: cover;
+  margin:1px;
+  float:left;
+  background-color:#fff;
+  span {
+    position: absolute;
+    left: -4px;
+    top: -3px;
+    font-size: 12px;
+font-family: Arial;
+    background-color: #f00;
+    color: #ffffff;
+    border-radius: 6px;
+        padding: 0px 5px;
+  }
+}
+.mergeOTable {
+  .imgs {
+  }
+  .tag {
+    background-color: #0094ff;
+    color: #fff;
+    display: inline-block;
+    padding: 3px 3px 3px 4px;
+    line-height: 12px;
+    padding-right: 4px;
+    height: 20px;
+    min-width: 20px;
+    text-align: center;
+    border-radius: 5px;
+    margin-left: 2px;
+  }
+  .s1 {
+    padding: 4px;
+    background-color: #ffffff;
+  }
+  .s2 {
+    background-color: #a8d59d;
+  }
+  .s3 {
+    background-color: #fffbbd;
+  }
+  .s4 {
+    background-color: #efefef;
+    color: #999;
+  }
+}
 
 .centerWrapper {
   display: flex;
@@ -396,32 +484,44 @@ height: 100%;
 }
 
 .orderS0 { //
-  background-color: #fffcd5;
-  color: #666;
+  background-color: #fffcd5!important;
+  color: #666!important;
 }
 .orderS1 { //
-  background-color: #fde7ab;
-  color: #666;
+  background-color: rgb(253, 231, 171)!important;
+  color: rgb(102, 102, 102)!important;
 }
 .orderS2 { //
-  background-color: #c6e3ef;
-  color: #0a87ba;
+  background-color: rgb(224, 253, 173)!important;
+  color: rgb(1, 124, 26)!important;
 }
 .orderS3 { //
-  background-color: #009f3c;
-  color: #fff;
+  background-color: rgb(198, 227, 239)!important;
+      color: rgb(10, 135, 186)!important;
 }
 .orderS4 { //
-  //background-color: #fde7ab;
-  //color: #666;
+  background-color: rgb(0, 159, 60)!important;
+  color: rgb(255, 255, 255)!important;
 }
 .orderS5 {
-  background-color: #ccc;
-  color: #333;
+  background-color: #ccc!important;
+  color: #333!important;
+}
+.orderS6 {
+  background-color: rgb(255, 0, 0)!important;
+    color: rgb(255, 255, 255)!important;
 }
 .orderS7 {
-  background-color: #a9834f;
-  color: #fff;
+  background-color: rgb(169, 131, 79)!important;
+  color: rgb(255, 255, 255)!important;
+  .dtype {
+    color: #ff0;
+    margin-top: 5px;
+  }
+}
+.orderS8 {
+  background-color: rgb(204, 204, 204)!important;
+    color: rgb(51, 51, 51)!important;
 }
 
 
@@ -449,8 +549,11 @@ height: 100%;
   display: flex;
   flex-direction: column;
   :global {
+    .ant-radio-group {
+      width: 100%;
+    }
     .ant-radio-wrapper {
-      width: 32%;
+      width: 31%;
       margin-bottom: 5px;
     }
   }
@@ -468,6 +571,41 @@ height: 100%;
   margin-right: 9px;
   :global(.ant-btn) {
     margin-left:4px;
+  }
+}
+
+.iframeModal {
+  :global {
+    .ant-modal-body {
+      padding: 0;
+      line-height: 1;
+    }
+    iframe {
+      width: 100%;
+    min-height: 500px;
+    }
+  }
+}
+.processDiv {
+  ul {
+    list-style-type: decimal;
+    margin-bottom: 5px;
+  }
+  li {
+    border-bottom: 1px dotted transparent;
+    &:hover {
+      border-color: #eee;
+    }
+  }
+  strong {
+    width: 56px;
+    display: inline-block;
+    text-align: center;
+  }
+  span {
+    color: #696969;
+    margin-left:10px;
+    font-family: 'Segoe UI','宋体', Tahoma, Arial, Verdana;
   }
 }
 
@@ -495,9 +633,6 @@ height: 100%;
   .fck-1,
   .fck-7 {
     &:hover {
-      .float-1 {
-        display: block;
-      }
       .float-2 {
         display: block;
       }
@@ -513,9 +648,13 @@ height: 100%;
   .fck-4,
   .fck-5,
   .fck-6,
-  .fck-7 {
+  .fck-7,
+  .fck-8 {
     &:hover {
       .float-0 {
+        display: block;
+      }
+      .float-1 {
         display: block;
       }
     }
