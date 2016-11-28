@@ -66,7 +66,7 @@ export default React.createClass({
   render() {
     const {style, className, placeholder} = this.props
     const CN = className ? `${styles.zhang} ${className}` : styles.zhang
-    const styler = style ? {width: this.props.width || 135, ...style} : {width: this.props.width || 135}
+    const styler = style ? {width: this.props.width || 145, ...style} : {width: this.props.width || 145}
     return (
       <div className={CN} style={styler}>
         <div className={styles.inputArea} onClick={this.handleSelect}>

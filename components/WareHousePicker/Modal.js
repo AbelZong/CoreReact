@@ -35,7 +35,7 @@ export default React.createClass({
       ZGet({
         uri: 'Common/GetChildWarehouseList2',
         success: ({d}) => {
-          const lst = d.Lst && d.Lst instanceof Array ? d.Lst : []
+          const lst = d && d instanceof Array ? d : []
           this.setState({
             spinning: false,
             dataList: lst,
