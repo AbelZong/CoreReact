@@ -18,7 +18,7 @@ import {
 import styles from './index.scss'
 import {Button, Form, Select, DatePicker, Input} from 'antd'
 import SkuPicker from 'components/SkuPicker'
-import WareHousePicker from 'components/WareHouse2Picker'
+import WareHousePicker from 'components/WareHousePicker'
 const RangePicker = DatePicker.RangePicker
 const createForm = Form.create
 const FormItem = Form.Item
