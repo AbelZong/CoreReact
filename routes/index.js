@@ -70,6 +70,7 @@ import Warehouse3rdRoute from './Warehouse/3rd'
 import SuperAnnounceRoute from './Super/Announce'
 import OrderListRoute from './Order/List'
 import StockInitRoute from './Stock/Init'
+import StockTakeRoute from './Stock/Take'
 //import AdminCompanyRoute from './Admin/Company'
 // const QQ = require.context('./__ENTERIES__', false, /\.js$/)
 // console.dir(QQ)
@@ -134,6 +135,7 @@ export const createRoutes = (store) => ([
       SuperAnnounceRoute(store),
       OrderListRoute(store),
       StockInitRoute(store),
+      StockTakeRoute(store),
       NotFoundRoute
     ],
     ignoreScrollBehavior: true

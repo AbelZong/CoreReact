@@ -19,10 +19,8 @@ import styles from './index.scss'
 import {
   Button,
   Form,
-  Select,
   Input
 } from 'antd'
-import SkuPicker from 'components/SkuPicker'
 const createForm = Form.create
 const FormItem = Form.Item
 import Wrapper from 'components/MainWrapper'
@@ -43,7 +41,10 @@ export default connect()(createForm()(Wrapper(React.createClass({
         if (errors) {
           return
         }
-        this.props.dispatch({type: 'STOCK_INIT_CONDITIONS_SET', payload: {Skuautoid: v.a4.id}})
+        this.props.dispatch({type: 'STOCK_INIT_ITEM_CONDITIONS_SET', payload: {
+          SkuID: v.SkuID ? v.SkuID : '',
+          SkuName: v.SkuName ? v.SkuName : ''
+        }})
       })
     })
   },
@@ -55,16 +56,23 @@ export default connect()(createForm()(Wrapper(React.createClass({
   render() {
     const { getFieldDecorator } = this.props.form
     return (
-      <div className={styles.toolbars}>
+      <div className={styles.toolbars2}>
         <Form inline>
           <FormItem>
-            {getFieldDecorator('a4')(
-              <SkuPicker size='small' />
+            {getFieldDecorator('SkuID')(
+              <Input className={styles.searchInput} size='small' placeholder='商品编码' />
+            )}
+          </FormItem>
+          <FormItem>
+            {getFieldDecorator('SkuName')(
+              <Input className={styles.searchInput} size='small' placeholder='商品名称' />
             )}
           </FormItem>
           <Button type='primary' size='small' style={{marginLeft: 2}} onClick={this.handleSearch}>搜索</Button>
           <Button size='small' style={{marginLeft: 3}} onClick={this.handleReset}>重置</Button>
+          <div className={styles.searchTip} >注意,期初库存为累加关系,每添加一次库存叠加一次</div>
         </Form>
+
       </div>
     )
   }
