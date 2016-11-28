@@ -17,47 +17,83 @@ import styles from './index.scss'
 import {Icon, Popconfirm} from 'antd'
 import {ZGet, ZPost} from 'utils/Xfetch'
 
-export default connect()(React.createClass({
+export default React.createClass({
+  getInitialState() {
+    return {
+      exprs: []
+    }
+  },
+  componentWillMount() {
+    this._firstBlood()
+  },
   refreshDataCallback() {
     this._firstBlood()
   },
-  _firstBlood(_data) {
-    const conditions = _data || this.props.conditions || {}
-    this.grid.showLoading()
-    const uri = 'admin/power'
-    const data = Object.assign({
-      Page: 1,
-      PageSize: this.grid.getPageSize()
-    }, conditions)
-    ZGet(uri, data, ({d}) => {
-      this.grid.setDatasource({
-        total: d.total,
-        rowData: d.list,
-        page: d.page,
-        getRows: (params) => {
-          if (params.page === 1) {
-            this._firstBlood()
-          } else {
-            const qData = Object.assign({
-              Page: params.page,
-              PageSize: params.pageSize
-            }, this.props.conditions)
-            ZGet(uri, qData, ({d}) => {
-              params.success(d.list)
-            }, ({m}) => {
-              params.fail(m)
-            })
-          }
-        }
-      })
+  _firstBlood() {
+    this.setState({
+      exprs: [
+        {ID: '1', Name: '圆通快递', Detail: {
+          'ID': '1',
+          'StartWeight': '10',
+          'StartFee': '10',
+          'AddWeight': '10',
+          'AddFee': '10',
+          'CalcType': 'start_and_more',
+          'WeightOff': '10',
+          'items': [
+            {
+              'Destination': {
+                '江苏': '苏州市,淮安市'
+              },
+              'StartWeight': '1',
+              'StartFee': '1',
+              'AddWeight': '1',
+              'AddFee': '1',
+              'Ranges': [
+                {
+                  'MinWeight': '1',
+                  'MaxWeight': '2',
+                  'StartWeight': '3',
+                  'StartFee': '3',
+                  'AddWeight': '3',
+                  'AddFee': '3'
+                }
+              ]
+            }
+          ]
+        }},
+        {ID: '2', Name: 'EMS', Detail: null},
+        {ID: '3', Name: '顺丰速运', Detail: null}
+      ]
     })
+    // ZGet('', ({d}) => {
+    //   this.setState(d)
+    // })
   },
   render() {
     return (
       <div className={styles.main}>
-	  sdf
+        {this.state.exprs.length ? this.state.exprs.map(x => <Tt key={x.ID} {...x} />) : (
+          <div className='mt20 tc'>请先设置 物流（快递）公司 信息</div>
+        )}
+      </div>
+    )
+  }
+})
+const Tt = connect()(React.createClass({
+  render() {
+    return (
+      <div className={styles.Tt}>
+        <h3>{this.props.Name}</h3>
+        <div className='flex-row'>
+          <div className={styles.l}>
+            左边
+          </div>
+          <div className={styles.r}>
+            右边<br />边
+          </div>
+        </div>
       </div>
     )
   }
 }))
-

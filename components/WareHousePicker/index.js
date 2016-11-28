@@ -70,7 +70,7 @@ export default React.createClass({
     return (
       <div className={CN} style={styler}>
         <div className={styles.inputArea} onClick={this.handleSelect}>
-          <Input value={this.state.name} placeholder={placeholder || '第三方物流或分仓'} size={this.props.size || 'default'} className={styles.input} />
+          <Input value={this.state.name} placeholder={placeholder || '选择本仓位'} size={this.props.size || 'default'} className={styles.input} />
           <span className={styles.operator}>
             {this.state.name !== '' ? <Icon type='minus' onClick={this.handleRemove} title='点击移除' /> : <Icon type='ellipsis-h' title='点击选择' />}
           </span>

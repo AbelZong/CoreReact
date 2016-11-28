@@ -13,13 +13,13 @@
 */
 import { handleActions } from 'redux-actions'
 
-const access_list = handleActions({
-  ACCESS_LIST: (state, action) => (action.payload)
+const logistics_freight_expr_1_vis = handleActions({
+  LOGISTICS_FREIGHT_EXPR_1_VIS: (state, action) => (action.payload)
 }, null)
-const access_modify_visiable = handleActions({
-  ACCESS_MODIFY_VISIABLE: (state, action) => (action.payload)
-}, -1)
+const logistics_freight_area_1_vis = handleActions({
+  LOGISTICS_FREIGHT_AREA_1_VIS: (state, action) => (action.payload)
+}, null)
 
 export default {
-  access_list, access_modify_visiable
+  logistics_freight_expr_1_vis, logistics_freight_area_1_vis
 }
