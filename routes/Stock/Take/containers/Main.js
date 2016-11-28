@@ -5,7 +5,7 @@
 * Description:
 *
 * Author: ChenJie <827869959@qq.com>
-* Date  : 2016-11-24 PM
+* Date  : 2016-11-28 PM
 * Last Updated:
 *
 * For the full copyright and license information, please view the LICENSE
@@ -29,10 +29,14 @@ import {
   reactCellRendererFactory
 } from 'ag-grid-react'
 import Wrapper from 'components/MainWrapper'
-import ModifyModal from './ModifyModal'
-import WareChoose from './WareChoose'
-
 const gridOptions = {
+  enableSorting: true,
+  enableServerSideSorting: true,
+  onRowClicked: function(params) {
+    this.grid.props.dispatch({type: 'STOCK_TAKE_ITEM_CONDITIONS_SET', payload: {
+      ParentID: params.node.data.ID
+    }})
+  }
 }
 const OperatorsRender = React.createClass({
   handleEditClick(e) {
@@ -57,14 +61,15 @@ const OperatorsRender = React.createClass({
 })
 const StateRender = React.createClass({
   render() {
-    if (this.props.data.Status === 0) {
-      return <div>待确认</div>
-    }
-    if (this.props.data.Status === 1) {
-      return <div>生效</div>
-    }
-    if (this.props.data.Status === 1) {
-      return <div>作废</div>
+    switch (this.props.data.Status) {
+      case 0:
+        return <div>待确认</div>
+      case 1:
+        return <div>生效</div>
+      case 2:
+        return <div>作废</div>
+      default:
+        return <div>作废</div>
     }
   }
 })
@@ -78,7 +83,7 @@ const columnDefs = [
     suppressSorting: true,
     enableSorting: true
   }, {
-    headerName: '期初单号',
+    headerName: '盘点单号',
     field: 'ID',
     cellStyle: {textAlign: 'center'},
     width: 100
@@ -87,15 +92,23 @@ const columnDefs = [
     field: 'CreateDate',
     width: 130
   }, {
-    headerName: '仓库名称',
+    headerName: '状态',
+    field: 'Status',
+    width: 80,
+    cellStyle: {textAlign: 'center'},
+    cellRenderer: reactCellRendererFactory(StateRender)
+  }, {
+    headerName: '仓库',
     field: 'WhName',
     width: 200
   }, {
-    headerName: '状态',
-    field: 'Status',
-    width: 50,
-    cellStyle: {textAlign: 'center'},
-    cellRenderer: reactCellRendererFactory(StateRender)
+    headerName: '创建人',
+    field: 'Creator',
+    width: 200
+  }, {
+    headerName: '备注',
+    field: 'Remark',
+    width: 200
   }, {
     headerName: '操作',
     width: 100,
@@ -130,7 +143,7 @@ const Main = React.createClass({
   },
   _firstBlood(_conditions) {
     const conditions = Object.assign({}, this.props.conditions || {}, _conditions || {})
-    const uri = 'XyCore/StockInit/StockInitMainLst'
+    const uri = 'XyCore/StockTake/StockTakeMainLst'
     const data = Object.assign({
       PageSize: this.grid.getPageSize(),
       PageIndex: 1
@@ -170,24 +183,19 @@ const Main = React.createClass({
   handleGridReady(grid) {
     this.grid = grid
   },
-  handleNewEvent() {
-    this.props.dispatch({type: 'STOCK_INIT_WARE_VIS_SET', payload: 1})
-  },
   render() {
     return (
       <div className={styles.main}>
         <div className={styles.topOperators}>
           <Button type='ghost' onClick={this.handleNewEvent} size='small'>
-            <Iconfa type='plus' style={{color: 'red'}} />&nbsp;添加新的期初库存
+            <Iconfa type='plus' style={{color: 'red'}} />&nbsp;添加新的盘点
           </Button>
         </div>
-        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'stock_init' }} columnDefs={columnDefs} grid={this} paged />
-        <ModifyModal />
-        <WareChoose />
+        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'stock_take' }} columnDefs={columnDefs} grid={this} paged />
       </div>
-    )
+      )
   }
 })
 export default connect(state => ({
-  conditions: state.stock_init_conditions
+  conditions: state.stock_take_conditions
 }))(Wrapper(Main))

@@ -16,16 +16,14 @@ import {
   connect
 } from 'react-redux'
 import styles from './index.scss'
-import {
-  Button,
-  Form,
-  Select,
-  Input
-} from 'antd'
+import {Button, Form, Select, DatePicker, Input} from 'antd'
 import SkuPicker from 'components/SkuPicker'
+import WareHousePicker from 'components/WareHouse2Picker'
+const RangePicker = DatePicker.RangePicker
 const createForm = Form.create
 const FormItem = Form.Item
 import Wrapper from 'components/MainWrapper'
+import {sTypes} from 'constants/Stock'
 export default connect()(createForm()(Wrapper(React.createClass({
   componentDidMount() {
     //this.refreshDataCallback()
@@ -57,6 +55,24 @@ export default connect()(createForm()(Wrapper(React.createClass({
     return (
       <div className={styles.toolbars}>
         <Form inline>
+          <FormItem>
+            {getFieldDecorator('a7')(
+              <WareHousePicker size='small' />
+            )}
+          </FormItem>
+          <FormItem>
+            {getFieldDecorator('a2')(
+              <RangePicker size='small' showTime format='YYYY-MM-DD HH:mm:ss' />
+            )}
+          </FormItem>
+          <FormItem>
+            {getFieldDecorator('s6')(
+              <Select placeholder='盘点状态' style={{ width: 80 }} size='small'>
+                <Option value=''>全部状态</Option>
+                {Object.keys(sTypes).map(k => <Option key={k} value={k}>{sTypes[k]}</Option>)}
+              </Select>
+            )}
+          </FormItem>
           <FormItem>
             {getFieldDecorator('a4')(
               <SkuPicker size='small' />

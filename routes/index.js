@@ -71,6 +71,7 @@ import SuperAnnounceRoute from './Super/Announce'
 import OrderListRoute from './Order/List'
 import OrderAfterRoute from './Order/After'
 import StockInitRoute from './Stock/Init'
+import StockTakeRoute from './Stock/Take'
 import LogisticsFreightRoute from './Logistics/Freight'
 import LogisticsCompanyRoute from './Logistics/Company'
 //import AdminCompanyRoute from './Admin/Company'
@@ -136,6 +137,7 @@ export const createRoutes = (store) => ([
       ProductNormMappingRoute(store),
       SuperAnnounceRoute(store),
       StockInitRoute(store),
+      StockTakeRoute(store),
       OrderListRoute(store),
       OrderAfterRoute(store),
       LogisticsFreightRoute(store),
