@@ -14,6 +14,9 @@
 import { handleActions } from 'redux-actions'
 import update from 'react-addons-update'
 
+const stock_take_ware_vis = handleActions({
+  STOCK_TAKE_WARE_VIS_SET: (state, action) => action.payload
+}, -1)
 const stock_take_conditions = handleActions({
   STOCK_TAKE_CONDITIONS_SET: (state, action) => action.payload,
   STOCK_TAKE_CONDITIONS_UPDATE: (state, action) => update(state, action.update)
@@ -24,5 +27,5 @@ const stock_take_item_conditions = handleActions({
 }, {})
 
 export default {
-  stock_take_conditions, stock_take_item_conditions
+  stock_take_conditions, stock_take_item_conditions, stock_take_ware_vis
 }

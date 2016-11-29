@@ -16,27 +16,26 @@ import {connect} from 'react-redux'
 import {ZGet, ZPost} from 'utils/Xfetch'
 import ZGrid from 'components/Grid/index'
 import styles from './index.scss'
-import {Button, Popconfirm, InputNumber, DatePicker, message, Popover, notification} from 'antd'
-import moment from 'moment'
+import {Button, Popconfirm, Input, message} from 'antd'
 import {findDOMNode} from 'react-dom'
 import {Icon as Iconfa} from 'components/Icon'
-import SkuPicker from 'components/SkuPicker/append'
+import AppendProduct from 'components/SkuPicker/append'
 
 const OperatorsRender = React.createClass({
   handleDeleteClick() {
-    // const noder = this.props.node
-    // if (noder) {
-    //   if (noder.data.id <= 0) {
-    //     return this.props.api.removeItems([noder])
-    //   }
-    //   ZPost({
-    //     uri: 'Purchase/DelPurDetail',
-    //     data: {ID: this.props.api.gridOptionsWrapper.gridOptions.grid.props.conditions.Purid, DetailID: [noder.data.id]},
-    //     success: () => {
-    //       this.props.api.removeItems([noder])
-    //     }
-    //   })
-    // }
+    const noder = this.props.node
+    if (noder) {
+      if (noder.data.ID <= 0) {
+        return this.props.api.removeItems([noder])
+      }
+      ZPost({
+        uri: 'XyCore/StockTake/DelTakeItem',
+        data: {IDLst: [noder.data.ID]},
+        success: () => {
+          this.props.api.removeItems([noder])
+        }
+      })
+    }
   },
   //  <Iconfa type='wrench' onClick={this.handleEditClick} title='更新' />
   render() {
@@ -50,13 +49,23 @@ const OperatorsRender = React.createClass({
   }
 })
 
-const PriceEditor = React.createClass({
+const InvQtyEditor = React.createClass({
   getInitialState() {
     return {
       value: this.props.value || 0
     }
   },
   getValue() {
+    ZPost('XyCore/StockTake/SaveTakeQty', {
+      ID: this.props.node.data.ID,
+      InvQty: this.state.value
+    }, ({s, m}) => {
+      if (s !== 1) {
+        message.error(m)
+      }
+      const Yyah = this.props.api.gridOptionsWrapper.gridOptions
+      Yyah.grid.refreshDataCallback()
+    })
     return this.state.value
   },
   afterGuiAttached() {
@@ -66,10 +75,14 @@ const PriceEditor = React.createClass({
     input.addEventListener('dblclick', evt, false)
   },
   handleChange(e) {
-    const value = Math.max(e, 0)
-    this.setState({ value })
+    const value = Math.max(e.target.value, 0)
+    if (/^[0-9]*[1-9][0-9]*$/.test(value)) {
+      this.setState({ value })
+    } else {
+      this.setState({ value: this.props.value })
+    }
   },
-  render() { return <InputNumber ref='zhang' min={0} step={0.01} value={this.state.value} onChange={this.handleChange} /> }
+  render() { return <Input ref='zhang' value={this.state.value} onChange={this.handleChange} /> }
 })
 const columnDefs = [{
   headerName: 'ID',
@@ -101,10 +114,8 @@ const columnDefs = [{
   headerName: '实点数量',
   field: 'InvQty',
   width: 100,
-  cellEditorFramework: PriceEditor,
-  editable: function(params) {
-    return params.api.gridOptionsWrapper.gridOptions.grid.state.Purst === 0
-  }
+  cellEditorFramework: InvQtyEditor,
+  editable: true
 }, {
   headerName: '盈亏数量',
   field: 'Qty',
@@ -121,12 +132,11 @@ const Test = React.createClass({
   getInitialState() {
     this._version = 0
     return {
-      Purid: 0,
-      Purst: -1
+      ParentID: 0,
+      display: 'none'
     }
   },
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps.conditions)
     if (!(Object.keys(nextProps.conditions).length === 1 && Object.keys(this.props.conditions).length === 1 && this.props.conditions.ParentID === nextProps.conditions.ParentID)) {
       if (nextProps.conditions.ParentID > 0) {
         this._version ++
@@ -141,6 +151,9 @@ const Test = React.createClass({
   },
   componentWillUnmount() {
     this.ignore = true
+  },
+  refreshDataCallback() {
+    this._firstBlood(null, this._version)
   },
   refreshRowData() {
     this._firstBlood(null, this._version)
@@ -173,7 +186,7 @@ const Test = React.createClass({
               if (_version !== this._version || this.ignore) {
                 return
               }
-              params.success(d.Pur)
+              params.success(d.ItemLst)
             }, (m) => {
               if (this.ignore) {
                 return
@@ -184,60 +197,57 @@ const Test = React.createClass({
         }
       })
       this.setState({
-        Purid: Number(conditions.Purid),
-        Purst: Number(d.status)
+        ParentID: Number(conditions.ParentID),
+        display: conditions.Status === 0 ? 'block' : 'none'
       })
     }, this.grid.showNoRows)
   },
   handleGridReady(grid) {
     this.grid = grid
   },
-  handleSkusChange(lst) {
-    // if (lst && lst instanceof Array && lst.length) {
-    //   const ids = lst.map(x => x.ID)
-    //   this.grid.x0pCall(ZPost('Purchase/InsertPurDetail', {ids, purchaseid: this.props.conditions.Purid}, ({d}) => {
-    //     const {successIDs, failIDs} = d
-    //     if (successIDs && successIDs instanceof Array && successIDs.length) {
-    //       const newRows = []
-    //       lst.forEach(x => {
-    //         if (successIDs.indexOf(x.ID) >= 0) {
-    //           newRows.push({
-    //             id: x.ID,
-    //             img: x.Img,
-    //             skuid: x.SkuID,
-    //             skuname: x.SkuName,
-    //             norm: x.Norm,
-    //             goodscode: x.GoodsCode
-    //           })
-    //         }
-    //       })
-    //       this.grid.appendRows(newRows)
-    //     }
-    //     if (failIDs && failIDs instanceof Array && failIDs.length) {
-    //       const des = []
-    //       failIDs.forEach(x => {
-    //         const dd = lst.filter(y => y.ID === x.id)[0]
-    //         des.push(dd.SkuName + ': ' + x.reason)
-    //       })
-    //       notification.info({
-    //         message: '新增明细商品有错',
-    //         description: des.join(';')
-    //       })
-    //     }
-    //   }))
-    // }
-  },
-  renderOps() {
-    if (this.state.Purid > 0) {
-      if (this.state.Purst === 0) {
-        return <SkuPicker onChange={this.handleSkusChange} size='small' />
-      }
+  handleAppend(lst) {
+    if (lst && lst instanceof Array && lst.length) {
+      const SkuIDLst = lst.map(x => x.ID)
+      this.grid.x0pCall(ZPost('XyCore/StockTake/InsertTakeItem', {SkuIDLst, ParentID: this.state.ParentID}, ({s, m}) => {
+        if (s === 1) {
+          // const newRows = []
+          // lst.forEach(x => {
+          //   newRows.push({
+          //     ID: x.ID,
+          //     Img: x.Img,
+          //     SkuID: x.SkuID,
+          //     SkuName: x.SkuName,
+          //     Norm: x.Norm,
+          //     InvQty: x.InvQty === null ? 0 : x.InvQty,
+          //     Price: x.Qty === null ? 0 : x.Qty
+          //   })
+          // })
+          // this.grid.appendRows(newRows)
+          this.refreshDataCallback()
+        } else {
+          message.error(m)
+        }
+      }))
     }
-    return null
+  },
+  deleteRowByIDs() {
+    // const ids = this.grid.api.getSelectedRows().map(x => x.id)
+    // if (ids.length) {
+    //   return ids
+    // }
+    // this.grid.x0pCall(ZPost('XyCore/StockInit/UnCheckInit', {ID: id}, () => {
+    //   this.refreshDataCallback()
+    // }))
   },
   render() {
     return (
       <div className={styles.detailTable}>
+        <div className={styles.topOperators} style={{display: this.state.display}}>
+          <AppendProduct onChange={this.handleAppend} />
+          <Button type='ghost' style={{marginLeft: '15px'}} onClick={this.handleSearch}> <Iconfa type='print' style={{color: '#32cd32'}} />&nbsp;打印盘点表</Button>
+          <Button type='ghost' style={{marginLeft: '15px'}} onClick={this.handleSearch}> <Iconfa type='sign-out' style={{color: '#32cd32'}} />&nbsp;导出盘点单模板</Button>
+          <Button type='ghost' style={{marginLeft: '15px'}} onClick={this.handleSearch}> <Iconfa type='sign-in' style={{color: '#32cd32'}} />&nbsp;导入盘点后库存</Button>
+        </div>
         <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'stock_take_item' }} columnDefs={columnDefs} paged grid={this} />
       </div>
     )

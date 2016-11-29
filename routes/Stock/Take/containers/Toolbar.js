@@ -16,11 +16,12 @@ import {
   connect
 } from 'react-redux'
 import styles from './index.scss'
-import {Button, Form, Select, DatePicker, Input} from 'antd'
+import {Button, Form, Select, DatePicker} from 'antd'
 import SkuPicker from 'components/SkuPicker'
 import WareHousePicker from 'components/WareHousePicker'
 const RangePicker = DatePicker.RangePicker
 const createForm = Form.create
+const Option = Select.Option
 const FormItem = Form.Item
 import Wrapper from 'components/MainWrapper'
 import {sTypes} from 'constants/Stock'
@@ -41,7 +42,13 @@ export default connect()(createForm()(Wrapper(React.createClass({
         if (errors) {
           return
         }
-        this.props.dispatch({type: 'STOCK_INIT_CONDITIONS_SET', payload: {Skuautoid: v.a4.id}})
+        this.props.dispatch({type: 'STOCK_TAKE_CONDITIONS_SET', payload: {
+          WhID: v.a7 && v.a7.id ? v.a7.id : '',
+          DateF: v.a2 && v.a2[0] ? v.a2[0].format() : '',
+          DateT: v.a2 && v.a2[1] ? v.a2[1].format() : '',
+          Status: v.s6 || '',
+          Skuautoid: v.a4 && v.a4.id ? v.a4.id : ''
+        }})
       })
     })
   },

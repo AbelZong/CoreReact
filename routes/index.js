@@ -73,6 +73,7 @@ import OrderAfterRoute from './Order/After'
 import OrderGiftRuleRoute from './Order/GiftRule'
 import StockInitRoute from './Stock/Init'
 import StockTakeRoute from './Stock/Take'
+import StockMainInvRoute from './Stock/MainInv'
 import LogisticsFreightRoute from './Logistics/Freight'
 import LogisticsCompanyRoute from './Logistics/Company'
 //import AdminCompanyRoute from './Admin/Company'
@@ -139,6 +140,7 @@ export const createRoutes = (store) => ([
       SuperAnnounceRoute(store),
       StockInitRoute(store),
       StockTakeRoute(store),
+      StockMainInvRoute(store),
       OrderListRoute(store),
       OrderAfterRoute(store),
       OrderGiftRuleRoute(store),

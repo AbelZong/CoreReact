@@ -15,7 +15,8 @@ import React from 'react'
 import {connect} from 'react-redux'
 import {
   Popconfirm,
-  Button} from 'antd'
+  Button,
+message} from 'antd'
 import ZGrid from 'components/Grid/index'
 import styles from './index.scss'
 import {
@@ -25,16 +26,30 @@ import {
 import {
   Icon as Iconfa
 } from 'components/Icon'
-import {
-  reactCellRendererFactory
-} from 'ag-grid-react'
 import Wrapper from 'components/MainWrapper'
+import WareChoose from './WareChoose'
+import Prompt from 'components/Modal/Prompt'
+import {sTypes} from 'constants/Stock'
 const gridOptions = {
   enableSorting: true,
   enableServerSideSorting: true,
   onRowClicked: function(params) {
     this.grid.props.dispatch({type: 'STOCK_TAKE_ITEM_CONDITIONS_SET', payload: {
-      ParentID: params.node.data.ID
+      ParentID: params.node.data.ID,
+      Status: params.node.data.Status
+    }})
+  },
+  onBeforeSortChanged: function() {
+    const sorter = this.api.getSortModel()[0]
+    const conditions = sorter ? {
+      SortField: sorter.colId,
+      SortDirection: sorter.sort.toUpperCase()
+    } : {
+      SortField: '',
+      SortDirection: ''
+    }
+    this.grid.props.dispatch({type: 'STOCK_TAKE_CONDITIONS_UPDATE', update: {
+      $merge: conditions
     }})
   }
 }
@@ -42,7 +57,7 @@ const OperatorsRender = React.createClass({
   handleEditClick(e) {
     e.stopPropagation()
     const Yyah = this.props.api.gridOptionsWrapper.gridOptions
-    Yyah.grid.modifyRowByID([this.props.data.ID, this.props.data.Status])
+    Yyah.grid.handleMyRemark(this.props.data.ID)
   },
   handleDeleteClick() {
     const Yyah = this.props.api.gridOptionsWrapper.gridOptions
@@ -57,20 +72,6 @@ const OperatorsRender = React.createClass({
         </Popconfirm>
       </div>
     )
-  }
-})
-const StateRender = React.createClass({
-  render() {
-    switch (this.props.data.Status) {
-      case 0:
-        return <div>待确认</div>
-      case 1:
-        return <div>生效</div>
-      case 2:
-        return <div>作废</div>
-      default:
-        return <div>作废</div>
-    }
   }
 })
 const columnDefs = [
@@ -94,9 +95,15 @@ const columnDefs = [
   }, {
     headerName: '状态',
     field: 'Status',
-    width: 80,
     cellStyle: {textAlign: 'center'},
-    cellRenderer: reactCellRendererFactory(StateRender)
+    cellRenderer: function(params) {
+      const k = params.data.Status + ''
+      return sTypes[k] || k
+    },
+    cellClass: function(params) {
+      return styles.Status + ' ' + (styles[`Status${params.data.Status}`] || '')
+    },
+    width: 70
   }, {
     headerName: '仓库',
     field: 'WhName',
@@ -129,9 +136,6 @@ const Main = React.createClass({
   },
   componentWillUnmount() {
     this.ignore = true
-  },
-  modifyRowByID(arr) {
-    this.props.dispatch({type: 'STOCK_INIT_MODIFY_VIS_SET', payload: arr})
   },
   deleteRowByIDs(id) {
     this.grid.x0pCall(ZPost('XyCore/StockInit/UnCheckInit', {ID: id}, () => {
@@ -183,6 +187,65 @@ const Main = React.createClass({
   handleGridReady(grid) {
     this.grid = grid
   },
+  handleNewEvent() {
+    this.props.dispatch({type: 'STOCK_TAKE_WARE_VIS_SET', payload: 1})
+  },
+  handleMyRemark(id) {
+    ZPost('XyCore/StockTake/TakeRemarkQuery', {
+      ID: id
+    }, ({d}) => {
+      console.log('d', d)
+      return 1
+    })
+    Prompt({
+      title: '备注',
+      placeholder: '',
+      onPrompt: ({value}) => {
+        return new Promise((resolve, reject) => {
+          ZPost('XyCore/StockTake/UptTakeRemark', {
+            Remark: value,
+            ID: id
+          }, () => {
+            resolve()
+            this.props.data.Remark = value
+            this.props.api.refreshRows([this.props.node])
+          }, reject)
+        })
+      }
+    })
+  },
+  getSelectIDs() {
+    const ids = this.grid.api.getSelectedRows().map(x => x.ID)
+    if (ids.length > 0) {
+      if (ids.length > 2) {
+        message.info('请勿多选')
+        return false
+      } else {
+        return ids[0]
+      }
+    } else {
+      message.info('请先选择')
+      return false
+    }
+  },
+  handleChangeStatus1() {
+    const ids = this.getSelectIDs()
+    if (ids === false) {
+      return
+    }
+    this.grid.x0pCall(ZPost('XyCore/StockTake/CheckTake', {ID: ids}, () => {
+      this.grid.refreshRowData()
+    }))
+  },
+  handleChangeStatus2() {
+    const ids = this.getSelectIDs()
+    if (ids === false) {
+      return
+    }
+    this.grid.x0pCall(ZPost('XyCore/StockTake/UnCheckTake', {ID: ids}, () => {
+      this.grid.refreshRowData()
+    }))
+  },
   render() {
     return (
       <div className={styles.main}>
@@ -191,7 +254,12 @@ const Main = React.createClass({
             <Iconfa type='plus' style={{color: 'red'}} />&nbsp;添加新的盘点
           </Button>
         </div>
-        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'stock_take' }} columnDefs={columnDefs} grid={this} paged />
+        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'stock_take' }} columnDefs={columnDefs} grid={this} paged >
+          <Iconfa type='long-arrow-up' /> 单条操作：
+          <Button type='ghost' size='small' onClick={this.handleChangeStatus1}>生效</Button>
+          <Button type='ghost' size='small' style={{marginLeft: 10}} onClick={this.handleChangeStatus2}>作废</Button>
+        </ZGrid>
+        <WareChoose />
       </div>
       )
   }

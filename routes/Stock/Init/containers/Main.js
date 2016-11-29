@@ -25,12 +25,10 @@ import {
 import {
   Icon as Iconfa
 } from 'components/Icon'
-import {
-  reactCellRendererFactory
-} from 'ag-grid-react'
 import Wrapper from 'components/MainWrapper'
 import ModifyModal from './ModifyModal'
 import WareChoose from './WareChoose'
+import {sTypes} from 'constants/Stock'
 
 const gridOptions = {
 }
@@ -53,19 +51,6 @@ const OperatorsRender = React.createClass({
         </Popconfirm>
       </div>
     )
-  }
-})
-const StateRender = React.createClass({
-  render() {
-    if (this.props.data.Status === 0) {
-      return <div>待确认</div>
-    }
-    if (this.props.data.Status === 1) {
-      return <div>生效</div>
-    }
-    if (this.props.data.Status === 1) {
-      return <div>作废</div>
-    }
   }
 })
 const columnDefs = [
@@ -93,9 +78,15 @@ const columnDefs = [
   }, {
     headerName: '状态',
     field: 'Status',
-    width: 50,
     cellStyle: {textAlign: 'center'},
-    cellRenderer: reactCellRendererFactory(StateRender)
+    cellRenderer: function(params) {
+      const k = params.data.Status + ''
+      return sTypes[k] || k
+    },
+    cellClass: function(params) {
+      return styles.Status + ' ' + (styles[`Status${params.data.Status}`] || '')
+    },
+    width: 60
   }, {
     headerName: '操作',
     width: 100,
