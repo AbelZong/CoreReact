@@ -12,7 +12,7 @@
 * file that was distributed with this source code.
 */
 .toolbars {
-  padding: 10px 5px 15px 10px;
+  padding: 10px 5px 5px 10px;
 }
 .main {
   padding-left:10px;
@@ -79,37 +79,20 @@
   position: relative;
   line-height: 30px;
 }
-.listWrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  .status {
-    text-align: center;
-  }
-  .status0 {
-    color: #666;
-    background-color: #fde7ab;
-  }
-  .status1 {
-    background-color: rgb(171, 212, 110);
-    color: rgb(255, 255, 255);
-  }
-  .status2 {
-    background-color: rgb(0, 159, 60);
-    color: rgb(255, 255, 255);
-  }
-  .status3 {
-    color: #0a87ba;
-    background-color:#c6e3ef;
-  }
-  .status4 {
-    color: #fff;
-    background-color:#009f3c;
-  }
-  .status5 {
-    background-color: rgb(255, 0, 0);
-    color: rgb(255, 255, 255);
-  }
+.Status {
+  text-align: center;
+}
+.Status0 {
+  color: #666;
+  background-color: #fde7ab;
+}
+.Status1 {
+  background-color: rgb(0, 159, 60);
+  color: rgb(255, 255, 255);
+}
+.Status2 {
+  background-color: rgb(255, 0, 0);
+  color: rgb(255, 255, 255);
 }
 .topOperators {
   display: flex;
@@ -123,3 +106,5 @@
     text-align: right;
   }
 }
+
+

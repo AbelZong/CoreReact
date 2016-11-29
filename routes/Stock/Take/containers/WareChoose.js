@@ -21,7 +21,7 @@ const createForm = Form.create
 const FormItem = Form.Item
 
 export default connect(state => ({
-  doge: state.stock_init_ware_vis
+  doge: state.stock_take_ware_vis
 }))(createForm()((React.createClass({
   getInitialState() {
     return {
@@ -58,14 +58,14 @@ export default connect(state => ({
     }
   },
   hideModal() {
-    this.props.dispatch({ type: 'STOCK_INIT_WARE_VIS_SET', payload: -1 })
+    this.props.dispatch({ type: 'STOCK_TAKE_WARE_VIS_SET', payload: -1 })
     this.props.form.resetFields()
   },
   handleGridReady(grid) {
     this.grid = grid
   },
   handleCancel() {
-    this.props.dispatch({type: 'STOCK_INIT_WARE_VIS_SET', payload: 0})
+    this.props.dispatch({type: 'STOCK_TAKE_WARE_VIS_SET', payload: 0})
   },
   handleOk() {
     this.props.form.validateFieldsAndScroll((errors, v) => {
@@ -74,7 +74,7 @@ export default connect(state => ({
       }
       if (v.Ware !== undefined) {
         let obj = v.Ware.split('-')
-        let uri = 'XyCore/StockInit/InsertInitMain'
+        let uri = 'XyCore/StockTake/InsertTakeMain'
         let data = {
           Parent_WhID: obj[0],
           WhID: obj[1]
@@ -85,7 +85,6 @@ export default connect(state => ({
           this.setState({
             confirmLoading: false
           })
-          this.props.dispatch({type: 'STOCK_INIT_MODIFY_VIS_SET', payload: [d.d, 0]})
         })
       }
     })
