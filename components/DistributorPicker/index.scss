@@ -1,0 +1,74 @@
+/**
+* This file is part of the <智鼠> application.
+*
+* Version: 0.0.1
+* Description:
+*
+* Author: HuaZhang <yahveh.zh@gmail.com>
+* Date  : 2016-10-09 13:53:03
+* Last Updated:
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
+.zhang {
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle;
+  position: relative;
+}
+.inputArea {
+  position: relative;
+  input {
+    cursor: pointer;
+  }
+}
+.operator {
+  position: absolute;
+  z-index:1;
+  right:8px;
+  top: 25%;
+  pointer-events: none;
+  :global(.fa-minus) {
+    pointer-events: all;
+  }
+}
+
+
+.hua {
+  :global {
+    .ant-spin {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      margin-left: -16px;
+    }
+    .ant-radio-group {
+      width: 100%;
+    }
+    .ant-radio-wrapper {
+      margin-right:0;
+      display: inline-block;
+      height: 24px;
+      width: 49%;
+      line-height: 24px;
+      float: left;
+      &:hover {
+        .ant-radio-inner {
+          border-color: #2db7f5;
+        }
+      }
+    }
+  }
+}
+.hua,
+.dataList {
+  height:280px;
+}
+
+.footer {
+}
+.filterInput {
+  float:left;
+  width: 260px;
+}

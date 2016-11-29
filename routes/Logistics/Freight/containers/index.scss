@@ -11,12 +11,169 @@
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
 */
-
+.main {
+  padding-left:10px;
+  padding-right:5px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 .Tt {
-  .l {
-    background-color:#ccc;
+  margin: 10px;
+  .area {
+    margin: auto 0;
+    padding-left: 5px;
+    flex: 1;
   }
-  .r {
-    background-color:#000;
+  .areaE {
+    display:flex;
+    padding: 0 10px;
+  }
+  .noTt {
+    padding:10px 2em;
+  }
+  .tile {
+    margin-bottom: 3px;
+    h3 {
+      display: inline-block;
+    }
+  }
+  .gray {
+    color:#9C9C9C;
+  }
+}
+.ttt {
+  border: 1px solid #ccc;
+  .th {
+    background-color:#f9f9f9;
+    color:#333;
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    line-height: 26px;
+    .td0 {
+      display: block;
+    }
+  }
+  .tr {
+    display: flex;
+    flex-direction: row;
+    line-height: 24px;
+    border-top:1px solid #eee;
+  }
+  .tdc {
+    display: flex;
+    flex-direction: column;
+  }
+  .tdr {
+    display: flex;
+    flex-direction: row;
+  }
+  .tdr1 {
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px dotted #eee;
+  }
+  .tdr2 {
+    border-left: 1px solid #eee;
+    .btns {
+      padding:5px 20px;
+      a {
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+  .td0 {
+    flex: 1;
+    display: flex;
+  }
+  .td1 {
+    width:130px;
+    border-left:1px solid #eee;
+    text-align: center;
+  }
+  .td2 {
+    width:80px;
+    border-left:1px solid #eee;
+    text-align: center;
+  }
+  .td3 {
+    width:80px;
+    border-left:1px solid #eee;
+    text-align: center;
+  }
+  .td4 {
+    width:80px;
+    border-left:1px solid #eee;
+    text-align: center;
+  }
+  .td5 {
+    width:80px;
+    border-left:1px solid #eee;
+    text-align: center;
+  }
+  .tdd {
+    display: flex;
+    flex-direction: column;
+    .td2,
+    .td3,
+    .td4,
+    .td5 {
+      border-left: 0;
+    }
+    :global {
+      .ant-input-number {
+        width: 75px;
+      }
+    }
+    .tdr,
+    .tdr1 {
+      &:hover {
+        background-color:#f9f9f9;
+      }
+    }
+    .tdr1 {
+      border-bottom: 0;
+      line-height: 28px;
+      .td1 {
+        margin-top: 3px;
+      }
+    }
+    .td1 {
+      width: 180px;
+    }
+  }
+  .td10 {
+    width: 70px;
+    text-align: center;
+    display: flex;
+  }
+}
+
+._mC {
+  margin: auto;
+}
+
+.mForm {
+  :global {
+    .pos-form .ant-form-item,
+    .pos-form .ant-form-item-with-help {
+        margin-bottom: 0;
+        display: inline-block;
+    }
+    .ant-form-item-control {
+      line-height: 28px;
+    }
+    .ant-input-number {
+      margin: 0 1px;
+    }
+  }
+  .line {
+    margin-bottom:3px;
+    padding:0 5px 2px;
+    background-color:#f9f9f9;
+    border:1px solid #f5f5f5;
   }
 }

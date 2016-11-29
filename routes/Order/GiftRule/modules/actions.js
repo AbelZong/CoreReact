@@ -11,19 +11,3 @@
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
 */
-
-.main {
-  padding-left:10px;
-  padding-right:5px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  :global(.z-grid) {
-    :global(.ag-row:hover) {
-        background-color: #f5f5f5;
-    }
-    :global(.ag-group-value > div) {
-      display: inherit;
-    }
-  }
-}

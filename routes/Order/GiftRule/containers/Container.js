@@ -20,7 +20,6 @@ import {
 } from 'utils'
 import styles from 'components/App.scss'
 import Main from './Main'
-import Scrollbar from 'components/Scrollbars/index'
 export default connect()(React.createClass({
   componentDidMount() {
     endLoading()
@@ -28,11 +27,7 @@ export default connect()(React.createClass({
   render() {
     return (
       <div className={`${styles.content} flex-column`}>
-        <Scrollbar autoHide>
-          <div className={styles.zHint}>
-            <Main />
-          </div>
-        </Scrollbar>
+        <Main />
       </div>
     )
   }

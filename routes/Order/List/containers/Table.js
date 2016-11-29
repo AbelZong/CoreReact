@@ -22,6 +22,7 @@ import SkuPicker from 'components/SkuPicker'
 import SkuPickerModal from 'components/SkuPicker/Modal'
 import ShopPicker from 'components/ShopPicker'
 import BuyerModal from './BuyerModal'
+import DistributorModal from 'components/DistributorPicker/Modal'
 import {
   Table,
   Select,
@@ -612,7 +613,45 @@ export default connect(state => ({
             }))
           }
         })
-        break
+        return
+      }
+      case '7': {
+        const nodes = this.grid.api.getSelectedNodes()
+        const len = nodes.length
+        if (!len) {
+          return message.info('请先选择')
+        }
+        const ids = nodes.map(x => x.data.ID)
+        Modal.confirm({
+          title: '确定选定的订单 转成分销+订单，由供销商发货？',
+          onOk: () => {
+            this.grid.x0pCall(ZPost('Order/SetOrdType', {OID: ids}, ({d}) => {
+              parseBatchOperatorResult.call(this, d, function(x, qq) {
+                Object.assign(x.data, qq)
+              }, ['ID', 'Status'], nodes, this.grid)
+            }))
+          }
+        })
+        return
+      }
+      case '8': {
+        const nodes = this.grid.api.getSelectedNodes()
+        const len = nodes.length
+        if (!len) {
+          return message.info('请先选择')
+        }
+        const ids = nodes.map(x => x.data.ID)
+        Modal.confirm({
+          title: '确定选定的订单 取消分销+属性，由自己发货？',
+          onOk: () => {
+            this.grid.x0pCall(ZPost('Order/CancleSetOrdType', {OID: ids}, ({d}) => {
+              parseBatchOperatorResult.call(this, d, function(x, qq) {
+                Object.assign(x.data, qq)
+              }, ['ID', 'Status'], nodes, this.grid)
+            }))
+          }
+        })
+        return
       }
     }
     const ids = this.grid.api.getSelectedRows().map(x => x.ID)
@@ -620,6 +659,10 @@ export default connect(state => ({
       return message.info('请先选择')
     }
     switch (e.key) {
+      case '9': {
+        this.props.dispatch({type: 'ORDER_LIST_DISTRIBUTOR_VIS_1_SET', payload: ids})
+        break
+      }
       case '3': {
         this.props.dispatch({type: 'ORDER_LIST_BATCH_GIFTS_1_SET', payload: ids})
         break
@@ -697,6 +740,9 @@ export default connect(state => ({
             <Menu.Item key='5'>合并订单还原成 合并前</Menu.Item>
             <Menu.Item key='4'>按商品信息标识自定义异常</Menu.Item>
             <Menu.Divider />
+            <Menu.Item key='7'><Icon type='check-square-o' /> 转成分销+订单属性，由供销商发货</Menu.Item>
+            <Menu.Item key='8'><Icon type='check-square-o' /> 取消分销+订单属性，自己发货</Menu.Item>
+            <Menu.Item key='9'><Icon type='check-square-o' /> 强制指定分销订单的供销商</Menu.Item>
           </Menu>}>
             <Button type='ghost' size='small'>
               <Icon type='edit' />修改&标记<Icon type='down' />
@@ -711,7 +757,7 @@ export default connect(state => ({
             this.props.dispatch({type: 'ORDER_LIST_WHOUSE_1_SET', payload: ids})
           }}>修改发货仓库</Button>
            内部Test号 486741
-        </ZGrid>
+        </ZGrid><BatchDistributor1 zch={this} />
         <ModalNewEgg refreshRowData={this.refreshRowData} />
         <ComSeller1 zch={this} /><ComRecAddress1 zch={this} /><ComDetail1 zch={this} /><ComExpr1 zch={this} /><ExpressModal zch={this} /><Whouse zch={this} /><ToExceptions zch={this} /><ToCancel1 zch={this} /><BatchSkus1 zch={this} /><OrderSplit zch={this} />
         <ExprSearchModal /><BatchGift1 zch={this} /><BatchCustomException zch={this} /><OrderMerge zch={this} /><OrderMergeRestore zch={this} />
@@ -1273,6 +1319,30 @@ const BatchCustomException = connect(state => ({
     )
   }
 })))
+const BatchDistributor1 = connect(state => ({
+  doge: state.order_list_distributor_vis_1
+}))(createClass({
+  handleModalOk(value) {
+    if (typeof value === 'undefined') {
+      return message.error('请选择供销商')
+    }
+    const nodes = this.props.zch.grid.api.getSelectedNodes()
+    this.props.zch.grid.x0pCall(ZPost('Order/SetSupDistributor', {OID: this.props.doge, SupDistributor: value}, ({d}) => {
+      this.handleModalCancel()
+      parseBatchOperatorResult.call(this, d, function(x, qq) {
+        Object.assign(x.data, qq)
+      }, ['Status', 'SupDistributor'], nodes, this.props.zch.grid)
+    }))
+  },
+  handleModalCancel() {
+    this.props.dispatch({type: 'ORDER_LIST_DISTRIBUTOR_VIS_1_SET', payload: null})
+  },
+  render() {
+    return (
+      <DistributorModal hideClear visible={this.props.doge !== null} onOk={this.handleModalOk} onCancel={this.handleModalCancel} />
+    )
+  }
+}))
 const BatchGift1 = connect(state => ({
   doge: state.order_list_batch_gifts_1
 }))(createClass({

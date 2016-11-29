@@ -12,21 +12,12 @@
 * file that was distributed with this source code.
 */
 import React from 'react'
-import {
-  connect
-} from 'react-redux'
+import {connect} from 'react-redux'
 import styles from './index.scss'
-import {
-  Icon,
-  Popconfirm
-} from 'antd'
-import {
-  ZGet,
-  ZPost
-} from 'utils/Xfetch'
-import Wrapper from 'components/MainWrapper'
+import {Icon, Popconfirm} from 'antd'
+import {ZGet, ZPost} from 'utils/Xfetch'
 
-export default connect()(Wrapper(React.createClass({
+export default connect()(React.createClass({
   refreshDataCallback() {
     this._firstBlood()
   },
@@ -64,8 +55,9 @@ export default connect()(Wrapper(React.createClass({
   render() {
     return (
       <div className={styles.main}>
-	  todo
+	  sdf
       </div>
     )
   }
-})))
+}))
+

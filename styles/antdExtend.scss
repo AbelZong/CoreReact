@@ -101,11 +101,14 @@
         right: 5px;
         top: 2px;
         pointer-events: none;
-        background-color: #fff;
+        background-color: rgba(255, 255, 255, 0.25);
             z-index: 10;
       }
      .ant-select-selection {
        box-shadow: none;
+     }
+     .ant-input-number-sm + .ant-form-explain {
+       top: 6px;
      }
     }
     fieldset {
