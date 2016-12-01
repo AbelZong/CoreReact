@@ -20,7 +20,6 @@ import {Button, Popconfirm, Input, message} from 'antd'
 import {findDOMNode} from 'react-dom'
 import {Icon as Iconfa} from 'components/Icon'
 import AppendProduct from 'components/SkuPicker/append'
-
 const OperatorsRender = React.createClass({
   handleDeleteClick() {
     const noder = this.props.node
@@ -84,6 +83,7 @@ const InvQtyEditor = React.createClass({
   },
   render() { return <Input ref='zhang' value={this.state.value} onChange={this.handleChange} /> }
 })
+
 const columnDefs = [{
   headerName: 'ID',
   field: 'ID',
@@ -114,6 +114,7 @@ const columnDefs = [{
   headerName: '实点数量',
   field: 'InvQty',
   width: 100,
+  cellClass: 'editable',
   cellEditorFramework: InvQtyEditor,
   editable: true
 }, {
@@ -229,15 +230,6 @@ const Test = React.createClass({
         }
       }))
     }
-  },
-  deleteRowByIDs() {
-    // const ids = this.grid.api.getSelectedRows().map(x => x.id)
-    // if (ids.length) {
-    //   return ids
-    // }
-    // this.grid.x0pCall(ZPost('XyCore/StockInit/UnCheckInit', {ID: id}, () => {
-    //   this.refreshDataCallback()
-    // }))
   },
   render() {
     return (

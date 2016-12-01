@@ -18,9 +18,9 @@ import {
 import styles from './index.scss'
 import {
   Button,
-  Form
+  Form,
+  Input
 } from 'antd'
-import SkuPicker from 'components/SkuPicker'
 const createForm = Form.create
 const FormItem = Form.Item
 import Wrapper from 'components/MainWrapper'
@@ -41,7 +41,7 @@ export default connect()(createForm()(Wrapper(React.createClass({
         if (errors) {
           return
         }
-        this.props.dispatch({type: 'STOCK_INIT_CONDITIONS_SET', payload: {Skuautoid: v.a4.id}})
+        this.props.dispatch({type: 'STOCK_INVLOCK_CONDITIONS_SET', payload: v})
       })
     })
   },
@@ -50,14 +50,31 @@ export default connect()(createForm()(Wrapper(React.createClass({
     this.props.form.resetFields()
     this.runSearching()
   },
+  checkNum(rule, value, callback) {
+    if (!/^(0|[1-9][0-9]*)$/.test(value) && value !== undefined && value !== '') {
+      callback('请填写整数')
+    } else {
+      callback()
+    }
+  },
   render() {
     const { getFieldDecorator } = this.props.form
     return (
-      <div className={styles.toolbars}>
+      <div className={styles.toolbars2}>
         <Form inline>
           <FormItem>
-            {getFieldDecorator('a4')(
-              <SkuPicker size='small' />
+            {getFieldDecorator('SkuID')(
+              <Input placeholder='商品编码' size='small' />
+            )}
+          </FormItem>
+          <FormItem>
+            {getFieldDecorator('ShopType')(
+              <Input placeholder='店铺类型编号' size='small' />
+            )}
+          </FormItem>
+          <FormItem>
+            {getFieldDecorator('Name')(
+              <Input placeholder='锁定名称' size='small' />
             )}
           </FormItem>
           <Button type='primary' size='small' style={{marginLeft: 2}} onClick={this.handleSearch}>搜索</Button>
