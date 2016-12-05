@@ -274,7 +274,7 @@ const Main = React.createClass({
             <Iconfa type='eraser' style={{color: '#32cd32'}} />&nbsp;清除0库存资料
           </Button>
           <div className={styles.searchTip}>
-            <Icon type='edit' /> 图标的栏位，双击可修改数组
+            <Icon type='edit' /> 图标的栏位，双击可修改
           </div>
         </div>
         <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'stock_feninv' }} columnDefs={columnDefs} grid={this} paged />

@@ -34,6 +34,7 @@ import Wrapper from 'components/MainWrapper'
 import ModifyModal from './ModifyModal'
 import InvDetailQuery from './InvDetailQuery'
 import InvLock from './InvLock'
+import SafeModal from './SafeModal'
 import EE from 'utils/EE'
 const gridOptions = {
 }
@@ -324,6 +325,15 @@ const Main = React.createClass({
   },
   handleSafeClick(e) {
     switch (e.key) {
+      case '1': {
+        const IDLst = this.grid.api.getSelectedRows().map(x => x.ID)
+        if (IDLst.length === 0) {
+          message.info('请先选择栏位')
+        } else {
+          this.props.dispatch({ type: 'STOCK_SAFEINV_VIS_SET', payload: IDLst })
+        }
+        break
+      }
       case '2': {
         ZPost('XyCore/Inventory/ClearInvMainSafeQty', null, ({s, m}) => {
           if (s === 1) {
@@ -384,7 +394,7 @@ const Main = React.createClass({
     )
     const safemenu = (
       <Menu onClick={this.handleSafeClick}>
-        <Menu.Item key='1'>设置安全库存</Menu.Item>
+        <Menu.Item key='1'>批量设置安全库存</Menu.Item>
         <Menu.Item key='2'>清除所有商品安全库存</Menu.Item>
         <Menu.Item key='3'>导入安全库存</Menu.Item>
         <Menu.Item key='4'>设置安全库存天数</Menu.Item>
@@ -432,13 +442,14 @@ const Main = React.createClass({
             </Button>
           </Dropdown>
           <div className={styles.searchTip}>
-            <Icon type='edit' /> 图标的栏位，双击可修改数组
+            <Icon type='edit' /> 图标的栏位，双击可修改
           </div>
         </div>
         <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'stock_maininv' }} columnDefs={columnDefs} grid={this} paged />
         <ModifyModal />
         <InvLock />
         <InvDetailQuery />
+        <SafeModal />
       </div>
     )
   }

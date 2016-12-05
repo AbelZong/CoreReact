@@ -65,6 +65,7 @@ import ProductCatesRoute from './Product/Cates'
 import ProductListRoute from './Product/List'
 import ProductList2Route from './Product/List2'
 import ProductApproveRoute from './Product/Approve'
+import ProductTagPrintRoute from './Product/TagPrint'
 import ProductNormMappingRoute from './Product/NormMapping'
 import Warehouse3rdRoute from './Warehouse/3rd'
 import SuperAnnounceRoute from './Super/Announce'
@@ -135,6 +136,7 @@ export const createRoutes = (store) => ([
       ProductListRoute(store),
       ProductList2Route(store),
       ProductApproveRoute(store),
+      ProductTagPrintRoute(store),
       BusinessSettingRoute(store),
       ProductNormMappingRoute(store),
       SuperAnnounceRoute(store),

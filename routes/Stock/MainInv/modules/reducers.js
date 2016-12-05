@@ -8,6 +8,9 @@ const stock_maininv_conditions = handleActions({
 const stock_virtual_vis = handleActions({
   STOCK_VIRTUAL_VIS_SET: (state, action) => action.payload
 }, -1)
+const stock_safeinv_vis = handleActions({
+  STOCK_SAFEINV_VIS_SET: (state, action) => action.payload
+}, [])
 const stock_invlock_vis = handleActions({
   STOCK_INVLOCK_VIS_SET: (state, action) => action.payload
 }, -1)
@@ -27,5 +30,5 @@ const stock_inv_detail_conditions = handleActions({
 }, {})
 
 export default {
-  stock_maininv_conditions, stock_virtual_vis, stock_invlock_vis, stock_invlock_conditions, stock_invlock_mod_vis, stock_inv_detail_vis, stock_inv_detail_conditions
+  stock_maininv_conditions, stock_virtual_vis, stock_invlock_vis, stock_invlock_conditions, stock_invlock_mod_vis, stock_inv_detail_vis, stock_inv_detail_conditions, stock_safeinv_vis
 }
