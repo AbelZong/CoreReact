@@ -5,7 +5,7 @@
 * Description:
 *
 * Author: ChenJie <827869959@qq.com>
-* Date  : 2016-11-24 PM
+* Date  : 2016-11-29 PM
 * Last Updated:
 *
 * For the full copyright and license information, please view the LICENSE
@@ -15,7 +15,7 @@
   padding: 10px 5px 10px 10px;
 }
 .toolbars2 {
-  padding: 0px 5px 5px 10px;
+  padding: 0px 5px 10px 10px;
 }
 .main {
   padding-left:10px;
@@ -37,43 +37,20 @@
     text-align: right;
   }
 }
-.topOperators2 {
-  padding-left: 10px; 
-  display: flex;
-  flex-direction: row;
-  padding-bottom: 4px;
-  .Hleft {
-    flex: 1;
-  }
-  .Hright {
-    flex-basis: 150px;
-    text-align: right;
-  }
-}
 
-.Status {
-  text-align: center;
-}
-.Status0 {
-  color: #666;
-  background-color: #fde7ab;
-}
-.Status1 {
-  background-color: rgb(0, 159, 60);
-  color: rgb(255, 255, 255);
-}
-.Status2 {
-  background-color: rgb(255, 0, 0);
-  color: rgb(255, 255, 255);
-}
-.searchInput{
-  margin-top:3px
-}
 .searchTip{
     display: inline-block;
     margin-left: 15px;
-    background: #FFFF00;
     padding: 2px 10px;
-    color: #FF4500;
+    color: #d3d3d3;
+    line-height: 28px;
+}
+.divTip{
+    display: inline-block;
+    margin-left: 15px;
+    padding: 2px 10px;
+    color: red;
+    line-height: 28px;
+    font-size: 16px
 }
 

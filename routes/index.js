@@ -65,6 +65,7 @@ import ProductCatesRoute from './Product/Cates'
 import ProductListRoute from './Product/List'
 import ProductList2Route from './Product/List2'
 import ProductApproveRoute from './Product/Approve'
+import ProductTagPrintRoute from './Product/TagPrint'
 import ProductNormMappingRoute from './Product/NormMapping'
 import Warehouse3rdRoute from './Warehouse/3rd'
 import SuperAnnounceRoute from './Super/Announce'
@@ -74,6 +75,7 @@ import OrderGiftRuleRoute from './Order/GiftRule'
 import StockInitRoute from './Stock/Init'
 import StockTakeRoute from './Stock/Take'
 import StockMainInvRoute from './Stock/MainInv'
+import StockFenInvRoute from './Stock/FenInv'
 import LogisticsFreightRoute from './Logistics/Freight'
 import LogisticsCompanyRoute from './Logistics/Company'
 //import AdminCompanyRoute from './Admin/Company'
@@ -135,12 +137,14 @@ export const createRoutes = (store) => ([
       ProductListRoute(store),
       ProductList2Route(store),
       ProductApproveRoute(store),
+      ProductTagPrintRoute(store),
       BusinessSettingRoute(store),
       ProductNormMappingRoute(store),
       SuperAnnounceRoute(store),
       StockInitRoute(store),
       StockTakeRoute(store),
       StockMainInvRoute(store),
+      StockFenInvRoute(store),
       OrderListRoute(store),
       OrderAfterRoute(store),
       OrderGiftRuleRoute(store),

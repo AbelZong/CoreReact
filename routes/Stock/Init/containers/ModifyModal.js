@@ -18,14 +18,10 @@ import {Modal, message, Button, Input, Tooltip} from 'antd'
 import {
   Icon as Iconfa
 } from 'components/Icon'
-import {startLoading} from 'utils'
 import ZGrid from 'components/Grid/index'
 import {ZGet, ZPost} from 'utils/Xfetch'
 import Toolbar2 from './Toolbar2'
 import AppendProduct from 'components/SkuPicker/append'
-import {
-  reactCellRendererFactory
-} from 'ag-grid-react'
 import Wrapper from 'components/MainWrapper'
 
 const InvQtyEditor = React.createClass({
@@ -111,11 +107,6 @@ const PriceEditor = React.createClass({
   },
   render() { return <Input type='number' ref='zhang' min={0} value={this.state.value} onChange={this.handleChange} /> }
 })
-const BaseRender = React.createClass({
-  render() {
-    return <Tooltip placement='rightTop' title='双击编辑'><div>{this.props.value}</div></Tooltip>
-  }
-})
 
 const gridOptions = {
   groupIncludeFooter: true,
@@ -158,7 +149,7 @@ const defColumns = [
     cellStyle: {textAlign: 'center'},
     width: 60,
     editable: true,
-    cellRenderer: reactCellRendererFactory(BaseRender),
+    cellClass: 'editable',
     cellEditorFramework: InvQtyEditor
   }, {
     headerName: '成本价',
@@ -166,7 +157,7 @@ const defColumns = [
     cellStyle: {textAlign: 'center'},
     width: 80,
     editable: true,
-    cellRenderer: reactCellRendererFactory(BaseRender),
+    cellClass: 'editable',
     cellEditorFramework: PriceEditor
   }, {
     headerName: '成交金额',
@@ -321,34 +312,6 @@ const ModifyModal = React.createClass({
         message.error(m)
       }
     })
-  },
-  handleSubmit() {
-    // this.props.form.validateFields((errors, values) => {
-    //   const wtf = !!errors
-    //   if (wtf) {
-    //     return false
-    //   }
-    //   this.setState({
-    //     confirmLoading: true
-    //   })
-    //   const {doge} = this.props
-    //   const data = values
-    //   let uri = ''
-    //   if (doge === 0) {
-    //     uri = 'shop/createshop'
-    //   } else {
-    //     uri = 'shop/modifyshop'
-    //     data.id = doge
-    //   }
-    //   ZPost(uri, data, () => {
-    //     this.hideModal()
-    //     EE.triggerRefreshMain()
-    //   }, () => {
-    //     this.setState({
-    //       confirmLoading: false
-    //     })
-    //   })
-    // })
   },
   hideModal() {
     this.props.dispatch({ type: 'STOCK_INIT_MODIFY_VIS_SET', payload: [-1, 0] })
