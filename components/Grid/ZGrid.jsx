@@ -166,6 +166,7 @@ class ZGrid extends React.Component {
       const _states = {
         current: 0
       }
+      this.getRowsFunc = args.hasOwnProperty('getRows') ? args.getRows : null
       _states.rowData = (args.rowData && args.rowData instanceof Array) ? args.rowData : []
       _states.total = typeof args.total === 'undefined' ? _states.rowData.length : Number(args.total)
       this.setState(_states, () => {
@@ -333,9 +334,10 @@ class ZGrid extends React.Component {
             <div className='op-r'>
               {paged && (
                 <span>
-                  <Pagination size='small' current={this.state.current} pageSize={this.state.pageSize} onChange={this.handlePageChange} onShowSizeChange={this.handlePageShowSizeChange} total={this.state.total} showSizeChanger showQuickJumper pageSizeOptions={pageSizeOptions} showTotal={total => `共 ${total} 条`} /><a title='刷新ZGrid容器' className='cur' onClick={this.refreshRowData}><Icon type='refresh' spin={false} /></a>
+                  <Pagination size='small' current={this.state.current} pageSize={this.state.pageSize} onChange={this.handlePageChange} onShowSizeChange={this.handlePageShowSizeChange} total={this.state.total} showSizeChanger showQuickJumper pageSizeOptions={pageSizeOptions} showTotal={total => `共 ${total} 条`} />
                 </span>
               )}
+              {this.getRowsFunc !== null ? <a title='刷新ZGrid容器' className='cur' onClick={this.refreshRowData}><Icon type='refresh' spin={false} /></a> : null }
               <a title='显示隐藏列名' className='cur' onClick={this.toggleColumnCheckedVisibe}><Icon type='eye-slash' /></a>
               <Popconfirm placement='leftBottom' title='确定要恢复ZGrid容器默认设置吗？' onConfirm={this.removeCache}><a title='恢复容器默认设置' className='cur'><Icon type='eraser' /></a>
               </Popconfirm>

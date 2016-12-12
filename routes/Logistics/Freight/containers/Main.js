@@ -29,7 +29,7 @@ import {
   Radio
 } from 'antd'
 import {
-  ZGet,
+  //ZGet,
   ZPost
 } from 'utils/Xfetch'
 import {
@@ -297,7 +297,7 @@ const Modal1 = connect(state => ({
     const {getFieldDecorator} = this.props.form
     const Detail = data.Detail || {}
     return (
-      <Modal title={`运费模板设置-${data.Name}`} confirmLoading={confirmLoading} onOk={this.handleOK} visible={visible} onCancel={this.handleok} width='100%'>
+      <Modal maskClosable={false} title={`运费模板设置-${data.Name}`} confirmLoading={confirmLoading} onOk={this.handleOK} visible={visible} onCancel={this.handleok} width='100%'>
         <Alert message='除指定地区外,其余地区运费采用默认运费（如需根据不同重量范围，采用不同的规则，请进行详细设定）' type='warning' />
         <div className={styles.mForm}>
           <Form horizontal className='pos-form'>

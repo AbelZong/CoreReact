@@ -1,0 +1,51 @@
+/**
+* This file is part of the <智鼠> application.
+*
+* Version: 0.0.1
+* Description:
+*
+* Author: HuaZhang <yahveh.zh@gmail.com>
+* Date  : 2016-12-09 AM
+* Last Updated:
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
+.toolbars {
+  padding: 10px 5px 10px 10px;
+  :global {
+    .ant-form-item,
+    .ant-form-item-label {
+      vertical-align: bottom;
+    }
+  }
+}
+.status0 {
+  text-align: center;
+  background-color: rgb(253, 231, 171) !important;
+    color: rgb(102, 102, 102);
+}
+.status1 {
+  text-align: center;
+  background-color: rgb(171, 212, 110) !important;
+    color: rgb(255, 255, 255);
+}
+.status2 {
+  text-align: center;
+  background-color: rgb(255, 0, 0) !important;
+color: rgb(255, 255, 255);
+}
+.main {
+  padding-left:10px;
+  padding-right:5px;
+  flex: 1;
+  display: flex;
+  :global(.z-grid) {
+    :global(.ag-row:hover) {
+        background-color: #f5f5f5;
+    }
+    :global(.ag-group-value > div) {
+      display: inherit;
+    }
+  }
+}

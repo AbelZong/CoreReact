@@ -540,7 +540,7 @@ export default connect()(Wrapper(React.createClass({
                         this.mergeConditions('Osource', e.target.value)
                       }}>
                         {dt.OSource.map(x => <Radio key={x.value} value={x.value}><span title='双击直接单项查询' onDoubleClick={() => {
-                          const cds = {'Osource': x.Value}
+                          const cds = {'Osource': x.value}
                           this.runS(cds)
                         }}>{x.label}</span></Radio>)}
                       </RadioGroup>
@@ -570,7 +570,7 @@ export default connect()(Wrapper(React.createClass({
                     this.mergeConditions('LoanType', e.target.value)
                   }}>
                     {dt.LoanType.map(x => <Radio key={x.value} value={x.value}><span title='双击直接单项查询' onDoubleClick={() => {
-                      const cds = {'LoanType': x.Value}
+                      const cds = {'LoanType': x.value}
                       this.runS(cds)
                     }}>{x.label}</span></Radio>)}
                   </RadioGroup>
@@ -582,7 +582,7 @@ export default connect()(Wrapper(React.createClass({
                     this.mergeConditions('LoanType', e.target.value)
                   }}>
                     {dt.IsPaid.map(x => <Radio key={x.value} value={x.value}><span title='双击直接单项查询' onDoubleClick={() => {
-                      const cds = {'LoanType': x.Value}
+                      const cds = {'LoanType': x.value}
                       this.runS(cds)
                     }}>{x.label}</span></Radio>)}
                   </RadioGroup>

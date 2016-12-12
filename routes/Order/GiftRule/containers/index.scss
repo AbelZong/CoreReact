@@ -12,3 +12,144 @@
 * file that was distributed with this source code.
 */
 
+.aside {
+  padding:0 5px 10px;
+  .nor {
+    margin-bottom:15px;
+  }
+  .bbq {
+    small {
+      background-color:#f9f9f9;
+      padding:1px 6px;
+      margin-left:10px;
+      color:#999;
+    }
+  }
+  .wCBG {
+    padding-left:8px;
+    user-select: none;
+    display: inline-block;
+    &:hover {
+      background-color:#fff;
+    }
+  }
+  .box {
+    margin-bottom: 5px;
+    &:hover {
+      background-color:#f9f9f9;
+    }
+    .tt {
+      position: relative;
+      padding-left: 25px;
+      line-height:30px;
+      border-bottom: 1px dotted #f9f9f9;
+      user-select: none;
+      .arrow {
+        position: absolute;
+        left:5px;
+        top:0;
+        width: 18px;
+height: 100%;
+        &:before {
+          position: absolute;
+          left:5px;
+          top:0;
+          font-family: anticon!important;
+          content: "\E606";
+          color: #666;
+          transform: scale(.58333333);
+        }
+      }
+    }
+    .dd {
+      //padding-left:5px;
+      padding-top:5px;
+      padding-bottom:10px;
+    }
+    &.closed {
+      .tt {
+        .arrow {
+          &:before {
+            transform: scale(.58333333) rotate(-90deg);
+          }
+        }
+      }
+      .dd {
+        display: none;
+      }
+    }
+  }
+  :global{
+    .ant-radio-wrapper,
+    .ant-checkbox-group-item {
+      margin-left:8px;
+    }
+  }
+}
+
+.logs {
+  max-height:600px;
+  overflow: auto;
+}
+
+.zgrid {
+  margin: 0 2px 0 5px;
+}
+
+.form {
+  :global {
+    .ant-form-item {
+      margin-bottom: 0px;
+    }
+  }
+}
+.custItem {
+
+}
+.text {
+  color:#999;
+  display: inline-block;
+}
+.tags {
+  max-height:168px;
+  overflow: auto;
+  :global(.ant-tag-text) {
+    color:#fff;
+  }
+}
+.innerW {
+  border-radius: 3px;
+    border: 1px solid #eee;
+    background-color: #fcfcfc;
+}
+
+.greenBG {
+  background-color: #16a216!important;
+    color: rgb(255, 255, 255);
+    text-align: center;
+}
+.grayBG {
+  background-color: rgb(128, 128, 128)!important;
+    color: rgb(255, 255, 255);
+    text-align: center;
+}
+
+.form-hack1 {
+  margin-bottom:0;
+  display: inline-block;
+}
+
+.mt {
+  margin: 1px;
+}
+
+.evc {
+  padding: 10px;
+  min-height: 80px;
+}
+.eve {
+  color: #999;
+  border: 1px dotted #f5f5f5;
+  background-color: #f5f5f5;
+  padding: 3px 5px 0;
+}

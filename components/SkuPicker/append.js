@@ -44,10 +44,10 @@ export default React.createClass({
     })
   },
   render() {
-    const {style, size, children, type, initialValues} = this.props
+    const {style, size, children, type, initialValues, disabled} = this.props
     //<Icon type='plus' style={{color: 'red'}} /> {text || '添加新的商品'}
     return (
-      <Button size={size} type={type || 'ghost'} onClick={this.handleSelect} style={style}>
+      <Button size={size} type={type || 'ghost'} onClick={this.handleSelect} disabled={disabled} style={style}>
         {children || '添加新的商品'}
         <Modal doge={this.state.visible} onOk={this.handleModalOk} onCancel={this.handleModalCancel} initialValues={initialValues} />
       </Button>

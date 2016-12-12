@@ -94,6 +94,12 @@
     .ant-form-item-with-help {
       margin-bottom: 12px;
     }
+    &.form-sm {
+      .ant-form-item,
+      .ant-form-item-with-help {
+          margin-bottom: 0;
+      }
+    }
     .has-error {
       .ant-form-explain {
         display: block;
@@ -107,6 +113,8 @@
      .ant-select-selection {
        box-shadow: none;
      }
+     .ant-radio-group-small + .ant-form-explain,
+     .ant-select-sm + .ant-form-explain,
      .ant-input-number-sm + .ant-form-explain {
        top: 6px;
      }

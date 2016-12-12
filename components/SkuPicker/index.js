@@ -28,12 +28,14 @@ export default React.createClass({
   },
   componentWillReceiveProps(nextProps) {
     if (typeof nextProps.value === 'undefined') {
-      if (this.state.value !== nextProps.value) {
-        //this._setValue(null, '')
-        this.setState({
-          value: null,
-          name: ''
-        })
+      if (nextProps.hasOwnProperty('value')) {
+        if (this.state.value !== nextProps.value) {
+          //this._setValue(null, '')
+          this.setState({
+            value: null,
+            name: ''
+          })
+        }
       }
     } else {
       if (this.state.value !== nextProps.value.id) {
@@ -60,7 +62,6 @@ export default React.createClass({
       //sbc
       const name = this.props.nameField ? data[this.props.nameField] : data.SkuName
       const value = this.props.valueField ? data[this.props.valueField] : data.ID
-      //console.log(data, name, value)
       this._setValue(value, name, '0', data)
     } else {
       this._setValue(null, '', '0', data)
@@ -79,11 +80,11 @@ export default React.createClass({
     e.stopPropagation()
     this._setValue(null, '')
   },
-  handleSelect1(type) {
-    this.setState({
-      type
-    })
-  },
+  // handleSelect1(type) {
+  //   this.setState({
+  //     type
+  //   })
+  // },
   render() {
     const {style, className, size} = this.props
     let CN = className ? `${styles.zhang} ${className}` : styles.zhang
@@ -105,7 +106,7 @@ export default React.createClass({
     return (
       <div className={CN} style={styler}>
         <div className={styles.inputArea}>
-          <Input onClick={this.handleSelect} value={this.state.name} placeholder={this.props.placeholder || '包含商品'} size={this.props.size || 'default'} className={styles.input} title={this.state.name || '点击选择商品'} />
+          <Input onClick={this.handleSelect} value={this.state.name} placeholder={this.props.placeholder || '包含商品'} size={this.props.size || 'default'} className={styles.input} title={this.state.name || '点击选择'} />
           <span className={styles.operator}>
             {this.state.name !== '' ? <Icon type='minus' onClick={this.handleRemove} title='点击移除' /> : <Icon type='ellipsis-h' title='点击选择' />}
           </span>

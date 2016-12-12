@@ -78,6 +78,9 @@ import StockMainInvRoute from './Stock/MainInv'
 import StockFenInvRoute from './Stock/FenInv'
 import LogisticsFreightRoute from './Logistics/Freight'
 import LogisticsCompanyRoute from './Logistics/Company'
+import SaleOutRoute from './Sale/Out'
+import SalePayRoute from './Sale/Pay'
+import SaleRefundRoute from './Sale/Refund'
 //import AdminCompanyRoute from './Admin/Company'
 // const QQ = require.context('./__ENTERIES__', false, /\.js$/)
 // console.dir(QQ)
@@ -150,6 +153,9 @@ export const createRoutes = (store) => ([
       OrderGiftRuleRoute(store),
       LogisticsFreightRoute(store),
       LogisticsCompanyRoute(store),
+      SaleOutRoute(store),
+      SalePayRoute(store),
+      SaleRefundRoute(store),
       NotFoundRoute
     ],
     ignoreScrollBehavior: true

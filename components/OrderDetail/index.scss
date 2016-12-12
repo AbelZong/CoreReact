@@ -1,0 +1,297 @@
+/**
+* This file is part of the <智鼠> application.
+*
+* Version: 0.0.1
+* Description:
+*
+* Author: HuaZhang <yahveh.zh@gmail.com>
+* Date  : 2016-12-03 AM
+* Last Updated:
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
+.noMBForm {
+  :global {
+    .pos-form .ant-form-item,
+    .pos-form .ant-form-item-with-help {
+        margin-bottom: 0;
+    }
+  }
+}
+
+.logs {
+  h3 {
+    margin: 10px 0;
+  }
+  div {
+    font-family: 'Segoe UI','宋体', Tahoma, Arial, Verdana;
+    font-size:12px;
+  }
+}
+.pays {
+  margin-top:10px;
+  h3 {
+    padding: 10px 0;
+  }
+  .ppap0 {
+    text-align: center;
+  }
+  .ppap1,
+  .ppap2,
+  .ppap3 {
+    border-bottom: 1px dotted #ccc;
+    margin-right: 10px;
+    color: #333;
+    &:before {
+      content: '单号:';
+      display: inline-block;
+      color: #999;
+      border-bottom: 1px solid #fff;
+      margin-bottom: -1px;
+      margin-right: 5px;
+    }
+  }
+  .ppap2 {
+    &:before {
+      content: '金额:';
+    }
+  }
+  .ppap3 {
+    &:before {
+      content: '支付日期:';
+    }
+  }
+}
+
+.items {
+  margin-top:20px;
+  h3 {
+    border-top: 1px solid #f9f9f9;
+    padding: 10px 0;
+  }
+  ._poster {
+    width: 46px;
+    height: 46px;
+    background-size: contain;
+    vertical-align: middle;
+    //margin: auto;
+    margin: -8px;
+  }
+  ._ppap {
+    display:inline-block;
+    color:#A0A0A0;
+    margin-right:5px;
+  }
+  .tQty {
+    color: #00f;
+    width: 100px;
+    text-align: left;
+    display: inline-block;
+  }
+  :global {
+    .gray {
+      color:#A9A9A9;
+    }
+  }
+}
+.items_c {
+  margin: 10px 0 20px;
+  font-family: 'Segoe UI','宋体', Tahoma, Arial, Verdana;
+  .bPrice {
+    text-align: left;
+    color:#666;
+    width:100px;
+    display:inline-block;
+  }
+  .rPrice {
+    text-align: left;
+    color:#f00;
+    width:100px;
+    display:inline-block;
+  }
+  .bPrice,
+  .rPrice {
+    font-size:13px;
+    &:before {
+      content: '￥';
+      color:inherit;
+      display: inline-block;
+      margin-right:4px;
+      margin-left:1px;
+      pointer-events: none;
+      font-size:12px;
+    }
+  }
+  .hr {
+    margin: 10px 0;
+    border-top: 1px dotted #f5f5f5;
+    padding: 5px 0;
+  }
+}
+._zp:before {
+  content: '赠';
+  font-size: 12px;
+  padding: 1px 3px;
+  line-height: 1;
+  border-radius: 5px;
+  color: rgb(255, 0, 0);
+  font-weight: 400;
+  background-color: rgb(250, 205, 138);
+  margin-right:2px;
+  text-shadow: none;
+}
+.skuer {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px dotted #f5f5f5;
+  ._text {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  ._ipts {
+    display: none;
+    position: absolute;
+    left:0;
+    top: 0;
+    margin-top: 12px;
+    :global {
+      .ant-input {
+        text-align: right;
+      }
+    }
+  }
+  ._gray2 {
+    color: #999;
+  }
+  ._poster,
+  ._price,
+  ._itemid,
+  ._tPrice,
+  ._info,
+  ._amount,
+  ._num {
+    vertical-align: middle;
+    padding: 4px 6px 4px 2px;
+    line-height: 16px;
+    position: relative;
+    margin-right:1px;
+    height: 60px;
+  }
+  ._ict {
+    margin:auto;
+    text-align: left;
+    width: 100%;
+  }
+  ._poster {
+    padding-left: 6px;
+    border: 6px solid transparent;
+    width: 32px;
+    height: 32px;
+    background-size: contain;
+    margin-top: 13px;
+    //background-color:#fff;
+  }
+  ._itemid {
+    width: 160px;
+      display: flex;
+      flex-direction: column;
+  }
+  ._price {
+    width: 76px;
+    ._red {
+      color: #f00;
+      text-align: right;
+      margin: auto;
+      width: 100%;
+    }
+  }
+  ._num {
+    width: 50px;
+    ._blue {
+      color: #00f;
+      text-align: right;
+      margin: auto;
+      width: 100%;
+    }
+  }
+  ._tPrice {
+    width: 76px;
+      display: flex;
+      flex-direction: column;
+    ._gray {
+      font-style: italic;
+      text-align: right;
+      color: #666;
+      margin: auto;
+    }
+  }
+  ._info {
+    flex: 1;
+    ._weight {
+      color: #42c8ff;
+    }
+    ._ipts {
+      width: 90%;
+      :global {
+        .ant-input {
+          text-align: left;
+        }
+      }
+    }
+  }
+  ._amount {
+    width:136px;
+    ._ipts {
+      margin-top: 16px;
+    }
+    ._am {
+      color: #06a026;
+      text-align:right;
+      margin: auto;
+    }
+    :global(.ant-btn-ghost) span {
+        color:#666;
+    }
+  }
+}
+.process {
+  .exception {
+    background-color: #0094ff;
+    color: #fff;
+    padding: 5px 10px;
+  }
+}
+
+.experWrapper {
+  display: flex;
+  flex-direction: row;
+  .exps {
+    flex: 1;
+  }
+  .radios {
+    width: 200px;
+    padding-left:20px;
+    :global {
+      .ant-radio-wrapper {
+        display: block;
+        line-height: 23px;
+      }
+    }
+  }
+  .pch {
+  }
+  .row {
+    margin-bottom: 5px;
+    border-bottom: 1px dotted #f9f9f9;
+    :global {
+      .ant-row {
+        margin-bottom: 5px;
+      }
+    }
+    strong {
+      font-size:14px;
+    }
+  }
+}

@@ -13,13 +13,20 @@
 */
 import { handleActions } from 'redux-actions'
 
-const access_list = handleActions({
-  ACCESS_LIST: (state, action) => (action.payload)
+const order_giftrule_conditions = handleActions({
+  ORDER_GIFTRULE_CONDITIONS_SET: (state, action) => (action.payload)
 }, null)
-const access_modify_visiable = handleActions({
-  ACCESS_MODIFY_VISIABLE: (state, action) => (action.payload)
-}, -1)
+const order_giftrule_modal_1_vis = handleActions({
+  ORDER_GIFTRULE_MODAL_1_VIS_SET: (state, action) => (action.payload)
+}, null)
+const order_giftrule_modal_2_vis = handleActions({
+  ORDER_GIFTRULE_MODAL_2_VIS_SET: (state, action) => (action.payload)
+}, null)
+const order_giftrule_collapse = handleActions({
+  ORDER_GIFTRULE_COLLAPSE_SET: (state, action) => (action.payload),
+  ORDER_GIFTRULE_COLLAPSE_REVER: (state, action) => !state
+}, false)
 
 export default {
-  access_list, access_modify_visiable
+  order_giftrule_conditions, order_giftrule_modal_1_vis, order_giftrule_collapse, order_giftrule_modal_2_vis
 }
