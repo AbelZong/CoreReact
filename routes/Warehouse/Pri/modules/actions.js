@@ -5,18 +5,9 @@
 * Description:
 *
 * Author: HuaZhang <yahveh.zh@gmail.com>
-* Date  : 2016-12-06 PM
+* Date  : 2016-09-07 12:50:44
 * Last Updated:
 *
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
 */
-import {handleActions} from 'redux-actions'
-import update from 'react-addons-update'
-const product_shop_band = handleActions({
-  PRODUCT_SHOP_BAND_SET: (state, action) => action.payload
-}, -1)
-
-export default {
-  product_shop_band
-}

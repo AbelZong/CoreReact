@@ -21,6 +21,7 @@ import {
   ZGet,
   ZPost
 } from 'utils/Xfetch'
+import EE from 'utils/EE'
 import ZGrid from 'components/Grid/index'
 import styles from './index.scss'
 import SkuInfo from './SkuInfo'
@@ -28,6 +29,7 @@ import Wrapper from 'components/MainWrapper'
 import SupplierPicker from 'components/SupplierPicker'
 import BrandPicker from 'components/BrandPicker'
 import ItemCatPicker from 'components/ItemCatPicker'
+import {sTypes} from 'constants/List2'
 import {
   Popconfirm,
   Select,
@@ -92,7 +94,7 @@ const Main = React.createClass({
   handleEnable() {
     const ids = this._getIDs()
     if (ids) {
-      this.grid.x0pCall(ZPost('XyComm/Customkind/SkuKindEnable', {IDLst: ids, Enable: 1}, () => {
+      this.grid.x0pCall(ZPost('XyCore/CoreSku/UpdateGoodsEnable', {IDLst: ids, Enable: 1}, () => {
         this.refreshDataCallback()
       }))
     }
@@ -100,7 +102,7 @@ const Main = React.createClass({
   handleBackup() {
     const ids = this._getIDs()
     if (ids) {
-      this.grid.x0pCall(ZPost('XyComm/Customkind/SkuKindEnable', {IDLst: ids, Enable: 2}, () => {
+      this.grid.x0pCall(ZPost('XyCore/CoreSku/UpdateGoodsEnable', {IDLst: ids, Enable: 2}, () => {
         this.refreshDataCallback()
       }))
     }
@@ -108,7 +110,7 @@ const Main = React.createClass({
   handleDisable() {
     const ids = this._getIDs()
     if (ids) {
-      this.grid.x0pCall(ZPost('XyComm/Customkind/SkuKindEnable', {IDLst: ids, Enable: 0}, () => {
+      this.grid.x0pCall(ZPost('XyCore/CoreSku/UpdateGoodsEnable', {IDLst: ids, Enable: 0}, () => {
         this.refreshDataCallback()
       }))
     }
@@ -438,7 +440,7 @@ const ModifyModal = connect(state => ({
         for (let i = 0; i < skulength; i++) {
           Norm += item[`sku${i}`] + ';'
           t[`Pid${parseInt(i) + 1}`] = item[`pid${parseInt(i) + 1}`]
-          t[`val_id${parseInt(i) + 1}`] = item[`val_id${parseInt(i) + 1}`]
+          t[`val_id${parseInt(i) + 1}`] = item[`ID${parseInt(i) + 1}`] > 0 ? item[`ID${parseInt(i) + 1}`] : item[`val_id${parseInt(i) + 1}`]
         }
         t['Norm'] = Norm.substring(0, Norm.length - 1)
         items.push(t)
@@ -465,6 +467,7 @@ const ModifyModal = connect(state => ({
             for (let a of Object.values(cc)) {
               if (a.checked) {
                 skuprops.push({
+                  id: a.id,
                   pid: a.pid,
                   val_id: a.val_id,
                   val_name: a.value,
@@ -499,6 +502,7 @@ const ModifyModal = connect(state => ({
 
       ZPost(uri, data, () => {
         this.hideModal()
+        EE.triggerRefreshMain()
       }, () => {
         this.setState({
           confirmLoading: false
@@ -557,7 +561,7 @@ const ModifyModal = connect(state => ({
               kindid: e.id,
               skuProps: Object.values(skuProps),
               itemProps: itemProps
-            }, () => console.log(this.state))
+            })
           }
         }
       }).then(endLoading)
@@ -701,6 +705,7 @@ const ModifyModal = connect(state => ({
     //   items: newstate
     // })
     tempItems = newstate
+    //console.log('tempItems', tempItems)
   },
   render() {
     const { getFieldDecorator } = this.props.form
@@ -714,7 +719,7 @@ const ModifyModal = connect(state => ({
       wrapperCol: { span: 24 }
     }
     return (
-      <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={confirmLoading} width={800} maskClosable={false}>
+      <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={confirmLoading} width={800} maskClosable>
         <Form horizontal className='pos-form'>
           <FormItem {...formItemLayout2} label='款式编码(货号)'>
             {getFieldDecorator('GoodsCode', {
@@ -945,7 +950,11 @@ const columnDefs = [
     width: 70,
     cellStyle: {textAlign: 'center'},
     cellRenderer: function(params) {
-      console.log(params)
+      const k = params.data.Enable + ''
+      return sTypes[k] || k
+    },
+    cellClass: function(params) {
+      return styles.Status + ' ' + (styles[`Status${params.data.Enable}`] || '')
     },
     suppressMenu: true
     //pinned: 'right'
@@ -1061,7 +1070,7 @@ const AttrCC = React.createClass({
     if (this.state.edit === '0' || this.state.value === '') {
       return (
         <div className={styles.checked}>
-          <Select labelInValue placeholder={`-选择${this.state.name}-`} style={{ width: 200 }} defaultValue={{key: this.state.def_val_id}} onChange={this.handleCheck}>
+          <Select labelInValue placeholder={`-选择${this.state.name}-`} style={{ width: 200 }} defaultValue={{ key: this.state.def_val_id !== '0' ? `${this.state.def_val_id}` : '' }} onChange={this.handleCheck}>
             {this.state.values.length ? (this.state.values.map(y => <Option value={`${y.id}`} key={y.id}>{y.name}
             </Option>)
             ) : <Option key={0} />}

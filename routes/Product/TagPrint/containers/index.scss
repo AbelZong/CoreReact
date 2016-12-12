@@ -54,3 +54,28 @@
     }
   }
 }
+
+.aTag{
+  width:100px;
+  text-align: center;
+  margin: 5px;
+  background: #fff;
+  border: 1px solid #eaeaea ;
+  color:#000;
+  display: inline-block;
+  &.active,
+  &:hover {
+    background: #2db7f5;
+    color:#fff;
+    }
+
+}
+
+.aOn{
+  background: #2db7f5;
+  color:#fff;
+}
+
+.form{
+  margin-top: 15px;
+}

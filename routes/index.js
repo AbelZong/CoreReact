@@ -60,6 +60,7 @@ import CompanyClientsRoute from './Company/Clients'
 import WarehouseSettingsRoute from './Warehouse/Settings'
 import WarehouseSettingsPlusRoute from './Warehouse/Settings+'
 import WarehouseOrderulesRoute from './Warehouse/Orderules'
+import WarehousePriRoute from './Warehouse/Pri'
 import BusinessSettingRoute from './Admin/BusinessSetting'
 import ProductCatesRoute from './Product/Cates'
 import ProductListRoute from './Product/List'
@@ -73,6 +74,7 @@ import OrderListRoute from './Order/List'
 import OrderAfterRoute from './Order/After'
 import StockInitRoute from './Stock/Init'
 import StockTakeRoute from './Stock/Take'
+import StockPickAndBatch from './Stock/PickAndBatch'
 import StockMainInvRoute from './Stock/MainInv'
 import StockFenInvRoute from './Stock/FenInv'
 import LogisticsFreightRoute from './Logistics/Freight'
@@ -132,6 +134,7 @@ export const createRoutes = (store) => ([
       WarehouseSettingsPlusRoute(store),
       WarehouseOrderulesRoute(store),
       Warehouse3rdRoute(store),
+      WarehousePriRoute(store),
       ProductCatesRoute(store),
       ProductListRoute(store),
       ProductList2Route(store),
@@ -144,6 +147,7 @@ export const createRoutes = (store) => ([
       StockTakeRoute(store),
       StockMainInvRoute(store),
       StockFenInvRoute(store),
+      StockPickAndBatch(store),
       OrderListRoute(store),
       OrderAfterRoute(store),
       LogisticsFreightRoute(store),
