@@ -193,7 +193,7 @@ const SkuInfo = React.createClass({
   },
   _firstload(_v) {
     const v = Object.assign({}, this.props.value || {}, _v || {})
-    let beforeItems = this.state.items.length === 0 ? v.items : this.state.items
+    let beforeItems = v.items
     let itemsDecar = []
     let catalogs = [] //sku 栏位
     let skuprops = v.skuprops
@@ -216,6 +216,7 @@ const SkuInfo = React.createClass({
             val_name: p.val_name,
             val_id: p.val_id,
             pid: p.pid,
+            ID: p.ID,
             mapping: p.mapping
           })
         }
@@ -226,6 +227,7 @@ const SkuInfo = React.createClass({
             val_name: p.val_name,
             val_id: p.val_id,
             pid: p.pid,
+            ID: p.ID,
             mapping: p.mapping
           })
         }
@@ -241,13 +243,15 @@ const SkuInfo = React.createClass({
           [`sku${id}`]: decar[id].val_name,
           [`pid${parseInt(id) + 1}`]: decar[id].pid,
           [`val_id${parseInt(id) + 1}`]: decar[id].val_id,
-          [`mapping${parseInt(id) + 1}`]: decar[id].mapping
+          [`mapping${parseInt(id) + 1}`]: decar[id].mapping,
+          [`ID${parseInt(id) + 1}`]: decar[id].ID
         })
       }
       items.push(_ite)
     }
     for (let it in items) {
-      let beforeItem = beforeItems.length > 0 ? beforeItems.find(x => this.ItemEqual(x, items[it])) : undefined
+      let beforeItem = beforeItems.length > 0 ? beforeItems.find(x => this.ItemEqual(x, items[it]))
+       : undefined
       if (beforeItem !== undefined) {
         items[it]['SalePrice'] = beforeItem.isedit ? beforeItem.SalePrice : 0.00
         items[it]['PurPrice'] = beforeItem.isedit ? beforeItem.PurPrice : 0.00
@@ -261,6 +265,7 @@ const SkuInfo = React.createClass({
         items[it]['Norm'] = beforeItem.Norm
         for (let i = 0; i < this.state.skuprops.length; i++) {
           items[it][`val_id${parseInt(i) + 1}`] = beforeItem[`val_id${parseInt(i) + 1}`]
+          items[it][`ID${parseInt(i) + 1}`] = beforeItem[`ID${parseInt(i) + 1}`]
         }
       } else {
         items[it]['SalePrice'] = 0.00

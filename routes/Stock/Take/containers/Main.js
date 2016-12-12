@@ -191,11 +191,10 @@ const Main = React.createClass({
     this.props.dispatch({type: 'STOCK_TAKE_WARE_VIS_SET', payload: 1})
   },
   handleMyRemark(id) {
-    ZPost('XyCore/StockTake/TakeRemarkQuery', {
+    ZGet('XyCore/StockTake/TakeRemarkQuery', {
       ID: id
     }, ({d}) => {
       console.log('d', d)
-      return 1
     })
     Prompt({
       title: '备注',

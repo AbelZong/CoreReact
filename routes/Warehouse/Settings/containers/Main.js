@@ -19,6 +19,8 @@ import {
 import styles from './index.scss'
 import Wrapper from 'components/MainWrapper'
 import Areas from 'json/AreaCascader'
+import {connect} from 'react-redux'
+import ModifyModal from './ModifyModal'
 import {
   Form,
   Switch,
@@ -33,7 +35,7 @@ import {
 } from 'utils/index'
 const createForm = Form.create
 const FormItem = Form.Item
-export default createForm()(Wrapper(React.createClass({
+export default connect()(createForm()(Wrapper(React.createClass({
   getInitialState: function() {
     return {
       s2_enabled: true,
@@ -80,21 +82,37 @@ export default createForm()(Wrapper(React.createClass({
         s9: d.area,
         s10: d.address
       })
+      this.setState({
+        confirmLoading: false,
+        id1: d.id1,
+        id3: d.id3,
+        id4: d.id4,
+        id5: d.id5
+      })
     }).then(() => {
       endLoading()
-      this.setState({
-        confirmLoading: false
-      })
     })
   },
   handleSwitch3(e) {
-    this.setState({
-      s2_enabled: e
+    ZPost('Warehouse/UpdateEnable', {
+      ID: this.state.id3,
+      Enable: e
+    }).then(() => {
+      endLoading()
+      this.setState({
+        s2_enabled: e
+      })
     })
   },
   handleSwitch5(e) {
-    this.setState({
-      s4_enabled: e
+    ZPost('Warehouse/UpdateEnable', {
+      ID: this.state.id5,
+      Enable: e
+    }).then(() => {
+      endLoading()
+      this.setState({
+        s4_enabled: e
+      })
     })
   },
   handleSubmit(e) {
@@ -128,6 +146,34 @@ export default createForm()(Wrapper(React.createClass({
     e.preventDefault()
     this.props.form.resetFields()
   },
+  handleType1() {
+    this.props.dispatch({type: 'WARE_PILE_VIS_SET', payload: {
+      WarehouseID: this.state.id1,
+      WarehouseName: this.state.name1,
+      Type: 1
+    }})
+  },
+  handleType3() {
+    this.props.dispatch({type: 'WARE_PILE_VIS_SET', payload: {
+      WarehouseID: this.state.id3,
+      WarehouseName: this.state.name3,
+      Type: 3
+    }})
+  },
+  handleType4() {
+    this.props.dispatch({type: 'WARE_PILE_VIS_SET', payload: {
+      WarehouseID: this.state.id4,
+      WarehouseName: this.state.name4,
+      Type: 4
+    }})
+  },
+  handleType5() {
+    this.props.dispatch({type: 'WARE_PILE_VIS_SET', payload: {
+      WarehouseID: this.state.id5,
+      WarehouseName: this.state.name5,
+      Type: 5
+    }})
+  },
   render() {
     const { getFieldDecorator } = this.props.form
     const formItemLayout = {
@@ -151,7 +197,7 @@ export default createForm()(Wrapper(React.createClass({
               </FormItem>
             </Col>
             <Col span='18'>
-              <span className='ml10 hide'>设定主仓仓位</span>
+              <Button className='ml10' onClick={this.handleType1}>设定主仓仓位</Button>
             </Col>
           </FormItem>
           <FormItem {...formItemLayout} label='销售退货仓库名称'>
@@ -167,7 +213,7 @@ export default createForm()(Wrapper(React.createClass({
               </FormItem>
             </Col>
             <Col span='18'>
-              <div className='ml10 hide'>
+              <div className='ml10'>
                 <FormItem>
                   {getFieldDecorator('s3', {
                     valuePropName: 'checked',
@@ -175,7 +221,7 @@ export default createForm()(Wrapper(React.createClass({
                   })(
                     <Switch size='small' onChange={this.handleSwitch3} />
                   )}
-                  <span className='ml10 hide'>设定销退仓仓位</span>
+                  <Button className='ml10' onClick={this.handleType3}>设定销退仓仓位</Button>
                 </FormItem>
               </div>
             </Col>
@@ -193,7 +239,7 @@ export default createForm()(Wrapper(React.createClass({
               </FormItem>
             </Col>
             <Col span='18'>
-              <div className='ml10 hide'>
+              <div className='ml10'>
                 <FormItem>
                   {getFieldDecorator('s5', {
                     valuePropName: 'checked',
@@ -201,7 +247,7 @@ export default createForm()(Wrapper(React.createClass({
                   })(
                     <Switch size='small' onChange={this.handleSwitch5} />
                   )}
-                  <span className='ml10 hide'>设定进货仓仓位</span>
+                  <Button className='ml10' onClick={this.handleType4}>设定进货仓仓位</Button>
                 </FormItem>
               </div>
             </Col>
@@ -219,7 +265,7 @@ export default createForm()(Wrapper(React.createClass({
               </FormItem>
             </Col>
             <Col span='18'>
-              <span className='ml10 hide'>设定次品仓仓位</span>
+              <Button className='ml10' onClick={this.handleType5}>设定次品仓仓位</Button>
             </Col>
           </FormItem>
           <div className='hr' />
@@ -271,7 +317,8 @@ export default createForm()(Wrapper(React.createClass({
             </Col>
           </FormItem>
         </Form>
+        <ModifyModal />
       </div>
     )
   }
-})))
+}))))

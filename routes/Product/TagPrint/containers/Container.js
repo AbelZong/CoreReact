@@ -18,7 +18,6 @@ class TestContainer extends React.Component {
     endLoading()
   }
   refreshDataCallback() {
-    console.warn('getFirst Data')
   }
   changeDiv(e, i) {
     this.setState({
