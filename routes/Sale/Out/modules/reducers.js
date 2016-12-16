@@ -32,7 +32,10 @@ const order_list_to_2 = handleActions({
 const order_list_to_1 = handleActions({
   ORDER_LIST_TO_1_SET: (state, action) => action.payload
 }, null)
+const order_list_expr_s_1 = handleActions({
+  ORDER_LIST_EXPR_S_1_SET: (state, action) => action.payload
+}, null)
 
 export default {
-  sale_out_conditions, order_list_do_pay_1, order_list_detail_1, order_list_to_3, order_list_to_2, order_list_to_1
+  sale_out_conditions, order_list_do_pay_1, order_list_detail_1, order_list_to_3, order_list_to_2, order_list_to_1, order_list_expr_s_1
 }

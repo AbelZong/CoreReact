@@ -39,6 +39,7 @@ import {
   notification
 } from 'antd'
 import DetailModal from 'components/AfterSaleDetail'
+import OrderDetailModal from 'components/OrderDetail'
 import styles from './index.scss'
 import ZGrid from 'components/Grid/index'
 import DistributorModal from 'components/DistributorPicker/Modal'
@@ -218,7 +219,7 @@ export default connect(state => ({
             <Button type='ghost' size='small' onClick={this.handleBatchToDis}>提交给分销商</Button>
           </ButtonGroup>
         </ZGrid>
-        <CreateModal zch={this} /><DetailModal zch={this} />
+        <CreateModal zch={this} /><DetailModal zch={this} /><OrderDetailModal />
         <BindModal zch={this} /><BatchDistributor1 zch={this} />
       </div>
     )
@@ -341,7 +342,15 @@ const defColumns = [{
 }, {
   headerName: '订单号',
   field: 'OID',
-  width: 100
+  width: 100,
+  cellStyle: {textAlign: 'center'},
+  cellRendererFramework: ({data, value, api}) => {
+    return (
+      <a onClick={() => {
+        api.gridOptionsWrapper.gridOptions.grid.props.dispatch({type: 'ORDER_LIST_DETAIL_1_SET', payload: value})
+      }}>{value}</a>
+    )
+  }
 }, {
   headerName: '登记日期',
   field: 'RegisterDate',
@@ -355,6 +364,7 @@ const defColumns = [{
     render() {
       const {data, api, rowIndex} = this.props
       const dispatch = api.gridOptionsWrapper.gridOptions.grid.props.dispatch
+      console.log(data)
       return (
         <div>
           <Button size='small' type='primary' onClick={() => {

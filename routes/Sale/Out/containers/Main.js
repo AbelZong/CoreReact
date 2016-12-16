@@ -18,143 +18,34 @@ import {
 import styles from './index.scss'
 import ZGrid from 'components/Grid/index'
 import {
-  Select,
-  Input,
-  DatePicker,
-  Button
+  Button,
+  message,
+  Modal,
+  Icon,
+  notification
 } from 'antd'
 import {
   ZGet,
   ZPost
 } from 'utils/Xfetch'
+import {startLoading, endLoading} from 'utils/index'
+import IconFa from 'components/Icon'
 import OrderDetail from 'components/OrderDetail'
-import moment from 'moment'
-const Option = Select.Option
-const NumberEditor = React.createClass({
-  getInitialState() {
-    return {
-      value: this.props.value || 0
-    }
-  },
-  getValue() {
-    return this.state.value
-  },
-  afterGuiAttached() {
-    const input = this.refs.zhang.refs.input
-    const evt = (e) => e.stopPropagation()
-    input.addEventListener('click', evt, false)
-    input.addEventListener('dblclick', evt, false)
-  },
-  handleChange(e) {
-    this.setState({ value: Math.max(e.target.value, 0) })
-  },
-  render() { return <Input type='number' ref='zhang' min={0} value={this.state.value} onChange={this.handleChange} /> }
-})
-const InputEditor = React.createClass({
-  getInitialState() {
-    return {
-      value: this.props.value || ''
-    }
-  },
-  getValue() {
-    return this.state.value
-  },
-  afterGuiAttached() {
-    const input = this.refs.zhang.refs.input
-    const evt = (e) => e.stopPropagation()
-    input.addEventListener('click', evt, false)
-    input.addEventListener('dblclick', evt, false)
-  },
-  handleChange(e) {
-    this.setState({ value: e.target.value })
-  },
-  render() { return <Input ref='zhang' value={this.state.value} onChange={this.handleChange} /> }
-})
+import ExprSearch from 'components/ExprSearch'
+const ButtonGroup = Button.Group
+const EnableRender = function(params) {
+  return params.value ? '&radic;' : '&times;'
+}
 const defColumns = [
   {
-    headerName: '内部支付号',
+    headerName: '出仓单号',
     field: 'ID',
     cellStyle: {textAlign: 'center'},
     width: 100
   }, {
-    headerName: '支付时间',
-    cellStyle: {textAlign: 'center'},
-    field: 'PayDate',
-    width: 120,
-    cellClass: function(params) {
-      return params.data.Status === 0 ? 'editable' : ''
-    },
-    editable: function(params) {
-      return params.node.data.Status === 0
-    },
-    cellEditorFramework: React.createClass({
-      getInitialState() {
-        return {
-          value: moment(this.props.value)
-        }
-      },
-      getValue() {
-        return this.state.value.format()
-      },
-      handleChange(e) {
-        this.setState({ value: e })
-      },
-      render() { return <DatePicker format='YYYY-MM-DD HH:mm:ss' showTime value={this.state.value} onChange={this.handleChange} /> }
-    })
-  }, {
-    headerName: '操作',
-    width: 160,
-    cellRendererFramework: React.createClass({
-      _handleOp1() {
-        const grid = this.props.api.gridOptionsWrapper.gridOptions.grid.grid
-        grid.x0pCall(ZPost('Pay/ComfirmPay', {
-          ID: this.props.data.ID
-        }, () => {
-          this.props.data.Status = 1
-          this.props.api.refreshRows([this.props.node])
-        }))
-      },
-      _handleOp0() {
-        const grid = this.props.api.gridOptionsWrapper.gridOptions.grid.grid
-        grid.x0pCall(ZPost('Pay/CancleComfirmPay', {
-          ID: this.props.data.ID
-        }, () => {
-          this.props.data.Status = 0
-          this.props.api.refreshRows([this.props.node])
-        }))
-      },
-      _handleOp2() {
-        const grid = this.props.api.gridOptionsWrapper.gridOptions.grid.grid
-        grid.x0pCall(ZPost('Pay/CanclePay', {
-          ID: this.props.data.ID
-        }, () => {
-          this.props.data.Status = 2
-          this.props.api.refreshRows([this.props.node])
-        }))
-      },
-      render() {
-        const Status = this.props.data.Status
-        if (Status === 1) {
-          return (
-            <Button type='ghost' size='small' onClick={this._handleOp0}>取消审核</Button>
-          )
-        }
-        if (Status === 0) {
-          return (
-            <div>
-              <Button type='primary' size='small' onClick={this._handleOp1}>审核通过</Button>
-              &nbsp;
-              <Button type='dashed' size='small' onClick={this._handleOp2}>作废</Button>
-            </div>
-          )
-        }
-        return null
-      }
-    })
-  }, {
     headerName: '内部订单号',
-    field: 'OID',
     cellStyle: {textAlign: 'center'},
+    field: 'OID',
     width: 100,
     cellRendererFramework: ({data, value, api}) => {
       return (
@@ -168,27 +59,9 @@ const defColumns = [
     field: 'SoID',
     width: 100
   }, {
-    headerName: '支付单号',
-    field: 'PayNbr',
-    width: 130,
-    cellClass: function(params) {
-      return params.data.Status === 0 ? 'editable' : ''
-    },
-    editable: function(params) {
-      return params.node.data.Status === 0
-    },
-    cellEditorFramework: InputEditor
-  }, {
-    headerName: '金额',
-    field: 'PayAmount',
-    width: 80,
-    cellClass: function(params) {
-      return params.data.Status === 0 ? 'editable' : ''
-    },
-    editable: function(params) {
-      return params.node.data.Status === 0
-    },
-    cellEditorFramework: NumberEditor
+    headerName: '单据日期',
+    field: 'DocDate',
+    width: 120
   }, {
     headerName: '状态',
     field: 'StatusString',
@@ -197,73 +70,130 @@ const defColumns = [
       return styles[`status${params.data.Status}`]
     }
   }, {
-    headerName: '支付方式',
-    field: 'Payment',
-    width: 120,
-    cellClass: function(params) {
-      return params.data.Status === 0 ? 'editable' : ''
-    },
-    editable: function(params) {
-      return params.node.data.Status === 0
-    },
-    cellEditorFramework: React.createClass({
-      getInitialState() {
-        return {
-          value: this.props.node.data.Payment
-        }
-      },
-      getValue() {
-        return this.state.value
-      },
-      handleChange(e) {
-        this.setState({ value: e })
+    headerName: '物流公司',
+    field: 'ExpName',
+    width: 100
+  }, {
+    headerName: '物流单号',
+    field: 'ExCode',
+    width: 100,
+    cellRendererFramework: React.createClass({
+      handleClick() {
+        const {api, data} = this.props
+        api.gridOptionsWrapper.gridOptions.grid.props.dispatch({type: 'ORDER_LIST_EXPR_S_1_SET', payload: {
+          pp: data.ExpNamePinyin,
+          ap: data.ExCode
+        }})
       },
       render() {
-        const types = this.props.api.gridOptionsWrapper.gridOptions.grid._pres.Payment
+        const {value} = this.props
         return (
-          <Select value={this.state.value} onChange={this.handleChange} ref='zhang'>
-            {types && types.length ? types.map(x => <Option key={x.value} value={x.value}>{x.label}</Option>) : null}
-          </Select>
+          <a onClick={this.handleClick}>{value}</a>
         )
       }
     })
   }, {
-    headerName: '买家支付账号',
-    field: 'PayAccount',
-    width: 130,
-    cellClass: function(params) {
-      return params.data.Status === 0 ? 'editable' : ''
-    },
-    editable: function(params) {
-      return params.node.data.Status === 0
-    },
-    cellEditorFramework: InputEditor
+    headerName: '批次号',
+    field: 'BatchID',
+    width: 100
   }, {
-    headerName: '买家店铺账号',
-    field: 'BuyerShopID',
-    width: 130
-  // }, {
-  //   headerName: '售后单号',
-  //   field: 'Remark',
-  //   cellStyle: {textAlign: 'center'},
-  //   width: 130
+    headerName: '订单已打印',
+    field: 'IsOrdPrint',
+    width: 100,
+    cellStyle: {textAlign: 'center'},
+    cellRenderer: EnableRender
+  }, {
+    headerName: '快递单已打印',
+    field: 'IsExpPrint',
+    width: 100,
+    cellStyle: {textAlign: 'center'},
+    cellRenderer: EnableRender
+  }, {
+    headerName: '买家留言',
+    field: 'RecMessage',
+    width: 220
+  }, {
+    headerName: '收货地址',
+    field: 'ID',
+    width: 280,
+    cellRenderer: function(params) {
+      const d = params.data
+      return `${d.RecLogistics} ${d.RecCity} ${d.RecDistrict} ${d.RecAddress}`
+    }
+  }, {
+    headerName: '收货人',
+    field: 'RecName',
+    width: 100
+  }, {
+    headerName: '移动电话',
+    field: 'RecPhone',
+    width: 100
+  }, {
+    headerName: '预估重量',
+    field: 'ExWeight',
+    width: 100
+  }, {
+    headerName: '实际重量',
+    field: 'RealWeight',
+    width: 100
+  }, {
+    headerName: '货物方式',
+    field: 'ShipType',
+    width: 100
+  }, {
+    headerName: '运费',
+    field: 'ExCost',
+    width: 80
+  }, {
+    headerName: '已发货',
+    field: 'IsDeliver',
+    width: 100,
+    cellStyle: {textAlign: 'center'},
+    cellRenderer: EnableRender
+  }, {
+    headerName: '商品编号',
+    field: 'Sku',
+    width: 260
+  }, {
+    headerName: '备注',
+    field: 'Remark',
+    width: 260
+  }, {
+    headerName: '操作',
+    cellStyle: {textAlign: 'center'},
+    width: 100,
+    cellRendererFramework: React.createClass({
+      showStatus() {
+        startLoading()
+        ZGet('SaleOut/GetSkuList', {ID: this.props.data.ID}, ({d}) => {
+          Modal.info({
+            title: '捡货货品情况',
+            width: 600,
+            content: (
+              <div>
+                {d && d.length ? d.map(x => (
+                  <div className='mb5'>
+                    {x.SkuID}：<small>{x.InvLst.join(' ; ')}</small>
+                  </div>
+                )) : null}
+              </div>
+            )
+          })
+        }).then(endLoading)
+      },
+      render() {
+        if (this.props.data.Status) {
+          return null
+        }
+        return (
+          <a onClick={this.showStatus}>
+            查看捡货货品情况
+          </a>
+        )
+      }
+    })
   }]
 const gridOptions = {
-  editType: 'fullRow',
-  onRowValueChanged: function(e) {
-    const data = {
-      ID: e.data.ID,
-      Paydate: e.data.Paydate,
-      PayAmount: e.data.PayAmount,
-      PayNbr: e.data.PayNbr,
-      Payment: e.data.Payment,
-      PayAccount: e.data.PayAccount
-    }
-    this.grid.grid.x0pCall(ZPost('Pay/UpdatePay', data, ({d}) => {
-      e.node.setData(d)
-      this.grid.grid.api.refreshRows([e.node])
-    }))
-  }
 }
 const Main = React.createClass({
   componentWillReceiveProps(nextProps) {
@@ -275,11 +205,10 @@ const Main = React.createClass({
   refreshDataCallback() {
     this._firstBlood()
   },
-  _pres: {},
   _firstBlood(_data) {
     const conditions = _data || this.props.conditions || {}
     this.grid.showLoading()
-    const uri = 'Pay/GetPayinfoList'
+    const uri = 'SaleOut/GetSaleOutList'
     const data = Object.assign({
       PageIndex: 1,
       NumPerPage: this.grid.getPageSize()
@@ -288,12 +217,9 @@ const Main = React.createClass({
       if (this.ignore) {
         return
       }
-      this._pres = {
-        Payment: d.Payment
-      }
       this.grid.setDatasource({
         total: d.Datacnt,
-        rowData: d.Pay,
+        rowData: d.SaleOut,
         getRows: (params) => {
           if (params.page === 1) {
             this._firstBlood()
@@ -306,7 +232,7 @@ const Main = React.createClass({
               if (this.ignore) {
                 return
               }
-              params.success(d.Pay)
+              params.success(d.SaleOut)
             }, ({m}) => {
               params.fail(m)
             })
@@ -318,10 +244,51 @@ const Main = React.createClass({
   handleGridReady(grid) {
     this.grid = grid
   },
+  handleSign1() {
+    const nodes = this.grid.api.getSelectedNodes()
+    const ids = nodes.map(x => x.data.ID)
+    if (!ids.length) {
+      return message.info('请先选择')
+    }
+    if (ids) {
+      this.grid.x0pCall(ZPost('SaleOut/MarkExp', {ID: ids}, ({d}) => {
+        parseBatchOperatorResult.call(this, d, function(x, qq) {
+          x.data.IsExpPrint = qq.IsExpPrint
+        }, ['IsExpPrint'], nodes, this.grid)
+      }))
+    }
+  },
+  handleSign0() {
+    const nodes = this.grid.api.getSelectedNodes()
+    const ids = nodes.map(x => x.data.ID)
+    if (!ids.length) {
+      return message.info('请先选择')
+    }
+    if (ids) {
+      this.grid.x0pCall(ZPost('SaleOut/CancleMarkExp', {ID: ids}, ({d}) => {
+        parseBatchOperatorResult.call(this, d, function(x, qq) {
+          x.data.IsExpPrint = qq.IsExpPrint
+        }, ['IsExpPrint'], nodes, this.grid)
+      }))
+    }
+  },
   render() {
     return (
       <div className={styles.main}>
-        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'zhanghua_02394' }} columnDefs={defColumns} paged grid={this} />
+        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'zhanghua_0239411' }} columnDefs={defColumns} paged grid={this}>
+          批量：
+          <ButtonGroup>
+            <Button type='primary' size='small' onClick={this.handleSign1}>标记快递已打印</Button>
+            <Button type='ghost' size='small' onClick={this.handleSign0}>取消标记</Button>
+          </ButtonGroup>
+          &emsp;
+          <ButtonGroup>
+            <Button size='small'><IconFa type='print' />补打订单</Button>
+            <Button size='small'><IconFa type='print' />补打快递单</Button>
+            <Button size='small' className='hide'><IconFa type='print' />商品小标签</Button>
+          </ButtonGroup>
+        </ZGrid>
+        <ExprSearch />
         <OrderDetail />
       </div>
     )
@@ -330,3 +297,60 @@ const Main = React.createClass({
 export default connect(state => ({
   conditions: state.sale_out_conditions
 }))(Main)
+const parseBatchOperatorResult = function(d, cb, fields, nodes, grid, errmsg) {
+  if (d.SuccessIDs && d.SuccessIDs instanceof Array && d.SuccessIDs.length) {
+    const successIDs = {}
+    const IDs = []
+    for (let v of d.SuccessIDs) {
+      successIDs[`${v.ID}`] = v
+      IDs.push(v.ID)
+    }
+    const _nodes = nodes || (grid ? grid.api.getSelectedNodes() : this.props.zch.grid.api.getSelectedNodes())
+    _nodes.forEach(x => {
+      if (IDs.indexOf(x.data.ID) !== -1) {
+        cb(x, successIDs[`${x.data.ID}`])
+      }
+    })
+    if (fields === null) {
+      if (grid) {
+        grid.api.refreshRows(_nodes)
+      } else {
+        this.props.zch.grid.api.refreshRows(_nodes)
+      }
+    } else {
+      if (grid) {
+        grid.api.refreshCells(_nodes, fields)
+      } else {
+        this.props.zch.grid.api.refreshCells(_nodes, fields)
+      }
+    }
+  }
+  if (d.FailIDs && d.FailIDs instanceof Array && d.FailIDs.length) {
+    const description = (<div className={styles.processDiv}>
+      <ul>
+        {d.FailIDs.map(x => {
+          return (
+            <li key={x.ID}>
+              订单号(<strong>{x.ID}</strong>)<span>{x.Reason}</span>
+            </li>
+          )
+        })}
+      </ul>
+      <div className='hr' />
+      <div className='mt5 tr'><small className='gray'>请检查相关订单或刷新</small></div>
+    </div>)
+    Modal.warning({
+      title: errmsg || '处理结果问题反馈',
+      content: description,
+      width: 480,
+      onOk: function() {
+        notification.error({
+          message: '异常订单号',
+          description: <div className='break'>{d.FailIDs.map(x => x.ID).join(',')}</div>,
+          icon: <Icon type='meh-o' />,
+          duration: null
+        })
+      }
+    })
+  }
+}

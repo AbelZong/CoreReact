@@ -49,6 +49,7 @@ import NotFoundRoute from './NotFound'
 import PrintUserRoute from './Print'
 import PrintAdminRoute from './Print/admin'
 import PrintModifyRoute from './Print/modify'
+import PrintViewRoute from './Print/view'
 import AdminMenusRoute from './Admin/Menus'
 import AdminShopsRoute from './Admin/Shops'
 import AdminUsersRoute from './Admin/Users'
@@ -106,6 +107,7 @@ export const createRoutes = (store) => ([
     component: PageLayout,
     childRoutes: [
       PrintModifyRoute(store),
+      PrintViewRoute(store),
       NotFoundRoute
     ],
     ignoreScrollBehavior: true,

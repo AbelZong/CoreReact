@@ -22,6 +22,7 @@ import SkuPickerModal from 'components/SkuPicker/Modal'
 import ShopPicker from 'components/ShopPicker'
 import BuyerModal from './BuyerModal'
 import DistributorModal from 'components/DistributorPicker/Modal'
+import ExprSearchModal from 'components/ExprSearch'
 import {
   Table,
   Select,
@@ -2474,23 +2475,6 @@ const ComExpr1 = connect(state => ({
             </RadioGroup>
           </div>
         </div>
-      </Modal>
-    )
-  }
-}))
-const ExprSearchModal = connect(state => ({
-  doge: state.order_list_expr_s_1
-}))(createClass({
-  hideModal() {
-    this.props.dispatch({ type: 'ORDER_LIST_EXPR_S_1_SET', payload: null })
-  },
-  render() {
-    const {doge} = this.props
-    const visible = doge !== null
-    const src = doge ? `http://m.kuaidi100.com/index_all.html?type=${doge.pp}&postid=${doge.ap}#result` : 'about:blank'
-    return (
-      <Modal className={styles.iframeModal} title='物流状态（快递100）' visible={visible} width={350} onCancel={this.hideModal} footer=''>
-        <iframe frameBorder='0' src={src} />
       </Modal>
     )
   }

@@ -17,6 +17,7 @@ import {
   Button,
   Icon
 } from 'antd'
+import ExprSearchModal from 'components/ExprSearch'
 import appStyles from 'components/App.scss'
 import styles from './index.scss'
 import Iconfa from 'components/Icon'
@@ -110,6 +111,7 @@ export default connect()(React.createClass({
           </div>
           <div className={styles.liner} style={this.state.styles} />
         </div>
+        <ExprSearchModal />
       </div>
     )
   }

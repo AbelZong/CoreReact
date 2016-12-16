@@ -72,16 +72,20 @@ export default connect()(createForm()(Wrapper(React.createClass({
     setTimeout(() => {
       this.props.form.validateFieldsAndScroll((errors, v) => {
         if (errors) {
-          console.error('search Error: ', errors)
           return
         }
         const data = {
           Status: v.a3,
-          Payment: v.a5,
-          BuyerShopID: v.a4
+          IsWeightYN: v.a5,
+          ExID: v.a12 && v.a12.id ? v.a12.id : '',
+          IsExpPrint: v.a13,
+          ShopID: v.a14 && v.a14.id ? v.a14.id : '',
+          RecName: v.a15,
+          BatchID: v.a16
         }
+        const cds = this.state._conditions
         if (v.a1) {
-          data[this.state._conditions._ck1_] = v.a1
+          data[cds._ck1_] = v.a1
         }
         if (v.a2) {
           if (v.a2[0]) {
@@ -90,6 +94,9 @@ export default connect()(createForm()(Wrapper(React.createClass({
           if (v.a2[1]) {
             data.Dateend = v.a2[1].fomat()
           }
+        }
+        if (v.a11 && v.a11.id) {
+          data[cds.skuType] = v.a11.id
         }
         this.props.dispatch({type: 'SALE_OUT_CONDITIONS_SET', payload: data})
       })
@@ -207,8 +214,7 @@ export default connect()(createForm()(Wrapper(React.createClass({
             }}>已出库未打印</Button>
             <Button type='ghost' size='small' onClick={() => {
               this.props.form.setFieldsValue({
-                a3: '1',
-                a13: 'N'
+                a3: '2'
               })
               this.runSearching()
             }}>已出库未发货</Button>

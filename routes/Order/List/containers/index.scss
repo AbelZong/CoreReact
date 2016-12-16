@@ -574,18 +574,6 @@ font-family: Arial;
   }
 }
 
-.iframeModal {
-  :global {
-    .ant-modal-body {
-      padding: 0;
-      line-height: 1;
-    }
-    iframe {
-      width: 100%;
-    min-height: 500px;
-    }
-  }
-}
 .processDiv {
   ul {
     list-style-type: decimal;

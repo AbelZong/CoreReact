@@ -39,6 +39,25 @@ const order_after_distributor_vis_1 = handleActions({
   ORDER_AFTER_DISTRIBUTOR_VIS_1_SET: (state, action) => action.payload
 }, null)
 
+const order_list_do_pay_1 = handleActions({
+  ORDER_LIST_DO_PAY_1_SET: (state, action) => action.payload
+}, null)
+const order_list_detail_1 = handleActions({
+  ORDER_LIST_DETAIL_1_SET: (state, action) => action.payload
+}, null)
+const order_list_to_3 = handleActions({
+  ORDER_LIST_TO_3_SET: (state, action) => action.payload
+}, null)
+const order_list_to_2 = handleActions({
+  ORDER_LIST_TO_2_SET: (state, action) => action.payload
+}, null)
+const order_list_to_1 = handleActions({
+  ORDER_LIST_TO_1_SET: (state, action) => action.payload
+}, null)
+const order_list_expr_s_1 = handleActions({
+  ORDER_LIST_EXPR_S_1_SET: (state, action) => action.payload
+}, null)
 export default {
-  order_after_collapse, order_after_conditions, order_after_detail_vis, order_after_create_vis_1, order_after_bind_order_vis_1, order_after_order_detail_vis_1, order_after_order_detail_vis_2, order_after_distributor_vis_1
+  order_after_collapse, order_after_conditions, order_after_detail_vis, order_after_create_vis_1, order_after_bind_order_vis_1, order_after_order_detail_vis_1, order_after_order_detail_vis_2, order_after_distributor_vis_1,
+  order_list_do_pay_1, order_list_detail_1, order_list_to_3, order_list_to_2, order_list_to_1, order_list_expr_s_1
 }
