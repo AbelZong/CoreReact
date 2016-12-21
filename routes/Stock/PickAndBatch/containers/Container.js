@@ -16,6 +16,13 @@ import {endLoading} from 'utils'
 import styles from 'components/App.scss'
 import Main from './Main'
 import Toolbar from './Toolbar'
+import LimitModal from './LimitModal'
+import LimitSetModal from './LimitSetModal'
+import SetPickor from './SetPickor'
+import BatchLog from './BatchLog'
+import BatchDetail from './BatchDetail'
+import BatchUnique from './BatchUnique'
+import SaleOut from './SaleOut'
 
 export default React.createClass({
   componentDidMount() {
@@ -26,6 +33,13 @@ export default React.createClass({
       <div className={`${styles.content} flex-column`}>
         <Toolbar />
         <Main />
+        <LimitModal />
+        <LimitSetModal />
+        <SetPickor />
+        <BatchLog />
+        <BatchDetail />
+        <BatchUnique />
+        <SaleOut />
       </div>
     )
   }

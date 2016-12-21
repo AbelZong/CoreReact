@@ -174,7 +174,7 @@ const SkuInfo = React.createClass({
     if (item.Norm === undefined) {
       let index = 0
       for (let key in source) {
-        if (item[key] && source[key] === item[key]) {
+        if (source[key] === item[key]) {
           index++
         }
       }
@@ -193,7 +193,7 @@ const SkuInfo = React.createClass({
   },
   _firstload(_v) {
     const v = Object.assign({}, this.props.value || {}, _v || {})
-    let beforeItems = v.items
+    let beforeItems = Object.values(v.items)
     let itemsDecar = []
     let catalogs = [] //sku 栏位
     let skuprops = v.skuprops
@@ -238,13 +238,23 @@ const SkuInfo = React.createClass({
     let items = []
     for (let decar of _descartes) {
       let _ite = {}
-      for (let id in decar) {
+      if (decar.length > 1) {
+        for (let id in decar) {
+          _ite = Object.assign({}, _ite, {
+            [`sku${id}`]: decar[id].val_name,
+            [`pid${parseInt(id) + 1}`]: decar[id].pid,
+            [`val_id${parseInt(id) + 1}`]: decar[id].val_id,
+            [`mapping${parseInt(id) + 1}`]: decar[id].mapping,
+            [`ID${parseInt(id) + 1}`]: decar[id].ID
+          })
+        }
+      } else {
         _ite = Object.assign({}, _ite, {
-          [`sku${id}`]: decar[id].val_name,
-          [`pid${parseInt(id) + 1}`]: decar[id].pid,
-          [`val_id${parseInt(id) + 1}`]: decar[id].val_id,
-          [`mapping${parseInt(id) + 1}`]: decar[id].mapping,
-          [`ID${parseInt(id) + 1}`]: decar[id].ID
+          [`sku0`]: decar.val_name,
+          [`pid1`]: decar.pid,
+          [`val_id1`]: decar.val_id,
+          [`mapping1`]: decar.mapping,
+          [`ID1`]: decar.ID
         })
       }
       items.push(_ite)

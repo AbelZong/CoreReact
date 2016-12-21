@@ -34,16 +34,36 @@
   text-align: center;
 }
 .Status0 {
-  color: #666;
-  background-color: #fde7ab;
+  color: #fff;
+  background-color: #0b8794;
 }
 .Status1 {
-  background-color: rgb(0, 159, 60);
-  color: rgb(255, 255, 255);
+  color: #fff;
+  background-color: #0b8794;
 }
 .Status2 {
-  background-color: rgb(255, 0, 0);
-  color: rgb(255, 255, 255);
+  color: #fff;
+  background-color: #0b8794;
+}
+.Status3 {
+  background-color: #2db7f5;
+  color: #fff;
+}
+.Status4 {
+  background-color: rgb(198, 227, 239)!important;
+      color: rgb(10, 135, 186)!important;
+}
+.Status5 {
+  color: #fff;
+  background-color: #1daf1d;
+}
+.Status6 {
+  color: #fff;
+  background-color: #0a8c08;
+}
+.Status7 {
+  color: #fff;
+  background-color:red;
 }
 .topOperators {
   display: flex;
@@ -58,4 +78,127 @@
   }
 }
 
+.sliver {
+  color:#999;
+  margin-left:4px;
+  margin-right:4px;
+  font-size: 14px;
+}
+.limitform{
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+.left {
+  width: 300px;
+  padding:10px;
+  border-right: 1px solid #f9f9f9;
+    overflow: auto;
+  ul.lst {
+    li {
+      margin-bottom: 3px;
+      padding:5px;
+      :global(.pull-right) {
+        visibility: hidden;
+      }
+      &.active,
+      &:hover {
+        background-color:#f9f9f9;
+        :global(.pull-right) {
+          visibility: visible;
+        }
+      }
 
+    }
+    span {
+      cursor: pointer;
+    }
+  }
+}
+
+.aside {
+  padding:0 5px 10px;
+  .bbq {
+    small {
+      background-color:#f9f9f9;
+      padding:1px 6px;
+      margin-left:10px;
+      color:#999;
+    }
+  }
+  .wCBG {
+    padding-left:8px;
+    user-select: none;
+    em {
+      color: #fff;
+    background-color: rgba(255, 0, 0, 0.95);
+    border-radius: 5px;
+    padding: 0 4px 0 3px;
+    font-size: 12px;
+    }
+    &:hover {
+      background-color:#fff;
+    }
+  }
+  .box {
+    margin-bottom: 5px;
+    &:hover {
+      background-color:#f9f9f9;
+    }
+    .tt {
+      position: relative;
+      padding-left: 25px;
+      line-height:30px;
+      border-bottom: 1px dotted #f9f9f9;
+      user-select: none;
+      cursor: pointer;
+      .arrow {
+        position: absolute;
+        left:5px;
+        top:0;
+        width: 18px;
+height: 100%;
+        &:before {
+          position: absolute;
+          left:5px;
+          top:0;
+          font-family: anticon!important;
+          content: "\E606";
+          color: #666;
+          transform: scale(.58333333);
+        }
+      }
+    }
+    .dd {
+      //padding-left:5px;
+      padding-top:5px;
+      padding-bottom:10px;
+    }
+    &.closed {
+      .tt {
+        .arrow {
+          &:before {
+            transform: scale(.58333333) rotate(-90deg);
+          }
+        }
+      }
+      .dd {
+        display: none;
+      }
+    }
+  }
+  :global{
+    .ant-radio-wrapper,
+    .ant-checkbox-group-item {
+      margin-left:8px;
+    }
+  }
+}
+
+.part_left{
+  width: 400px;
+  line-height: 20px;
+  margin-bottom: 10px;
+}
+.part_right{
+  width: 400px
+}

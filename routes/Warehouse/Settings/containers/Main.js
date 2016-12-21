@@ -87,7 +87,11 @@ export default connect()(createForm()(Wrapper(React.createClass({
         id1: d.id1,
         id3: d.id3,
         id4: d.id4,
-        id5: d.id5
+        id5: d.id5,
+        name1: d.name1,
+        name3: d.name3,
+        name4: d.name4,
+        name5: d.name5
       })
     }).then(() => {
       endLoading()

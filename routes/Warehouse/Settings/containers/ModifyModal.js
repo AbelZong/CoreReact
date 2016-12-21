@@ -126,6 +126,7 @@ const WangWangWang = React.createClass({
     this.grid = grid
   },
   hideModal() {
+    this.props.dispatch({type: 'WARE_PILE_SER_SET', payload: {}})
     this.props.dispatch({ type: 'WARE_PILE_VIS_SET', payload: {WarehouseID: -1} })
     this.props.form.resetFields()
   },

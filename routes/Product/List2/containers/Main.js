@@ -556,13 +556,11 @@ const ModifyModal = connect(state => ({
               }
             }
           }
-          if (Object.values(skuProps).length > 0) {
-            this.setState({
-              kindid: e.id,
-              skuProps: Object.values(skuProps),
-              itemProps: itemProps
-            })
-          }
+          this.setState({
+            kindid: e.id,
+            skuProps: Object.values(skuProps),
+            itemProps: itemProps
+          })
         }
       }).then(endLoading)
       // this.setState({
@@ -679,7 +677,7 @@ const ModifyModal = connect(state => ({
       }
       this.setState({
         items: items
-      })
+      }, () => {})
     }
     if (field === 'PurPrice') {
       for (let i in items) {
