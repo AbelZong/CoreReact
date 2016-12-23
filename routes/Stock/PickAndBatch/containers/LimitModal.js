@@ -12,12 +12,33 @@
 * file that was distributed with this source code.
 */
 import React from 'react'
-import {Form, Input, InputNumber, Modal, Radio, Popconfirm, Row, Col, Select, Button, Checkbox, Popover, DatePicker} from 'antd'
-import {connect} from 'react-redux'
-import {ZPost, ZGet} from 'utils/Xfetch'
+import {
+  Form,
+  Input,
+  InputNumber,
+  Modal,
+  Radio,
+  Popconfirm,
+  Row,
+  Col,
+  Select,
+  Button,
+  Checkbox,
+  DatePicker
+} from 'antd'
+import {
+  connect
+} from 'react-redux'
+import {
+  ZPost,
+  ZGet
+} from 'utils/Xfetch'
 import EE from 'utils/EE'
 import styles from './index.scss'
-import {startLoading, endLoading} from 'utils'
+import {
+  startLoading,
+  endLoading
+} from 'utils'
 import classNames from 'classnames'
 
 const RangePicker = DatePicker.RangePicker
@@ -437,9 +458,7 @@ const Limit = connect(state => ({
           <Panel closed header='限定仓位'>
             <FormItem {...formItemLayout} label=''>
               {getFieldDecorator('PCodeIn')(
-                <Popover content={WareTip} title='小贴士：' placement='right'>
-                  <Input type='textarea' autosize={{minRows: 2, maxRows: 6}} />
-                </Popover>
+                <Input title={WareTip} type='textarea' autosize={{minRows: 2, maxRows: 6}} />
               )}
             </FormItem>
           </Panel>
@@ -543,9 +562,7 @@ const Limit = connect(state => ({
               <Col>
                 <FormItem {...formItemLayout} label='买家留言'>
                   {getFieldDecorator('RecMessage')(
-                    <Popover content='买家留言包含关键字，比如（发票,请联系我）`多关键字逗号分隔' title='小贴士：' placement='right'>
-                      <Input placeholder='买家留言包含关键字' style={{width: '200px'}} />
-                    </Popover>
+                    <Input placeholder='买家留言包含关键字,多个逗号分隔' style={{width: '200px'}} />
                   )}
                 </FormItem>
               </Col>
@@ -554,9 +571,7 @@ const Limit = connect(state => ({
               <Col>
                 <FormItem {...formItemLayout} label='卖家备注'>
                   {getFieldDecorator('SendMessage')(
-                    <Popover content='卖家备注包含关键字，比如（发票,特别关注）`多关键字逗号分隔' title='小贴士：' placement='right'>
-                      <Input placeholder='卖家留言包含关键字' style={{width: '200px'}} />
-                    </Popover>
+                    <Input placeholder='卖家留言包含关键字,多个逗号分隔' style={{width: '200px'}} />
                   )}
                 </FormItem>
               </Col>
