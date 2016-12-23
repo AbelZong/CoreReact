@@ -62,7 +62,7 @@ export default connect()(createForm()(Wrapper(React.createClass({
     const BatchID = getUriParam('BatchID')
     if (BatchID !== null) {
       this.props.form.setFieldsValue({
-        s16: BatchID
+        a16: BatchID
       })
     }
     this.refreshDataCallback()
