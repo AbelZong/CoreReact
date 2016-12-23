@@ -350,7 +350,9 @@ const Main = React.createClass({
     this.props.dispatch({ type: 'PB_BATCH_UNIQUE_VIS_SET', payload: id })
   },
   toSaleOut(id) {
-    this.props.dispatch({ type: 'PB_SALE_OUT_VIS_SET', payload: id })
+    //console.log(window.location)
+    window.open(window.location.origin + '/sale/out?BatchID=' + id)
+    //this.props.dispatch({ type: 'PB_SALE_OUT_VIS_SET', payload: id })
   },
   handleGridReady(grid) {
     this.grid = grid
