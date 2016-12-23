@@ -59,6 +59,12 @@ export default connect()(createForm()(Wrapper(React.createClass({
     }).then(endLoading)
   },
   componentDidMount() {
+    const BatchID = getUriParam('BatchID')
+    if (BatchID !== null) {
+      this.props.form.setFieldsValue({
+        s16: BatchID
+      })
+    }
     this.refreshDataCallback()
   },
   handleSearch(e) {
@@ -66,12 +72,6 @@ export default connect()(createForm()(Wrapper(React.createClass({
     this.runSearching()
   },
   refreshDataCallback() {
-    const BatchID = getUriParam('BatchID')
-    if (BatchID !== null) {
-      this.props.form.setFieldsValue({
-        s16: BatchID
-      })
-    }
     this.runSearching()
   },
   runSearching(x) {
