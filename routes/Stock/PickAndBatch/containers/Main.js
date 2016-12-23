@@ -207,7 +207,7 @@ const columnDefs = [
         Yyah.grid.toSaleOut(this.props.data.ID)
       },
       render() {
-        return <Tooltip placement='right' title='点击查看销售出库单' ><a href='javascript: void(0)' onClick={this.handleClick} >{this.props.data.OrderQty}</a></Tooltip>
+        return <a title='点击查看销售出库单' href='javascript: void(0)' onClick={this.handleClick} >{this.props.data.OrderQty}</a>
       }
     })),
     width: 80
@@ -221,7 +221,7 @@ const columnDefs = [
         Yyah.grid.toBatchDetail(this.props.data.ID)
       },
       render() {
-        return <Tooltip placement='right' title='点击查看拣货明细信息' ><a href='javascript: void(0)' onClick={this.handleClick} >{this.props.data.SkuQty}</a></Tooltip>
+        return <a title='点击查看拣货明细信息' href='javascript: void(0)' onClick={this.handleClick} >{this.props.data.SkuQty}</a>
       }
     })),
     width: 100
@@ -241,7 +241,7 @@ const columnDefs = [
         Yyah.grid.toBatchUnique(this.props.data.ID)
       },
       render() {
-        return <Tooltip placement='right' title='点击查看拣货唯一码' ><a href='javascript: void(0)' onClick={this.handleClick} >{this.props.data.PickedQty}</a></Tooltip>
+        return <a title='点击查看拣货唯一码' href='javascript: void(0)' onClick={this.handleClick} >{this.props.data.PickedQty}</a>
       }
     }))
   }, {

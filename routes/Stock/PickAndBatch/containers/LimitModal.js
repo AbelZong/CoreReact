@@ -206,13 +206,13 @@ const Limit = connect(state => ({
           //   PCodeIn: d.PCodeIn,
           //   ExpPrint: d.ExpPrint
           // }
-          this.props.form.setFieldsValue(d)
-        }, (d) => {
           this.setState({
             exDefault: d.ExpressIn === 'B',
             exAll: d.ExpressIn === 'A',
             shopDefault: d.ShopIn === 'B',
             shopAll: d.ShopIn === 'A'
+          }, () => {
+            this.props.form.setFieldsValue(d)
           })
         })
       } else if (nextProps.id === 0) {
