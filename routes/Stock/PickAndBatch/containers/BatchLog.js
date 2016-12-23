@@ -22,10 +22,6 @@ import {
 } from 'antd'
 import ZGrid from 'components/Grid/index'
 import styles from './index.scss'
-import {
-  ZGet,
-  ZPost
-} from 'utils/Xfetch'
 
 const createForm = Form.create
 const Option = Select.Option
@@ -125,8 +121,8 @@ const BatchLogMain = React.createClass({
     this._firstBlood()
   },
   _firstBlood(_conditions) {
-    const conditions = Object.assign({}, this.props.conditions || {}, _conditions || {})
-    const uri = 'Batch/GetBatchList'
+    //const conditions = Object.assign({}, this.props.conditions || {}, _conditions || {})
+    //const uri = 'Batch/GetBatchList'
     // const data = Object.assign({
     //   PageSize: this.grid.getPageSize(),
     //   PageIndex: 1

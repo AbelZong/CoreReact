@@ -8,7 +8,6 @@ import {
   ZGet, ZPost
 } from 'utils/Xfetch'
 
-
 const createForm = Form.create
 const FormItem = Form.Item
 const Option = Select.Option
@@ -68,7 +67,6 @@ const Brand = createForm()(React.createClass({
 export default connect(state => ({
   conditions: state.product_list2_conditions
 }))(Brand)
-
 
 const ModifyModal = connect(state => ({
   doge: state.product_shop_band
@@ -187,4 +185,3 @@ const PrintS = React.createClass({
     )
   }
 })
-

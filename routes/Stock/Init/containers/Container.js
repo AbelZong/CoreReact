@@ -16,7 +16,6 @@ import {endLoading} from 'utils'
 import styles from 'components/App.scss'
 import Main from './Main'
 import Toolbar from './Toolbar'
-import ModifyModal from './ModifyModal'
 
 export default React.createClass({
   componentDidMount() {

@@ -13,41 +13,42 @@
 */
 import React, { Component } from 'react'
 import { connect as Connect } from 'react-redux'
-import {ZGet} from 'utils/Xfetch'
-import { initRender } from '../modules/actionsModify'
+//import {ZGet} from 'utils/Xfetch'
+//import { initRender } from '../modules/actionsModify'
 import View from './View'
-import styles from './View.scss'
-import PageEntering from 'components/ToolPages/Entering'
-import {endLoading, getUriParam} from 'utils/index'
+//import styles from './View.scss'
+//import PageEntering from 'components/ToolPages/Entering'
+//import {endLoading, getUriParam} from 'utils/index'
 
 class Layout extends Component {
   componentWillMount() {
-    const my_id = getUriParam('my_id')
-    const sys_id = getUriParam('sys_id')
-    const type = getUriParam('type')
-    window.ZCH = {
-      my_id, sys_id, type
-    }
-    let uri = ''
-    let params = null
-    switch (true) {
-      case my_id > 0: { //加载个人模板
-        uri = 'print/tpl/my'
-        params = {my_id, type}
-        break
-      }
-      case sys_id > 0: { //加载系统模板，以及模块数据
-        uri = 'print/tpl/sys'
-        params = { sys_id, type }
-        break
-      }
-      default: { //只加载模块数据
-        uri = 'print/tpl/type'
-        params = { type }
-      }
-    }
-    this.props.dispatch({type: 'ENTERING_STOP'})
-    endLoading()
+    // const my_id = getUriParam('my_id')
+    // const sys_id = getUriParam('sys_id')
+    // const type = getUriParam('type')
+    // window.ZCH = {
+    //   my_id, sys_id, type
+    // }
+    // let uri = ''
+    // let params = null
+    // switch (true) {
+    //   case my_id > 0: { //加载个人模板
+    //     uri = 'print/tpl/my'
+    //     params = {my_id, type}
+    //     break
+    //   }
+    //   case sys_id > 0: { //加载系统模板，以及模块数据
+    //     uri = 'print/tpl/sys'
+    //     params = { sys_id, type }
+    //     break
+    //   }
+    //   default: { //只加载模块数据
+    //     uri = 'print/tpl/type'
+    //     params = { type }
+    //   }
+    // }
+    // this.props.dispatch({type: 'ENTERING_STOP'})
+    // endLoading()
+    //------------------
     // if (my_id === null) {
     //   this.props.dispatch({type: 'PM_ROLELV_SET', payload: 1})
     // }
@@ -69,7 +70,4 @@ class Layout extends Component {
   }
 }
 
-export default Connect(state => ({
-  currentTplID: state.pm_currentTplID,
-  print_msg: state.pm_print_msg
-}))(Layout)
+export default Connect()(Layout)

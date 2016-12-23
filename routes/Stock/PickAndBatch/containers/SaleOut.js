@@ -18,12 +18,7 @@ import {
 } from 'antd'
 import ZGrid from 'components/Grid/index'
 import styles from './index.scss'
-import {
-  ZGet,
-  ZPost
-} from 'utils/Xfetch'
 import SaleOutToolBar from './SaleOutToolBar'
-
 
 const DEFAULT_TITLE = '销售出库单'
 const gridOptions = {}
@@ -172,8 +167,8 @@ const SaleOut = React.createClass({
     this._firstBlood()
   },
   _firstBlood(_conditions) {
-    const conditions = Object.assign({}, this.props.conditions || {}, _conditions || {})
-    const uri = 'Batch/GetBatchList'
+    //const conditions = Object.assign({}, this.props.conditions || {}, _conditions || {})
+    //const uri = 'Batch/GetBatchList'
     // const data = Object.assign({
     //   PageSize: this.grid.getPageSize(),
     //   PageIndex: 1

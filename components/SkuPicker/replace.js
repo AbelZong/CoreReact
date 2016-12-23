@@ -14,7 +14,7 @@
 import React from 'react'
 import {Button} from 'antd'
 import Modal from './ReplaceModal'
-import styles from './index.scss'
+//import styles from './index.scss'
 
 export default React.createClass({
   getInitialState() {

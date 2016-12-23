@@ -28,8 +28,6 @@ const stock_init_item_conditions = handleActions({
   STOCK_INIT_ITEM_CONDITIONS_SET: (state, action) => action.payload,
   STOCK_INIT_ITEM_CONDITIONS_UPDATE: (state, action) => update(state, action.update)
 }, {})
-
-
 export default {
   stock_init_modify_vis, stock_init_conditions, stock_init_item_conditions, stock_init_ware_vis
 }

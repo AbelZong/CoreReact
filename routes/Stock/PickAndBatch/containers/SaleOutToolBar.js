@@ -16,7 +16,7 @@ import {
   connect
 } from 'react-redux'
 import styles from './index.scss'
-import {Button, Form, Select, DatePicker, Input, Checkbox, Row, Col} from 'antd'
+import {Button, Form, Select, DatePicker, Input, Row, Col} from 'antd'
 const RangePicker = DatePicker.RangePicker
 const createForm = Form.create
 const Option = Select.Option
@@ -25,10 +25,8 @@ import moment from 'moment'
 import Wrapper from 'components/MainWrapper'
 import SkuPicker from 'components/SkuPicker'
 import ExpressPicker from 'components/ExpressPicker'
-import {ZPost, ZGet} from 'utils/Xfetch'
-const CheckboxGroup = Checkbox.Group
+import {ZGet} from 'utils/Xfetch'
 const OptGroup = Select.OptGroup
-
 
 const outStatus = [{
   'value': '1',

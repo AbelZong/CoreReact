@@ -1,6 +1,5 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import classNames from 'classnames'
 import {endLoading} from 'utils'
 import istyles from './index.scss'
 import styles from 'components/App.scss'

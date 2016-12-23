@@ -14,7 +14,7 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import styles from './index.scss'
-import {Modal, message, Button, Input, Tooltip} from 'antd'
+import {Modal, message, Button, Input} from 'antd'
 import {
   Icon as Iconfa
 } from 'components/Icon'

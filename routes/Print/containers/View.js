@@ -35,12 +35,11 @@ import {
   getLodop
 } from '3rd/Lodop'
 import {
-  utf16to8
+  utf16to8,
+  getUriParam
 } from 'utils/index'
 import styles from './Modify/Preview.scss'
-import {
-  selectPrintMachine
-} from '../modules/actionsModify'
+import stylesA from './View.scss'
 const Option = Select.Option
 
 class View extends Component {
@@ -51,11 +50,12 @@ class View extends Component {
     emus: null,
     printing: false,
     setting: {
-      pageW: 210, //mm
-      pageH: 270,
+      pageW: 0, //210mm
+      pageH: 0, //270
       prT: 0, //边距上
       prL: 0 //边距左
     },
+    lodop_target: '',
     print_msg: null,
     printRange: {},
     print_setting: {
@@ -69,23 +69,123 @@ class View extends Component {
         { key: '1', value: '纵向(默认)' },
         { key: '2', value: '横向打印' }
       ]
+    },
+    tableColumns: null,
+    tableHelp: {
+      minTHHeight: 24,
+      minTDHeight: 24
+    },
+    tableStyle: {
+      left: 80, //default
+      top: 200 //default
+    },
+    bm: {
+      id: null,
+      type: null,
+      tpls: null,
+      title: ''
     }
   }
   componentWillMount() {
-    // ZGet('print/tpl/emu_data', {
-    //   type: window.ZCH.type
-    // }, ({d}) => {
-    //   this.setState({
-    //     emus: d.emu_data
-    //   })
-    // }, () => {
-    //   this.props.dispatch({ type: 'PM_PREVIEWED_SET', payload: false })
-    // })
+    const type = getUriParam('print')
+    ZGet('print/tpl/getPrintSet', {
+      tpl_type: type
+    }, ({d}) => {
+      console.log(d)
+      const states = {
+        setting: d.states.setting,
+        tableColumns: d.states.tableColumns || [],
+        bm: {
+          type,
+          tpls: d.tpls || [],
+          title: d.title || '',
+          id: d.tpl_id || null
+        }
+      }
+      if (d.states.tableHelp) {
+        states.tableHelp = d.states.tableHelp
+      }
+      if (d.states.tableStyle) {
+        states.tableStyle = d.states.tableStyle
+      }
+      if (d.states.doms && d.states.doms instanceof Array && d.states.doms.length) {
+        states.doms = d.states.doms.map((dom, index) => {
+          dom.id = `DOMS-${dom.type}-${dom.field}-${index}`
+          dom.actived = false
+          return dom
+        })
+      }
+      if (d.states.tableColumns && d.states.tableColumns instanceof Array && d.states.tableColumns.length) {
+        states.tableColumns = d.states.tableColumns.map((column, columnIndex) => {
+          column.id = `Column-${column.type}-${column.field}-${columnIndex}`
+          column.actived = 0
+          return column
+        })
+      }
+      this.setState(states, () => {
+        this.initialLodop(d.lodop_target, d.print_setting)
+      })
+    })
   }
-  componentDidMount() {
-    this.cacheState = this.context.store.getState()
+  initialLodop = (src, setting) => {
+    renderLodopScript(src, () => {
+      const Lodop = getLodop()
+      if (typeof Lodop === 'string') {
+        this.setState({
+          print_msg: Lodop
+        })
+      } else if (Lodop) {
+        const len = Lodop.GET_PRINTER_COUNT()
+        if (len > 0) {
+          let machine_index = 0
+          let paper = '*'
+          let direction = '1'
+          let quality = 100
+          const machines = []
+          for (let i = 0; i < len; i++) {
+            const name = Lodop.GET_PRINTER_NAME(i)
+            if (name === setting.machine_name) { //这个名字是从后台获取的
+              machine_index = i
+              paper = setting.paper
+              direction = setting.direction //.GET_PRINTER_NAME('0:Orientation')
+              quality = setting.quality //.GET_PRINTER_NAME(`${machine_index}:PrintQuality`);
+            }
+            machines.push({
+              key: i + '',
+              value: name
+            })
+          }
+          const merge = {
+            machines,
+            papers: getPagers(machine_index),
+            direction,
+            paper,
+            machine: machine_index + '',
+            quality
+          }
+          this.setState({
+            lodop_target: src,
+            print_setting: Object.assign({}, this.state.print_setting, merge)
+          }, this._getData)
+        }
+      }
+    })
   }
-
+  _getData = () => {
+    const type = this.state.bm.type
+    const data = {
+      type
+    }
+    switch (type) {
+      case 1: {
+        data.ids = getUriParam('ids')
+        break
+      }
+    }
+    ZGet('print/data/withType', data, ({d}) => {
+      console.log(d)
+    })
+  }
   changePrintState = (bool) => {
     this.setState(update(this.state, {
       printing: {
@@ -161,12 +261,10 @@ class View extends Component {
   renderDom(item, key, emu, oriTop, incY) {
     let cn = ''
     let con = null
-    let css
+    let css = item.css
     if (item.css.top > oriTop) {
       css = Object.assign({}, item.css)
       css.top += incY
-    } else {
-      css = item.css
     }
     switch (item.type) {
       case 1: {
@@ -240,19 +338,17 @@ class View extends Component {
   renderEmus = (emu, index) => {
     //const emu = this.state.emus[index]
     //console.log(emu)
-    const { pm_doms, pm_tableColumns, pm_tableStyle, pm_tableHelp } = this.cacheState
-    const { setting } = this.props
-    const { oriTop, inc } = this.getTableBottomPX(pm_tableStyle, pm_tableHelp, emu.items ? emu.items.length : 0)
+    const { doms, tableColumns, tableStyle, tableHelp, setting, print_setting } = this.state
+    const { oriTop, inc } = this.getTableBottomPX(tableStyle, tableHelp, emu.items ? emu.items.length : 0)
     //console.log('table bottom px is %s %s', oriY, incY)
-    const tcLen = pm_tableColumns ? pm_tableColumns.length : 0
+    const tcLen = tableColumns ? tableColumns.length : 0
     let tableWidth = 0
     if (tcLen > 0) {
       for (let i = 0; i < tcLen; i++) {
-        tableWidth += Math.max(pm_tableColumns[i].thCss.width, pm_tableColumns[i].tdCss.width) + 1
+        tableWidth += Math.max(tableColumns[i].thCss.width, tableColumns[i].tdCss.width) + 1
       }
       tableWidth = Math.ceil(tableWidth * 100) / 100 + 14 //hack for border (1 + 6) * 2
     }
-    const { print_setting } = this.props
     const roteCN = classNames({
       [`${styles.rotePreview}`]: print_setting.direction === '2'
     })
@@ -261,40 +357,60 @@ class View extends Component {
       <div key={index} className={styles.preview} style={{ width: `${setting.pageW}mm`, height: `${setting.pageH}mm` }}>
         <div ref={ref} className={roteCN}>
           {tcLen > 0 ? (
-            <div className={styles.tableWarper} style={{ ...pm_tableStyle, width: tableWidth }}>
+            <div className={styles.tableWarper} style={{ ...tableStyle, width: tableWidth }}>
               <div className={styles.table}>
-                {pm_tableColumns.map((item, key) => this.renderTableColumn(item, key, pm_tableHelp, emu, tcLen))}
+                {tableColumns.map((item, key) => this.renderTableColumn(item, key, tableHelp, emu, tcLen))}
               </div>
             </div>
           ) : null }
-          {pm_doms.map((item, key) => this.renderDom(item, key, emu, oriTop, inc))}
+          {doms.map((item0, key) => this.renderDom(item0, key, emu, oriTop, inc))}
         </div>
       </div>
     )
   }
   settingPageW = (e) => {
-    this.props.dispatch({ type: 'PM_SETTING_PAGEW_SET', val: e })
+    this.setState({
+      setting: Object.assign({}, this.state.setting, {
+        pageW: e * 1
+      })
+    })
   }
   settingPageH = (e) => {
-    this.props.dispatch({ type: 'PM_SETTING_PAGEH_SET', val: e })
+    this.setState({
+      setting: Object.assign({}, this.state.setting, {
+        pageH: e * 1
+      })
+    })
   }
 
   selectPrintMachine = (e) => {
-    this.props.dispatch(selectPrintMachine(e))
+    const merge = {
+      papers: getPagers(e),
+      paper: '*',
+      machine: e,
+      direction: window.CLODOP.GET_PRINTER_NAME(`${e}:Orientation`) || '1'
+    }
+    this.setState({
+      print_setting: Object.assign({}, this.state.print_setting, merge)
+    })
   }
   selectPrintPaper = (e) => {
-    this.props.dispatch({ type: 'PM_PRINTSETTING_MERGE', merge: {
-      paper: e
-    } })
+    this.setState({
+      print_setting: Object.assign({}, this.state.print_setting, {
+        paper: e
+      })
+    })
   }
   selectPrintDirection = (e) => {
-    this.props.dispatch({ type: 'PM_PRINTSETTING_MERGE', merge: {
-      direction: e
-    } })
+    this.setState({
+      print_setting: Object.assign({}, this.state.print_setting, {
+        direction: e
+      })
+    })
   }
   getPrintHtml = (type) => {
     const classnames = type === 1 ? '' : ` class='${styles.print_lodop}'`
-    const { setting } = this.props
+    const { setting } = this.state
     let str = `<!DOCTYPE html><html><head><meta http-equiv='X-UA-Compatible' content='IE=Edge;IE=11;IE=10;IE=9;IE=8' /><meta http-equiv='Content-Type' content='text/html; charset=utf-8' /><link rel='stylesheet' type='text/css' href='./index.css?from=src' /></head><body${classnames}><div class='${styles.preview}' style='width: ${setting.pageW}mm; height: ${setting.pageH}mm'>`
     str += this.refs.PrintArea0.innerHTML
     str += '</div></body></html>'
@@ -311,7 +427,7 @@ class View extends Component {
         })
         return
       }
-      const {setting, print_setting} = this.props
+      const {setting, print_setting} = this.state
       const pageW = setting.pageW
       const pageH = setting.pageH
       const direction = print_setting.direction || 0
@@ -334,29 +450,11 @@ class View extends Component {
         Lodop.SET_PRINTER_INDEX(machine)
         Lodop.SET_PRINT_PAGESIZE(direction, 0, 0, pageType)
       }
-      // switch (direction) {
-      //   case '1': {
-      //     Lodop.SET_PRINT_MODE('FULL_HEIGHT_FOR_OVERFLOW', true)
-      //     break
-      //   }
-      //   case '2': {
-      //     Lodop.SET_PRINT_MODE('FULL_WIDTH_FOR_OVERFLOW', true)
-      //     break
-      //   }
-      //   default:break
-      // }
       const html = this.getPrintHtml(2)
-      console.log(html)
-      //document.body.parentNode.innerHTML = html
-      const left = this.props.setting.prL
-      const top = this.props.setting.prT
-      //console.log(top, left, truePageW, truePageW)
-      //const html = `<!DOCTYPE html><html><head><meta http-equiv='X-UA-Compatible' content='IE=Edge;IE=11;IE=10;IE=9;IE=8' /><meta http-equiv='Content-Type' content='text/html; charset=utf-8' /><link rel='stylesheet' type='text/css' href='./index.css' /><body><svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='190'><polygon points='100,10 40,180 190,60 10,60 160,180' style='fill:lime;stroke:purple;stroke-width:5;fill-rule:evenodd;' /></svg><div class='${styles.td}'>sdfsdf</div></body>`
+      const left = this.state.setting.prL
+      const top = this.state.setting.prT
       Lodop.ADD_PRINT_HTM(`${top}mm`, `${left}mm`, `${pageW}mm`, `${pageH}mm`, html)
-      //Lodop.SET_PRINT_STYLEA(0, 'HtmWaitMilSecs', 1000)
-      //Lodop.SET_PRINT_MODE('CATCH_PRINT_STATUS', true)
       this.changePrintState(true)
-      //Lodop.ADD_PRINT_HTM(top, left, truePageW, truePageW, html)
       const printTaskID = Lodop[method]() //PRINT_DESIGN //PREVIEW //PRINT PRINT_SETUP
       Lodop.On_Return = (taskID, value) => {
         console.log(taskID, value)
@@ -406,8 +504,19 @@ class View extends Component {
     }, 100)
     docer.close()
   }
+  selectTpl = (e) => {
+    //todo
+    ZGet('print/tpl/getPrintSet', {tpl_id: e}, ({d}) => {
+      console.log(d)
+    })
+    this.setState({
+      bm: Object.assign({}, this.state.bm, {
+        id: e
+      })
+    })
+  }
   render() {
-    const { emus, setting, printing, print_msg, print_setting } = this.state
+    const { emus, setting, printing, print_msg, print_setting, bm } = this.state
     return (
       <div className={styles.height100}>
         <div className={styles.wraper}>
@@ -440,6 +549,17 @@ class View extends Component {
                   )
                 })}
               </Select>
+              {bm.tpls && bm.tpls.length ? (
+                <div className={stylesA.tpls}>
+                  <Select style={{ width: 90 }} size='small' value={bm.id} onChange={this.selectTpl}>
+                    {bm.tpls.map((item) => {
+                      return (
+                        <Option key={item.id} value={item.id}>{item.name}</Option>
+                      )
+                    })}
+                  </Select>
+                </div>
+              ) : null}
               <Button type='primary' onClick={this.fastPrint} disabled={printing || print_msg !== null}>快捷打印</Button>&nbsp;
               <Button type='ghost' size='small' onClick={this.fastPreview} disabled={printing || print_msg !== null}>预览</Button>&nbsp;
               <Button type='ghost' size='small' onClick={this.doPrint}>普通打印</Button>
@@ -458,9 +578,30 @@ class View extends Component {
   }
 }
 
-export default connect(state => ({
-  setting: state.pm_setting,
-  printRange: state.pm_printRange,
-  print_setting: state.pm_print_setting,
-  print_msg: state.pm_print_msg
-}))(View)
+const renderLodopScript = (src, cb) => {
+  let oscript = document.getElementById('zh_qbb_cdr_lodop')
+  if (oscript) {
+    oscript.parentNode.removeChild(oscript)
+  }
+  const head = document.head || document.getElementsByTagName('head')[0] || document.documentElement
+  oscript = document.createElement('script')
+  oscript.src = src
+  oscript.id = 'zh_qbb_cdr_lodop'
+  head.insertBefore(oscript, head.firstChild)
+  oscript.onload = oscript.onreadystatechange = () => {
+    if ((!oscript.readyState || /loaded|complete/.test(oscript.readyState))) {
+      setTimeout(cb, 10)
+    }
+  }
+}
+const getPagers = function(key) {
+  const papers = window.CLODOP.GET_PAGESIZES_LIST(key, '\n').split('\n').map((item) => {
+    return {
+      key: item,
+      value: item
+    }
+  })
+  papers.unshift({ key: '*', value: '纸张:自动' })
+  return papers
+}
+export default connect()(View)

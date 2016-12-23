@@ -3,18 +3,12 @@ import {connect} from 'react-redux'
 import {Tabs, Button, Upload, Icon, message, Form, Input} from 'antd'
 import styles from './index.scss'
 import ZGrid from 'components/Grid/index'
-import {
-  Icon as Iconfa
-} from 'components/Icon'
 import AppendProduct from 'components/SkuPicker/append'
 
 const TabPane = Tabs.TabPane
 const Dragger = Upload.Dragger
 const createForm = Form.create
 const FormItem = Form.Item
-
-
-
 
 const Main = React.createClass({
 
@@ -36,8 +30,6 @@ const Main = React.createClass({
 })
 
 export default Main
-
-
 const columnDefs = [
   {
     headerName: '#',

@@ -12,7 +12,6 @@
 * file that was distributed with this source code.
 */
 import {handleActions} from 'redux-actions'
-import update from 'react-addons-update'
 const product_shop_band = handleActions({
   PRODUCT_SHOP_BAND_SET: (state, action) => action.payload
 }, -1)
