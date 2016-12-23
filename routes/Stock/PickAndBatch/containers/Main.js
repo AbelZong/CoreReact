@@ -19,12 +19,8 @@ import {
   Menu,
   Tooltip,
   message,
-  Checkbox,
-  Modal,
-  Input,
-  Popover
+  Checkbox
 } from 'antd'
-import {startLoading, endLoading} from 'utils'
 import ZGrid from 'components/Grid/index'
 import styles from './index.scss'
 import {
@@ -40,7 +36,6 @@ import {BatchStatus} from 'constants/PickAndBatch'
 import {
   reactCellRendererFactory
 } from 'ag-grid-react'
-
 
 const MixedPickingRender = React.createClass({
   handleClick(e) {
@@ -643,9 +638,3 @@ const Main = React.createClass({
 export default connect(state => ({
   conditions: state.pb_list_condition
 }))(Wrapper(Main))
-
-
-
-
-
-

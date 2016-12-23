@@ -23,7 +23,7 @@ const Option = Select.Option
 const FormItem = Form.Item
 import moment from 'moment'
 import Wrapper from 'components/MainWrapper'
-import {ZPost, ZGet} from 'utils/Xfetch'
+import {ZGet} from 'utils/Xfetch'
 const CheckboxGroup = Checkbox.Group
 
 export default connect()(createForm()(Wrapper(React.createClass({

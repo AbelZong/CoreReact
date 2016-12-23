@@ -16,13 +16,13 @@ import {
   connect
 } from 'react-redux'
 import styles from './index.scss'
+// import {
+//   Icon,
+//   Popconfirm
+// } from 'antd'
 import {
-  Icon,
-  Popconfirm
-} from 'antd'
-import {
-  ZGet,
-  ZPost
+  ZGet
+  //ZPost
 } from 'utils/Xfetch'
 import Wrapper from 'components/MainWrapper'
 
@@ -64,7 +64,7 @@ export default connect()(Wrapper(React.createClass({
   render() {
     return (
       <div className={styles.main}>
-	  todo
+        todo
       </div>
     )
   }

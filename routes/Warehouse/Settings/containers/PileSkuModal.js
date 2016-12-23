@@ -12,11 +12,10 @@
 * file that was distributed with this source code.
 */
 import React from 'react'
-import { Form, Modal, Popconfirm, Button, message, Row, Col, Input } from 'antd'
+import { Form, Modal, Popconfirm, Button, message, Input } from 'antd'
 import {connect} from 'react-redux'
 import {ZPost, ZGet} from 'utils/Xfetch'
 import {startLoading, endLoading} from 'utils'
-import EE from 'utils/EE'
 import {
   Icon as Iconfa
 } from 'components/Icon'

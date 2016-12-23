@@ -1,10 +1,8 @@
 import React from 'react'
-import {connect} from 'react-redux'
 import {Form, Button, Input} from 'antd'
 import {startLoading, endLoading} from 'utils'
 import {
-  ZGet,
-  ZPost
+  ZGet
 } from 'utils/Xfetch'
 import update from 'react-addons-update'
 import styles from './index.scss'

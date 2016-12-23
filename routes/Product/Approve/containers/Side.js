@@ -8,7 +8,7 @@ class Side extends React.Component {
 
     return (
       <div className={styles.side}>
-	  i'm superman
+        i'm superman
       </div>
     )
   }

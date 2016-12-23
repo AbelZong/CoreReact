@@ -100,9 +100,9 @@ export function animationEnd(element, callback, flag) {
 }
 export function listToTree(_data, options) {
   const data = [].concat(_data)
-  const ID_KEY = options && options.idKey || 'id'
-  const PARENT_KEY = options && options.parentKey || 'parent'
-  const CHILDREN_KEY = options && options.childrenKey || 'children'
+  const ID_KEY = options && options.idKey ? options.idKey : 'id'
+  const PARENT_KEY = options && options.parentKey ? options.parentKey : 'parent'
+  const CHILDREN_KEY = options && options.childrenKey ? options.childrenKey : 'children'
   const tree = []
   const childrenOf = {}
   let item

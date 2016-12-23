@@ -1,8 +1,6 @@
 import React from 'react'
-import {connect} from 'react-redux'
-import {Row, Col, Icon, Button} from 'antd'
+import {Button} from 'antd'
 import styles from './index.scss'
-
 
 const Main = React.createClass({
 

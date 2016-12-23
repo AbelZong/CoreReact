@@ -16,7 +16,6 @@ class TestContainer extends React.Component {
   componentWillUnmount = () => {
   }
   refreshDataCallback = () => {
-    _cacheData = 'getFirst Data'
     console.warn('getFirst Data')
   }
   render() {
