@@ -21,7 +21,7 @@ import {
   Input
 } from 'antd'
 import {ZGet} from 'utils/Xfetch'
-import {startLoading, endLoading} from 'utils/index'
+import {startLoading, endLoading, getUriParam} from 'utils/index'
 import styles from './index.scss'
 const Option = Select.Option
 const createForm = Form.create
@@ -66,6 +66,12 @@ export default connect()(createForm()(Wrapper(React.createClass({
     this.runSearching()
   },
   refreshDataCallback() {
+    const BatchID = getUriParam('BatchID')
+    if (BatchID !== null) {
+      this.props.form.setFieldsValue({
+        s16: BatchID
+      })
+    }
     this.runSearching()
   },
   runSearching(x) {
