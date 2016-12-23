@@ -277,11 +277,19 @@ const columnDefs = [
     cellRenderer: reactCellRendererFactory(PickingPrintRender)
   }]
 const Main = React.createClass({
-
+  getInitialState() {
+    return {
+      SingleOrd: 0,
+      MultiOrd: 0,
+      BigOrd: 0
+    }
+  },
   componentDidMount() {
     this._firstBlood()
   },
   componentWillReceiveProps(nextProps) {
+    console.log('nextProps', nextProps.conditions)
+    console.log('this.props.conditions', this.props.conditions)
     this._firstBlood(nextProps.conditions)
   },
   componentWillUpdate(nextProps, nextState) {
@@ -342,7 +350,9 @@ const Main = React.createClass({
     this.props.dispatch({ type: 'PB_BATCH_UNIQUE_VIS_SET', payload: id })
   },
   toSaleOut(id) {
-    this.props.dispatch({ type: 'PB_SALE_OUT_VIS_SET', payload: id })
+    //console.log(window.location)
+    window.open(window.location.origin + '/sale/out?BatchID=' + id)
+    //this.props.dispatch({ type: 'PB_SALE_OUT_VIS_SET', payload: id })
   },
   handleGridReady(grid) {
     this.grid = grid
@@ -389,10 +399,13 @@ const Main = React.createClass({
   handlePickSort(e) {
     switch (e.key) {
       case '1': {
-        //this.props.dispatch({type: 'STOCK_VIRTUAL_VIS_SET', payload: 0})
+        ZPost('Batch/SetSingleOrd', null, () => {
+          this.refreshDataCallback()
+        })
         break
       }
       case '3': {
+        //波次类型(0:一单一件;1:一单多件;2:现场|大单;3:零拣补货;4:采购退货)
         this.props.dispatch({type: 'PB_LIMIT_VIS_SET', payload: 1})
         break
       }
@@ -517,15 +530,26 @@ const Main = React.createClass({
       this.props.dispatch({type: 'PB_PICKOR_SET_VIS_SET', payload: {ids: ids, re: true}})
     }
   },
+  handleVisibleChange(e) {
+    if (e) {
+      ZGet('Batch/GetOrdCount', null, ({d}) => {
+        this.setState({
+          SingleOrd: d.SingleOrd,
+          MultiOrd: d.MultiOrd,
+          BigOrd: d.BigOrd
+        })
+      })
+    }
+  },
   render() {
     const pickmenu = (
       <Menu onClick={this.handlePickSort}>
         <Menu.Item key='1'>
           <Iconfa type='play' style={{color: '#32cd32', display: 'inner-block'}} />&nbsp;
-          <Tooltip placement='right' title='每个订单只有一个数量单品（排除不含赠品），后面数字为待生成拣货任务的订单数'><a style={{display: 'inline-block'}} href='javascript:void'>生成单件: 10</a></Tooltip>
+          <Tooltip placement='right' title='每个订单只有一个数量单品（排除不含赠品），后面数字为待生成拣货任务的订单数'><a style={{display: 'inline-block'}} href='javascript:void'>生成单件: {this.state.SingleOrd}</a></Tooltip>
         </Menu.Item>
         <Menu.Item key='2'><Iconfa type='forward' style={{color: '#32cd32'}} />&nbsp;
-          <Tooltip placement='right' title='每个订单包含2个及以上数量单品（排除不含赠品），后面数字为待生成拣货任务的订单数'><a style={{display: 'inline-block'}} href='javascript:void'>生成单件: 250</a></Tooltip>
+          <Tooltip placement='right' title='每个订单包含2个及以上数量单品（排除不含赠品），后面数字为待生成拣货任务的订单数'><a style={{display: 'inline-block'}} href='javascript:void'>生成多件: {this.state.MultiOrd}</a></Tooltip>
         </Menu.Item>
         <Menu.Divider />
         <Menu.Item key='3'>生成单件（自定义设置条件）</Menu.Item>
@@ -534,7 +558,7 @@ const Main = React.createClass({
         <Menu.Divider />
         <Menu.Item key='6'>
           <Tooltip placement='right' title='现场取货：快递公司=[现场取货]，每订单一个批次，拣货完成直接发货.&nbsp;&nbsp;&nbsp;&nbsp;
-          大订单：商品总数量等于或超过指定数量，每订单一个批次，拣货完成后打印快递单发货'><a style={{display: 'inline-block'}} href='javascript:void'>生成现场取货或大订单: 250</a></Tooltip>
+          大订单：商品总数量等于或超过指定数量，每订单一个批次，拣货完成后打印快递单发货'><a style={{display: 'inline-block'}} href='javascript:void'>生成现场取货或大订单: {this.state.BigOrd}</a></Tooltip>
         </Menu.Item>
         <Menu.Item key='16'>生成整箱拣货</Menu.Item>
         <Menu.Item key='17'>生成补货</Menu.Item>
@@ -571,7 +595,7 @@ const Main = React.createClass({
     return (
       <div className={styles.main}>
         <div className={styles.topOperators}>
-          <Dropdown overlay={pickmenu}>
+          <Dropdown overlay={pickmenu} onVisibleChange={this.handleVisibleChange}>
             <Button type='ghost' size='small'>
               <Iconfa type='play' style={{color: '#32cd32'}} />&nbsp;生成拣货批次
             </Button>

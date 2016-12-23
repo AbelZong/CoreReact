@@ -86,6 +86,21 @@ export default connect()(createForm()(Wrapper(React.createClass({
     } else {
       this.props.form.setFieldsValue({Time: [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')]})
     }
+    this.props.form.validateFieldsAndScroll((errors, v) => {
+      if (errors) {
+        return
+      }
+      this.props.dispatch({type: 'PB_LIAT_CONSITION_SET', payload: {
+        ID: v.ID ? v.ID : '',
+        Remark: v.Remark ? v.Remark : '',
+        PickorID: v.PickorID && v.PickorID.length ? v.PickorID.join(',') : '',
+        Task: v.Task && v.Task.length ? v.Task.join(',') : '',
+        Type: v.Type && v.Type.length ? v.Type.join(',') : '',
+        DateStart: v.Time && v.Time.length ? v.Time[0].format() : '',
+        Dateend: v.Time && v.Time.length ? v.Time[1].format() : '',
+        Status: v.Status && v.Status.length ? v.Status.join(',') : ''
+      }})
+    })
   },
   render() {
     const { getFieldDecorator } = this.props.form

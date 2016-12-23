@@ -14,13 +14,21 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import {
-  Modal
+  Modal, Button, message, Dropdown, Menu, Form, Input, Col, Popover
 } from 'antd'
 import ZGrid from 'components/Grid/index'
 import styles from './index.scss'
+import {
+  ZPost
+} from 'utils/Xfetch'
+import {
+  Icon as Iconfa
+} from 'components/Icon'
 import SaleOutToolBar from './SaleOutToolBar'
-
+const InputGroup = Input.Group
 const DEFAULT_TITLE = '销售出库单'
+const createForm = Form.create
+const FormItem = Form.Item
 const gridOptions = {}
 const columnDefs = [
   {
@@ -208,14 +216,69 @@ const SaleOut = React.createClass({
   handleGridReady(grid) {
     this.grid = grid
   },
+  handlePrintSet(e) {
+    const ids = this.grid.api.getSelectedRows().map(x => x.ID)
+    if (ids.length === 0) {
+      message.info('请先选择拣货批次')
+    } else {
+      switch (e.key) {
+        case '1': {
+          ZPost('Batch/MarkPrint', {
+            ID: ids
+          }, () => {
+            this.refreshDataCallback()
+          })
+          break
+        }
+        case '2': {
+          ZPost('Batch/CancleMarkPrint', {
+            ID: ids
+          }, () => {
+            this.refreshDataCallback()
+          })
+          break
+        }
+        default: {
+          message.info('not supported yet')
+          break
+        }
+      }
+    }
+  },
   hideModal() {
     this.props.dispatch({ type: 'PB_SALE_OUT_VIS_SET', payload: -1 })
   },
   render() {
     const {visible, title, confirmLoading} = this.state
+    const markmenu = (
+      <Menu onClick={this.handlePrintSet}>
+        <Menu.Item key='1'><Iconfa type='pencil' style={{color: '#32cd32'}} />&nbsp;标记拣货单已打</Menu.Item>
+        <Menu.Item key='2'>取消标记拣货单已打</Menu.Item>
+      </Menu>
+    )
     return (
       <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={confirmLoading} width={1200} maskClosable>
         <SaleOutToolBar />
+        <SeachByPrint />
+        <div className={styles.topOperators}>
+          <Button type='ghost' size='small' style={{marginLeft: 10}}>
+            <Iconfa type='file-excel-o' style={{color: '#32cd32'}} />&nbsp;导出
+          </Button>
+          <Button type='ghost' size='small' style={{marginLeft: 10}}>
+            <Iconfa type='print' style={{color: '#32cd32'}} />&nbsp;补打订单
+          </Button>
+          <Button type='ghost' size='small' style={{marginLeft: 10}}>
+            <Iconfa type='print' style={{color: '#32cd32'}} />&nbsp;补打快递单
+          </Button>
+          <Button type='ghost' size='small' style={{marginLeft: 10}}>
+            <Iconfa type='print' style={{color: '#32cd32'}} />&nbsp;商品小标签
+          </Button>
+          <Dropdown overlay={markmenu}>
+            <Button type='ghost' size='small' style={{marginLeft: 10}}>
+              <Iconfa type='pencil' style={{color: '#32cd32'}} />&nbsp;标记&nbsp;|&nbsp;取消标记打印
+            </Button>
+          </Dropdown>
+        </div>
         <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'stock_batch_sale_out' }} columnDefs={columnDefs} grid={this} paged height={500} />
       </Modal>
       )
@@ -224,3 +287,91 @@ const SaleOut = React.createClass({
 export default connect(state => ({
   doge: state.pb_sale_out_vis
 }))(SaleOut)
+
+const SeachByPrint = connect(state => ({
+  doge: state.pb_sale_out_print_task_vis
+}))(createForm()(React.createClass({
+  getInitialState() {
+    return {
+      visible: false,
+      title: '根据打印任务筛选出库订单',
+      confirmLoading: false
+    }
+  },
+  componentWillReceiveProps(nextProps) {
+    if (this.props.doge !== nextProps.doge) {
+      if (nextProps.doge < 0) {
+        this.setState({
+          visible: false,
+          confirmLoading: false
+        })
+      } else {
+        this.setState({
+          visible: true,
+          confirmLoading: false
+        })
+      }
+    }
+  },
+  handleSubmit() {
+  },
+  hideModal() {
+    this.props.dispatch({ type: 'PB_SALE_OUT_PRINT_TASK_VIS_SET', payload: -1 })
+    this.setState({
+      visible: false
+    }, () => {
+      this.props.form.resetFields()
+    })
+  },
+  render() {
+    const { getFieldDecorator } = this.props.form
+    const {visible, title, confirmLoading} = this.state
+    const formItemLayout = {
+      labelCol: { span: 4 },
+      wrapperCol: { span: 20 }
+    }
+    const Pop1 = (
+      <div>
+        <p>打印任务号为每次请求打印时自动生成。</p>
+        <p>`标准格式由三部分组成，如：161112.2212.12（年月日-时分-打印流水号）</p>
+        <p>`如果只输入一部分，如：12=则默认为当天的打印流水号`如果输入两部分，如161112.12=则默认为指定打印日期及对应的打印流水号`全部输入则精确匹配</p>
+      </div>
+    )
+    return (
+      <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={confirmLoading} width={500} maskClosable>
+        <div className={styles.sborder}>
+          <p>打印快递单时，系统会为每次打印任务号生成一个任务号，并且每个订单按照打印先后顺序生成打印序号。</p>
+          <p>标准格式由三部分组成，如：161112.2212.12（年月日.时分.打印流水号）</p>
+          <p>打印序号指每个订单打印时的序号，每次任务均从1开始编号</p>
+        </div>
+        <Form horizontal className='pos-form' style={{marginTop: 10}}>
+          <FormItem {...formItemLayout} label='打印任务号'>
+            {getFieldDecorator('GoodsCode', {
+              rules: [{ required: true, message: '必填' }]
+            })(
+              <Popover placement='top' content={Pop1} trigger='click'>
+                <Input placeholder='' style={{width: 200}} />
+              </Popover>
+            )}
+          </FormItem>
+          <FormItem {...formItemLayout} label='打印序号'>
+            {getFieldDecorator('GoodsCode')(
+              <InputGroup>
+                <Col span={6}>
+                  <Popover placement='top' content='印任务号对应流水号，每打印任务均从1开始。' trigger='click'>
+                    <Input placeholder='起始打印号' />
+                  </Popover>
+                </Col>
+                <Col span={6}>
+                  <Popover placement='top' content='印任务号对应流水号，每打印任务均从1开始。' trigger='click'>
+                    <Input placeholder='结束打印号' />
+                  </Popover>
+                </Col>
+              </InputGroup>
+            )}
+          </FormItem>
+        </Form>
+      </Modal>
+    )
+  }
+})))

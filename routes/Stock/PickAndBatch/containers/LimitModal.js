@@ -32,10 +32,12 @@ const LimitModal = React.createClass({
     return {
       visible: false,
       confirmLoading: false,
-      title: DEFAULT_TITLE
+      title: DEFAULT_TITLE,
+      ploys: [],
+      on_id: 0
     }
   },
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps) { //波次类型(0:一单一件;1:一单多件;2:现场|大单;3:零拣补货;4:采购退货)
     if (this.props.doge !== nextProps.doge) {
       if (nextProps.doge < 0) {
         this.setState({
@@ -43,10 +45,13 @@ const LimitModal = React.createClass({
           confirmLoading: false
         })
       } else if (nextProps.doge === 1) {
-        this.setState({
-          visible: true,
-          title: DEFAULT_TITLE + '（单件）',
-          confirmLoading: false
+        ZGet('Batch/GetStrategySimple', {type: 0}, ({d}) => {
+          this.setState({
+            visible: true,
+            title: DEFAULT_TITLE + '（单件）',
+            confirmLoading: false,
+            ploys: d
+          })
         })
       } else if (nextProps.doge === 2) {
         this.setState({
@@ -76,53 +81,8 @@ const LimitModal = React.createClass({
   onRadioChange() {
 
   },
-  hideModal() {
-    this.props.dispatch({ type: 'PB_LIMIT_VIS_SET', payload: -1 })
-    this.props.form.resetFields()
-  },
-  render() {
-    const {visible, title, confirmLoading} = this.state
-    return (
-      <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={confirmLoading} width={680} maskClosable={false}>
-        <div className={styles.topOperators}>
-          <Left />
-        </div>
-        <Limit />
-      </Modal>
-    )
-  }
-})
-export default connect(state => ({
-  doge: state.pb_limit_vis
-}))(createForm()(LimitModal))
-
-const Left = connect(
-  state => ({
-    on_id: state.pb_limit_policy_vis
-  })
-)(React.createClass({
-  getInitialState: function() {
-    return {
-      ploys: [],
-      on_id: 0
-    }
-  },
-  componentDidMount() {
-    if (this.state.on_id >= 0) {
-      this.props.dispatch({type: 'WHER_PLOYS_VIS_SET', payload: -1})
-    }
-    this.refreshDataCallback()
-  },
-  refreshDataCallback() {
-    startLoading()
-    ZGet('Warehouse/WarePloyList', ({d}) => {
-      this.setState({
-        ploys: d
-      })
-    }).then(endLoading)
-  },
   handleModify(id) {
-    if (this.props.on_id !== -1 && this.props.on_id !== null) {
+    if (this.props.on_id !== -1 && this.props.on_id !== null && this.props.on_id !== undefined) {
       if (this.props.on_id !== id) {
         Modal.confirm({
           title: '当前有编辑策略，是否确定离开?',
@@ -162,24 +122,40 @@ const Left = connect(
       this.props.dispatch({type: 'WHER_PLOYS_VIS_SET', payload: 0})
     }
   },
+  hideModal() {
+    this.props.dispatch({ type: 'PB_LIMIT_VIS_SET', payload: -1 })
+    this.props.form.resetFields()
+  },
   render() {
+    const {visible, title, confirmLoading} = this.state
     const {ploys} = this.state
     const {on_id} = this.props
     return (
-      <div className={`${styles.left} h-scroller`}>
-        <ul className={styles.lst}>
-          {ploys.map(x => <li key={x.id} className={on_id === x.id ? styles.active : ''}>
-            <div className='clearfix'><span onClick={() => this.handleModify(x.id)}>{x.name}&emsp;<a>修改</a></span>
-              <Popconfirm title='确认删除？无法恢复' onConfirm={this.handleRemove}>
-                <a className='pull-right'>删除</a>
-              </Popconfirm>
-            </div>
-          </li>)}
-        </ul>
-      </div>
+      <Modal title={title} visible={visible} onOk={this.handleSubmit} onCancel={this.hideModal} confirmLoading={confirmLoading} width={680} maskClosable={false}>
+        <div className={styles.topOperators}>
+          <Button>添加新的限定策略</Button>
+        </div>
+        <div className={styles.topOperators}>
+          <div className={`${styles.left} h-scroller`}>
+            <ul className={styles.lst}>
+              {ploys.map(x => <li key={x.ID} className={on_id === x.ID ? styles.active : ''}>
+                <div className='clearfix'><span onClick={() => this.handleModify(x.ID)}>{x.StrategyName}&emsp;<a>修改</a></span>
+                  <Popconfirm title='确认删除？无法恢复' onConfirm={this.handleRemove}>
+                    <a className='pull-right'>删除</a>
+                  </Popconfirm>
+                </div>
+              </li>)}
+            </ul>
+          </div>
+        </div>
+        <Limit />
+      </Modal>
     )
   }
-}))
+})
+export default connect(state => ({
+  doge: state.pb_limit_vis
+}))(createForm()(LimitModal))
 
 const Limit = connect(state => ({
   id: state.pb_limit_policy_vis
@@ -190,12 +166,25 @@ const Limit = connect(state => ({
       s4_enabled: true,
       confirmLoading: false,
       title: '',
-      provinces: [],
       shops: [],
       distributors: [],
       SkuKinds: [],
-      shopDefault: true
+      express: [],
+      shopDefault: true,
+      shopAll: false,
+      exDefault: true,
+      exAll: false
     }
+  },
+  componentDidMount() {
+    ZGet('Common/batchBase', null, ({d}) => {
+      this.setState({
+        SkuKinds: d.KindLst.Children,
+        shops: d.shops,
+        distributors: d.distributor,
+        express: d.express
+      })
+    })
   },
   componentWillReceiveProps(nextProps) {
     if (nextProps.id !== this.props.id) {
@@ -203,33 +192,27 @@ const Limit = connect(state => ({
         confirmLoading: false
       })
       if (nextProps.id > 0) {
-        startLoading()
         this.setState({
-          confirmLoading: true
-        })
-        ZGet('XyComm/Customkind/SkuKindLst', {ParentID: 0}, ({d}) => {
-          this.setState({
-            SkuKinds: d.Children
-          })
+          confirmLoading: false
         })
 
-        ZGet('Warehouse/editploy', {id: nextProps.id}, ({d}) => {
-          const {ploy, province, shop, distributor} = d
+        ZGet('Batch/GetStrategyEdit', {id: nextProps.id}, ({d}) => {
+          // const ploy = {
+          //   StrategyName: d.StrategyName,
+          //   SkuIn: d.SkuIn,
+          //   SkuNotIn: d.SkuNotIn,
+          //   OrdGift: d.OrdGift,
+          //   KindIDIn: d.KindIDIn,
+          //   PCodeIn: d.PCodeIn,
+          //   ExpPrint: d.ExpPrint
+          // }
+          this.props.form.setFieldsValue(d)
+        }, (d) => {
           this.setState({
-            provinces: province,
-            shops: shop,
-            distributors: distributor
-          })
-          ploy.Payment = ploy.Payment + ''
-          ploy.WareHouse = ploy.Wid >= 0 ? {
-            id: ploy.Wid,
-            name: ploy.Wname
-          } : null
-          this.props.form.setFieldsValue(ploy)
-        }).then(() => {
-          endLoading()
-          this.setState({
-            confirmLoading: false
+            exDefault: d.ExpressIn === 'B',
+            exAll: d.ExpressIn === 'A',
+            shopDefault: d.ShopIn === 'B',
+            shopAll: d.ShopIn === 'A'
           })
         })
       } else if (nextProps.id === 0) {
@@ -248,16 +231,6 @@ const Limit = connect(state => ({
   },
   componentWillUnmount() {
     this.ignore = true
-  },
-  handleSwitch3(e) {
-    this.setState({
-      s2_enabled: e
-    })
-  },
-  handleSwitch5(e) {
-    this.setState({
-      s4_enabled: e
-    })
   },
   handleSubmit(e) {
     e.preventDefault()
@@ -314,10 +287,84 @@ const Limit = connect(state => ({
     return <div />
   },
   shopDefaultChange(e) {
-    const flag = e.target.value === undefined ? this.state.shopDefault : e.target.value
-    this.setState({
-      shopDefault: !flag
-    })
+    const v = e.target.value === undefined ? this.state.shopDefault : e.target.value
+    if (v === this.state.shopDefault) {
+      this.setState({
+        shopAll: false,
+        shopDefault: !v
+      })
+    } else {
+      if (!v === this.state.shopDefault && v) {
+        this.setState({
+          shopAll: false,
+          shopDefault: true
+        })
+      } else {
+        this.setState({
+          shopDefault: !v
+        })
+      }
+    }
+  },
+  shopAllChange(e) {
+    const v = e.target.value === undefined ? this.state.shopAll : e.target.value
+    if (!v) {
+      this.setState({
+        shopAll: !v,
+        shopDefault: false
+      })
+    } else {
+      if (!v === this.state.shopAll && v) {
+        this.setState({
+          shopAll: true,
+          shopDefault: false
+        })
+      } else {
+        this.setState({
+          shopAll: !v
+        })
+      }
+    }
+  },
+  exDefaultChange(e) {
+    const v = e.target.value === undefined ? this.state.exDefault : e.target.value
+    if (v === this.state.exDefault) {
+      this.setState({
+        exAll: false,
+        exDefault: !v
+      })
+    } else {
+      if (!v === this.state.exDefault && v) {
+        this.setState({
+          exAll: false,
+          exDefault: true
+        })
+      } else {
+        this.setState({
+          exDefault: !v
+        })
+      }
+    }
+  },
+  exAllChange(e) {
+    const v = e.target.value === undefined ? this.state.exAll : e.target.value
+    if (!v) {
+      this.setState({
+        exAll: !v,
+        exDefault: false
+      })
+    } else {
+      if (!v === this.state.exAll && v) {
+        this.setState({
+          exAll: true,
+          exDefault: false
+        })
+      } else {
+        this.setState({
+          exAll: !v
+        })
+      }
+    }
   },
   render() {
     const { getFieldDecorator } = this.props.form
@@ -348,7 +395,7 @@ const Limit = connect(state => ({
         </h3>
         <Form horizontal className={`${styles.limitform} pos-form`}>
           <FormItem {...formItemLayout} label='策略名称'>
-            {getFieldDecorator('Name', {
+            {getFieldDecorator('StrategyName', {
               rules: [
                 { required: true, whitespace: true, message: '必填' }
               ]
@@ -359,28 +406,28 @@ const Limit = connect(state => ({
           <div className='hr' />
           <Panel header='限定商品'>
             <FormItem {...formItemLayout} label='包含商品编码'>
-              {getFieldDecorator('ContainSkus')(
+              {getFieldDecorator('SkuIn')(
                 <Input type='textarea' autosize={{minRows: 2, maxRows: 6}} />
               )}
             </FormItem>
             <FormItem {...formItemLayout} label='排除商品编码'>
-              {getFieldDecorator('RemoveSkus')(
+              {getFieldDecorator('SkuNotIn')(
                 <Input type='textarea' autosize={{minRows: 2, maxRows: 6}} />
               )}
             </FormItem>
             <FormItem {...formItemLayout} label='订单包含赠品'>
-              {getFieldDecorator('Gift')(
+              {getFieldDecorator('OrdGift')(
                 <RadioGroup onChange={this.onChange}>
-                  <Radio value={1}>不区分订单是否包含赠品</Radio>
-                  <Radio value={2}>订单包含赠品</Radio>
-                  <Radio value={3}>订单没有赠品</Radio>
+                  <Radio value={0}>不区分订单是否包含赠品</Radio>
+                  <Radio value={1}>订单包含赠品</Radio>
+                  <Radio value={2}>订单没有赠品</Radio>
                 </RadioGroup>
               )}
             </FormItem>
           </Panel>
           <Panel closed header='限定商品分类'>
             <FormItem {...formItemLayout} label=''>
-              {getFieldDecorator('SkuKinds')(
+              {getFieldDecorator('KindIDIn')(
                 <Select multiple placeholder='请选择'>
                   {this.state.SkuKinds.map(x => <Option value={`${x.ID}`} key={x.ID}>{x.KindName}</Option>)}
                 </Select>
@@ -389,7 +436,7 @@ const Limit = connect(state => ({
           </Panel>
           <Panel closed header='限定仓位'>
             <FormItem {...formItemLayout} label=''>
-              {getFieldDecorator('Ware')(
+              {getFieldDecorator('PCodeIn')(
                 <Popover content={WareTip} title='小贴士：' placement='right'>
                   <Input type='textarea' autosize={{minRows: 2, maxRows: 6}} />
                 </Popover>
@@ -398,21 +445,37 @@ const Limit = connect(state => ({
           </Panel>
           <Panel closed header='限定打印快递单'>
             <FormItem {...formItemLayout} label=''>
-              {getFieldDecorator('WayBill', {initialValue: 1})(
+              {getFieldDecorator('ExpPrint', {initialValue: 0})(
                 <RadioGroup onChange={this.onChange}>
-                  <Radio value={1}>不限定</Radio>
-                  <Radio value={2}>未打印</Radio>
-                  <Radio value={3}>已打印</Radio>
+                  <Radio value={0} key={0}>不限定</Radio>
+                  <Radio value={1} key={1}>未打印</Radio>
+                  <Radio value={2} key={2}>已打印</Radio>
                 </RadioGroup>
               )}
             </FormItem>
           </Panel>
           <Panel closed header='限定快递公司'>
-          1
+            <FormItem {...formItemLayout} label=''>
+              {getFieldDecorator('DefaultEx')(
+                <Checkbox checked={this.state.exDefault} onChange={e => this.exDefaultChange(e)} >根据父页面【限制生成任务的快递公司】进行自动判断（默认，选择该项，以下选项无效）</Checkbox>
+              )}
+            </FormItem>
+            <FormItem {...formItemLayout} label=''>
+              {getFieldDecorator('AllEx')(
+                <Checkbox checked={this.state.exAll} onChange={e => this.exAllChange(e)} >全部快递公司（如果选择该项，以下选项无效）</Checkbox>
+              )}
+            </FormItem>
+            <FormItem {...formItemLayout} label=''>
+              {getFieldDecorator('ExpressIn')(
+                <Select multiple placeholder='请选择' disabled={this.state.exDefault || this.state.exAll}>
+                  {this.state.express.map(x => <Option value={`${x.value}`} key={x.value}>{x.label}</Option>)}
+                </Select>
+              )}
+            </FormItem>
           </Panel>
           <Panel closed header='限定分销商'>
             <FormItem {...formItemLayout} label=''>
-              {getFieldDecorator('Did')(
+              {getFieldDecorator('DistributorIn')(
                 <Select multiple placeholder='请选择'>
                   {this.state.distributors.map(x => <Option value={`${x.value}`} key={x.value}>{x.label}</Option>)}
                 </Select>
@@ -426,8 +489,13 @@ const Limit = connect(state => ({
               )}
             </FormItem>
             <FormItem {...formItemLayout} label=''>
-              {getFieldDecorator('Shopid')(
-                <Select multiple placeholder='请选择' disabled={this.state.shopDefault}>
+              {getFieldDecorator('AllShop')(
+                <Checkbox checked={this.state.shopAll} onChange={e => this.shopAllChange(e)} >全部店铺（如果选择该项，以下选项无效）</Checkbox>
+              )}
+            </FormItem>
+            <FormItem {...formItemLayout} label=''>
+              {getFieldDecorator('ShopIn')(
+                <Select multiple placeholder='请选择' disabled={this.state.shopDefault || this.state.shopAll}>
                   {this.state.shops.map(x => <Option value={`${x.value}`} key={x.value}>{x.label}</Option>)}
                 </Select>
               )}
@@ -448,15 +516,15 @@ const Limit = connect(state => ({
           <Panel closed header='其他限定条件'>
             <Row>
               <Col span={8}>
-                <FormItem {...formItemLayout3} label='限定金额-最大值'>
-                  {getFieldDecorator('MinMoney', {initialValue: 0})(
+                <FormItem {...formItemLayout3} label='限定金额-最小值'>
+                  {getFieldDecorator('AmtMin', {initialValue: 0})(
                     <InputNumber min={0} step={0.01} placeholder='最大值' />
                   )}
                 </FormItem>
               </Col>
               <Col span={8}>
-                <FormItem {...formItemLayout2} label='最小值'>
-                  {getFieldDecorator('MaxMoney', {initialValue: 0})(
+                <FormItem {...formItemLayout2} label='最大值'>
+                  {getFieldDecorator('AmtMax', {initialValue: 0})(
                     <InputNumber min={0} step={0.01} />
                   )}
                 </FormItem>
@@ -474,7 +542,7 @@ const Limit = connect(state => ({
             <Row>
               <Col>
                 <FormItem {...formItemLayout} label='买家留言'>
-                  {getFieldDecorator('BuyerMsg')(
+                  {getFieldDecorator('RecMessage')(
                     <Popover content='买家留言包含关键字，比如（发票,请联系我）`多关键字逗号分隔' title='小贴士：' placement='right'>
                       <Input placeholder='买家留言包含关键字' style={{width: '200px'}} />
                     </Popover>
@@ -485,7 +553,7 @@ const Limit = connect(state => ({
             <Row>
               <Col>
                 <FormItem {...formItemLayout} label='卖家备注'>
-                  {getFieldDecorator('SellerMsg')(
+                  {getFieldDecorator('SendMessage')(
                     <Popover content='卖家备注包含关键字，比如（发票,特别关注）`多关键字逗号分隔' title='小贴士：' placement='right'>
                       <Input placeholder='卖家留言包含关键字' style={{width: '200px'}} />
                     </Popover>
