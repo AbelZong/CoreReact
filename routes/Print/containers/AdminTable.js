@@ -12,13 +12,21 @@
 * file that was distributed with this source code.
 */
 import React from 'react'
-import { Button, message, Popconfirm } from 'antd'
-import {connect} from 'react-redux'
-import {ZGet, ZPost} from 'utils/Xfetch'
+import {
+  Button,
+  message,
+  Popconfirm
+} from 'antd'
+import {
+  connect
+} from 'react-redux'
+import {
+  ZGet,
+  ZPost
+} from 'utils/Xfetch'
 import styles from './Print.scss'
 import AdminOperatorsRender from './AdminOperatorsRender'
 import ZGrid from 'components/Grid/index'
-
 const defColumns = [
   {
     headerName: '#',
@@ -137,7 +145,6 @@ const AdminTable = React.createClass({
     )
   }
 })
-
 export default connect(state => ({
   activeTypeID: state.print_admin_type_active
 }), null, null, { withRef: true })(AdminTable)

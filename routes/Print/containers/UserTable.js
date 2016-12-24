@@ -12,13 +12,21 @@
 * file that was distributed with this source code.
 */
 import React from 'react'
-import { Button, message, Popconfirm } from 'antd'
-import {connect} from 'react-redux'
-import {ZGet, ZPost} from 'utils/Xfetch'
+import {
+  Button,
+  message,
+  Popconfirm
+} from 'antd'
+import {
+  connect
+} from 'react-redux'
+import {
+  ZGet,
+  ZPost
+} from 'utils/Xfetch'
 import styles from './Print.scss'
 import UserOperatorsRender from './UserOperatorsRender'
 import ZGrid from 'components/Grid/index'
-
 const defColumns = [
   {
     headerName: '#',
@@ -44,7 +52,6 @@ const defColumns = [
     width: 80,
     cellRendererFramework: UserOperatorsRender
   }]
-
 const UserTable = React.createClass({
   componentWillReceiveProps(nextProps) {
     const {activeTypeID} = nextProps
@@ -133,7 +140,7 @@ const UserTable = React.createClass({
         <div className={styles.toolbar}>
           <Button type='dashed' size='small' className='mr10'>
             <Popconfirm title='确定要删除选中？' onConfirm={this.handleDoRemove}>
-              <span>删除选中</span>
+              <span>删除</span>
             </Popconfirm>
           </Button>
         </div>
@@ -142,7 +149,6 @@ const UserTable = React.createClass({
     )
   }
 })
-
 export default connect(state => ({
   activeTypeID: state.print_user_type_active
 }), null, null, { withRef: true })(UserTable)

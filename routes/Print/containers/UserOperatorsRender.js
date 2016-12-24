@@ -41,7 +41,7 @@ export default React.createClass({
       <div className='operators'>
         {this.renderBtn()}
         <Icon type='edit' onClick={this.handleEditClick} />
-        <Popconfirm title='确定要删除 我 吗？' onConfirm={this.handleDeleteClick}>
+        <Popconfirm title='确定要删除？' onConfirm={this.handleDeleteClick}>
           <Icon type='delete' />
         </Popconfirm>
       </div>
