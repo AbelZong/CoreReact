@@ -61,7 +61,7 @@ const Toolbar = React.createClass({
             <Option value='false'>禁用</Option>
           </Select>
           <Button type='primary' icon='search' className={styles.s3} onClick={this.handleSearch} loading={this.props.loading}>搜索</Button>
-          <span style={{marginLeft: 10}}>todo</span>
+          <span className='hide' style={{marginLeft: 10}}>todo</span>
         </div>
       </div>
     )

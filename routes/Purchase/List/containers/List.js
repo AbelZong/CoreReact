@@ -255,7 +255,7 @@ const columnDefs = [{
 }, {
   headerName: '采购单号',
   field: 'id',
-  width: 80,
+  width: 100,
   pinned: true
 }, {
   headerName: '采购日期',
@@ -276,7 +276,7 @@ const columnDefs = [{
   cellClass: function(params) {
     return styles.status + ' ' + (styles[`status${params.data.status}`] || '')
   },
-  width: 60
+  width: 80
 }, {
   headerName: '商品类型',
   cellStyle: {textAlign: 'center'},
@@ -285,15 +285,15 @@ const columnDefs = [{
     const k = params.data.purtype + ''
     return types[k] || k
   },
-  width: 65
+  width: 100
 }, {
   headerName: '税率',
   field: 'taxrate',
-  width: 60
+  width: 80
 }, {
   headerName: '采购员',
   field: 'buyyer',
-  width: 72
+  width: 100
 }, {
   headerName: '备注',
   field: 'remark',

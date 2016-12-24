@@ -29,9 +29,9 @@ const FormItem = Form.Item
 const Option = Select.Option
 import Wrapper from 'components/MainWrapper'
 export default connect()(createForm()(Wrapper(React.createClass({
-  componentDidMount() {
+  //componentDidMount() {
     //this.refreshDataCallback()
-  },
+  //},
   handleSearch(e) {
     e.preventDefault()
     this.runSearching()

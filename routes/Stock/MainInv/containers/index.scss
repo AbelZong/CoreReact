@@ -26,8 +26,6 @@
 }
 
 .topOperators {
-  display: flex;
-  flex-direction: row;
   padding-bottom: 4px;
   .Hleft {
     flex: 1;
@@ -53,4 +51,3 @@
     line-height: 28px;
     font-size: 16px
 }
-

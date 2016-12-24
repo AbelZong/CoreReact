@@ -167,7 +167,7 @@ const defColumns = [{
           &nbsp;
           {this._renderAbler()}
           &nbsp;
-          <Button type='default' size='small' onClick={this.handleLog}>日志</Button>
+          <Button type='ghost' size='small' onClick={this.handleLog}>日志</Button>
         </div>
       )
     }

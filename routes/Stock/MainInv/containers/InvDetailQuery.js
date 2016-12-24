@@ -148,7 +148,7 @@ const InvDetailQuery = React.createClass({
     return (
       <Modal title={title} visible={visible} onCancel={this.hideModal} footer='' width={900}>
         <Toolbars3 />
-        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'stock_inv_detail' }} columnDefs={columnDefs2} grid={this} height={400} paged />
+        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'stock_inv_detail' }} columnDefs={columnDefs2} grid={this} columnsFited height={400} paged />
       </Modal>
     )
   }
@@ -158,9 +158,9 @@ export default connect(state => ({
   conditions: state.stock_inv_detail_conditions
 }))(InvDetailQuery)
 const Toolbars3 = connect()(createForm()(Wrapper(React.createClass({
-  componentDidMount() {
+  //componentDidMount() {
     //this.refreshDataCallback()
-  },
+  //},
   handleSearch(e) {
     e.preventDefault()
     this.runSearching()
@@ -196,6 +196,7 @@ const Toolbars3 = connect()(createForm()(Wrapper(React.createClass({
           <FormItem>
             {getFieldDecorator('type')(
               <Select placeholder='业务类型' style={{ width: 130 }} size='small'>
+                <Option value=''>全部业务类型</Option>
                 {Object.keys(sTypes).map(k => <Option key={k} value={k}>{sTypes[k]}</Option>)}
               </Select>
             )}

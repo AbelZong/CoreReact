@@ -283,7 +283,7 @@ const columnDefs = [{
 }, {
   headerName: '采购数量',
   field: 'purqty',
-  width: 80,
+  width: 90,
   cellEditorFramework: PriceEditor,
   editable: function(params) {
     return params.api.gridOptionsWrapper.gridOptions.grid.state.Purst === 0
@@ -291,11 +291,11 @@ const columnDefs = [{
 }, {
   headerName: '建议采购数量',
   field: 'suggestpurqty',
-  width: 70
+  width: 90
 }, {
   headerName: '已入库数量',
   field: 'recqty',
-  width: 80
+  width: 98
 }, {
   headerName: '单价',
   field: 'price',
@@ -307,7 +307,7 @@ const columnDefs = [{
 }, {
   headerName: '总金额',
   field: 'puramt',
-  width: 65
+  width: 80
 }, {
   headerName: '备注',
   field: 'remark',
@@ -330,7 +330,7 @@ const columnDefs = [{
 }, {
   headerName: '预计到货数量',
   field: 'planqty',
-  width: 80,
+  width: 110,
   cellEditorFramework: PriceEditor,
   editable: function(params) {
     return params.api.gridOptionsWrapper.gridOptions.grid.state.Purst !== 2
@@ -338,11 +338,11 @@ const columnDefs = [{
 }, {
   headerName: '预计到货金额',
   field: 'planamt',
-  width: 90
+  width: 110
 }, {
   headerName: '预计到货日期',
   field: 'recievedate',
-  width: 100,
+  width: 110,
   cellEditorFramework: DateEditor,
   editable: function(params) {
     return params.api.gridOptionsWrapper.gridOptions.grid.state.Purst !== 2
@@ -357,7 +357,7 @@ const columnDefs = [{
 }, {
   headerName: '操作',
   pinned: 'right',
-  width: 60,
+  width: 70,
   cellRendererFramework: OperatorsRender
 }]
 const gridOptions = {

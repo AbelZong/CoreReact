@@ -176,7 +176,7 @@ const columnDefs = [
   }, {
     headerName: '启用',
     field: 'Enable',
-    width: 50,
+    width: 70,
     cellStyle: {textAlign: 'center'},
     cellRenderer: reactCellRendererFactory(AbledRender)
   }, {

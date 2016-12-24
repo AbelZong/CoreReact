@@ -120,15 +120,13 @@ const columnDefs = [
     width: 30,
     checkboxSelection: true,
     cellStyle: {textAlign: 'center'},
-    pinned: 'left',
     suppressSorting: true,
     enableSorting: true
   }, {
     headerName: 'ID',
     field: 'ID',
     cellStyle: {textAlign: 'center'},
-    width: 60,
-    pinned: 'left'
+    width: 60
   }, {
     headerName: '图片',
     field: 'img',
@@ -137,29 +135,24 @@ const columnDefs = [
     cellRenderer: function(params) {
       const k = params.data.img
       return k ? '<img src="' + k + '" width=40 height=40>' : '-'
-    },
-    pinned: 'left'
+    }
   }, {
     headerName: '款式编码',
     field: 'GoodsCode',
-    width: 120,
-    pinned: 'left'
+    width: 120
   }, {
     headerName: '商品编码',
     field: 'SkuID',
-    width: 120,
-    pinned: 'left'
+    width: 120
   }, {
     headerName: '商品名',
     field: 'Name',
-    width: 130,
-    pinned: 'left'
+    width: 130
   }, {
     headerName: '颜色及规格',
     field: 'Norm',
     cellStyle: {textAlign: 'center'},
-    width: 100,
-    pinned: 'left'
+    width: 100
   }, {
     headerName: '主仓实际库存',
     cellStyle: {textAlign: 'right'},
