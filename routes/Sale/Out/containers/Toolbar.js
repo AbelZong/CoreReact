@@ -94,11 +94,11 @@ export default connect()(createForm()(Wrapper(React.createClass({
           data[cds._ck1_] = v.a1
         }
         if (v.a2) {
-          if (v.a2[0]) {
-            data.DateStart = v.a2[0].fomat()
+          if (v.a2.date_start) {
+            data.DateStart = v.a2.date_start.format()
           }
-          if (v.a2[1]) {
-            data.Dateend = v.a2[1].fomat()
+          if (v.a2.date_end) {
+            data.Dateend = v.a2.date_end.format()
           }
         }
         if (v.a11 && v.a11.id) {

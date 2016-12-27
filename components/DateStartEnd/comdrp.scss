@@ -1,0 +1,53 @@
+/**
+* This file is part of the <智鼠> application.
+*
+* Version: 0.0.2
+* Description:
+*
+* Author: HuaZhang <yahveh.zh@gmail.com>
+* Date  : 2016-12-03 AM
+* Last Updated:
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
+.box {
+  position: relative;
+  display: inline-block;
+  border: 1px solid #d9d9d9;
+  border-radius: 1px;
+  transition: all 0.3s;
+  &:hover {
+    border-color: #40a5ed;
+  }
+  :global {
+    .ant-input {
+      border: 0;
+      // &:focus {
+      //   box-shadow: none;
+      // }
+    }
+  }
+  &.small {
+    line-height: 22px;
+    vertical-align: middle;
+  }
+
+  &.default {}
+
+  &.large {}
+}
+
+.end,
+.pselecter,
+.start {
+  display: inline-block;
+}
+.pselecter {
+  padding: 0 5px;
+  text-align: center;
+}
+
+.separator {
+  color: #999;
+}

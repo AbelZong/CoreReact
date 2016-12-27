@@ -364,7 +364,7 @@ const defColumns = [{
     render() {
       const {data, api, rowIndex} = this.props
       const dispatch = api.gridOptionsWrapper.gridOptions.grid.props.dispatch
-      console.log(data)
+      //console.log(data)
       return (
         <div>
           <Button size='small' type='primary' onClick={() => {

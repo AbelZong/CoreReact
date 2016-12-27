@@ -80,9 +80,11 @@ export default connect()(createForm()(Wrapper(React.createClass({
           data[this.state._conditions._ck1_] = v.a1
         }
         if (v.a2) {
-          if (v.a2[0]) {
-            data.DateStart = v.a2[0].fomat()
-            data.Dateend = v.a2[1].fomat()
+          if (v.a2.date_start) {
+            data.DateStart = v.a2.date_start.format()
+          }
+          if (v.a2.date_end) {
+            data.Dateend = v.a2.date_end.format()
           }
         }
         this.props.dispatch({type: 'SALE_OUT_CONDITIONS_SET', payload: data})

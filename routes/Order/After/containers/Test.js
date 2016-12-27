@@ -196,9 +196,13 @@ const Toolbars = createForm()(React.createClass({
           }
         }
         delete data._cv_2_
-        if (data._Date_ instanceof Array) {
-          data.DateStart = data._Date_[0] ? data._Date_[0].format() : ''
-          data.DateEnd = data._Date_[0] ? data._Date_[0].format() : ''
+        if (data._Date_) {
+          if (data._Date_.date_start) {
+            data.DateStart = data._Date_.date_start.format()
+          }
+          if (data._Date_.date_end) {
+            data.DateEnd = data._Date_.date_end.format()
+          }
         }
         delete data._Date_
         data.Distributor = data.Distributor && data.Distributor.id ? data.Distributor.id : ''

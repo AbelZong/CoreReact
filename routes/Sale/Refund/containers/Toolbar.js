@@ -86,12 +86,12 @@ export default connect()(createForm()(Wrapper(React.createClass({
           data[cds._ck1_] = v.a1
         }
         if (v.a2) {
-          data.DateType = cds._ck2_
-          if (v.a2[0]) {
-            data.DateStart = v.a2[0].fomat()
+          data.DateType = v.a2.date_type
+          if (v.a2.date_start) {
+            data.DateStart = v.a2.date_start.format()
           }
-          if (v.a2[1]) {
-            data.Dateend = v.a2[1].fomat()
+          if (v.a2.date_end) {
+            data.Dateend = v.a2.date_end.format()
           }
         }
         this.props.dispatch({type: 'SALE_REFUND_CONDITIONS_SET', payload: data})
@@ -131,10 +131,12 @@ export default connect()(createForm()(Wrapper(React.createClass({
             )}
           </FormItem>
           <FormItem>
-            {getFieldDecorator('a2')(
-              <DateRange format='YYYY-MM-DD HH:mm:ss' size='small' onTypeChange={(v) => {
-                this.mergeConditions('_ck2_', v)
-              }} dateType={cd._ck2_} types={{
+            {getFieldDecorator('a2', {
+				initialValue: {
+					date_type: 'RefundDate'
+				}
+			})(
+              <DateRange format='YYYY-MM-DD HH:mm:ss' size='small' types={{
                 RefundDate: '退款时间',
                 ConfirmDate: '审核时间',
                 ModifyDate: '修改时间'
