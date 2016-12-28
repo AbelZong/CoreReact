@@ -56,6 +56,7 @@ import AdminUsersRoute from './Admin/Users'
 import AdminBrandsRoute from './Admin/Brands'
 import AdminCompanyRoute from './Admin/Company'
 import AdminAccessRoute from './Admin/Access'
+import AdminPrintSetRoute from './Admin/PrintSet'
 import PurchaseListRoute from './Purchase/List'
 import CompanyClientsRoute from './Company/Clients'
 import WarehouseSettingsRoute from './Warehouse/Settings'
@@ -134,6 +135,7 @@ export const createRoutes = (store) => ([
       AdminUsersRoute(store),
       AdminBrandsRoute(store),
       AdminAccessRoute(store),
+      AdminPrintSetRoute(store),
       PurchaseListRoute(store),
       CompanyClientsRoute(store),
       WarehouseSettingsRoute(store),

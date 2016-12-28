@@ -404,6 +404,12 @@ const Main = React.createClass({
         })
         break
       }
+      case '2': {
+        ZPost('Batch/SetMultiOrd', null, () => {
+          this.refreshDataCallback()
+        })
+        break
+      }
       case '3': {
         //波次类型(0:一单一件;1:一单多件;2:现场|大单;3:零拣补货;4:采购退货)
         this.props.dispatch({type: 'PB_LIMIT_VIS_SET', payload: 1})
@@ -472,8 +478,8 @@ const Main = React.createClass({
         case '1': {
           ZPost('Batch/MarkPrint', {
             ID: ids
-          }, () => {
-            this.refreshDataCallback()
+          }, ({d}) => {
+            this.grid.refreshRowData()
           })
           break
         }
@@ -481,7 +487,7 @@ const Main = React.createClass({
           ZPost('Batch/CancleMarkPrint', {
             ID: ids
           }, () => {
-            this.refreshDataCallback()
+            this.grid.refreshRowData()
           })
           break
         }
@@ -507,7 +513,7 @@ const Main = React.createClass({
               ID: ids
             }, () => {
               resolve()
-              this.refreshDataCallback()
+              this.grid.refreshRowData()
             }, reject)
           })
         }
@@ -623,6 +629,9 @@ const Main = React.createClass({
           <Button type='ghost' size='small' style={{marginLeft: 10}}>
             <Iconfa type='print' style={{color: '#32cd32'}} />&nbsp;打印拣货单
           </Button>
+        </div>
+        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'stock_take' }} columnDefs={columnDefs} grid={this} paged >
+         批量：
           <Dropdown overlay={markmenu}>
             <Button type='ghost' size='small' style={{marginLeft: 10}}>
               <Iconfa type='pencil' style={{color: '#32cd32'}} />&nbsp;标记&nbsp;|&nbsp;取消标记打印
@@ -631,8 +640,7 @@ const Main = React.createClass({
           <Button type='ghost' size='small' onClick={this.ModifyRemark} style={{marginLeft: 10}}>
               修改标志
           </Button>
-        </div>
-        <ZGrid className={styles.zgrid} onReady={this.handleGridReady} gridOptions={gridOptions} storeConfig={{ prefix: 'stock_take' }} columnDefs={columnDefs} grid={this} paged />
+        </ZGrid>
       </div>
       )
   }

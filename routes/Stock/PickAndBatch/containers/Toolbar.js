@@ -16,23 +16,26 @@ import {
   connect
 } from 'react-redux'
 import styles from './index.scss'
-import {Button, Form, Select, DatePicker, Input, Checkbox, Row} from 'antd'
-const RangePicker = DatePicker.RangePicker
+import {Button, Form, Select, Input, Checkbox, Row} from 'antd'
 const createForm = Form.create
 const Option = Select.Option
 const FormItem = Form.Item
-import moment from 'moment'
+
 import Wrapper from 'components/MainWrapper'
+import DateRange from 'components/DateStartEnd'
 import {ZGet} from 'utils/Xfetch'
 const CheckboxGroup = Checkbox.Group
-
+const DEFAULT_CONDITIONS = {
+  _ch_: 'ChooseDate'
+}
 export default connect()(createForm()(Wrapper(React.createClass({
   getInitialState() {
     return {
       BatchStatus: [],
       Pickor: [],
       Task: [],
-      BatchType: []
+      BatchType: [],
+      _conditions: DEFAULT_CONDITIONS
     }
   },
   componentDidMount() {
@@ -46,6 +49,7 @@ export default connect()(createForm()(Wrapper(React.createClass({
     })
   },
   handleSearch(e) {
+    console.log('Crf')
     e.preventDefault()
     this.runSearching()
   },
@@ -64,8 +68,8 @@ export default connect()(createForm()(Wrapper(React.createClass({
           PickorID: v.PickorID && v.PickorID.length ? v.PickorID.join(',') : '',
           Task: v.Task && v.Task.length ? v.Task.join(',') : '',
           Type: v.Type && v.Type.length ? v.Type.join(',') : '',
-          DateStart: v.Time && v.Time.length ? v.Time[0].format() : '',
-          Dateend: v.Time && v.Time.length ? v.Time[1].format() : '',
+          DateStart: v.Time && v.Time.date_start ? v.Time.date_start.format() : '',
+          Dateend: v.Time && v.Time.date_end ? v.Time.date_end.format() : '',
           Status: v.Status && v.Status.length ? v.Status.join(',') : ''
         }})
       })
@@ -75,17 +79,22 @@ export default connect()(createForm()(Wrapper(React.createClass({
     e.preventDefault()
     this.props.form.resetFields()
     this.runSearching()
+    this.setState({
+      _conditions: DEFAULT_CONDITIONS
+    }, () => {
+      this.runSearching()
+    })
   },
   onStatusChange() {
 
   },
   selectChange() {},
   timeSet(e, flag) {
-    if (flag === 1) {
-      this.props.form.setFieldsValue({Time: [moment().startOf('day'), moment().endOf('day')]})
-    } else {
-      this.props.form.setFieldsValue({Time: [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')]})
-    }
+    // if (flag === 1) {
+    //   this.props.form.setFieldsValue({Time: [moment().startOf('day'), moment().endOf('day')]})
+    // } else {
+    //   this.props.form.setFieldsValue({Time: [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')]})
+    // }
     this.props.form.validateFieldsAndScroll((errors, v) => {
       if (errors) {
         return
@@ -96,14 +105,15 @@ export default connect()(createForm()(Wrapper(React.createClass({
         PickorID: v.PickorID && v.PickorID.length ? v.PickorID.join(',') : '',
         Task: v.Task && v.Task.length ? v.Task.join(',') : '',
         Type: v.Type && v.Type.length ? v.Type.join(',') : '',
-        DateStart: v.Time && v.Time.length ? v.Time[0].format() : '',
-        Dateend: v.Time && v.Time.length ? v.Time[1].format() : '',
+        DateStart: v.Time && v.Time.date_start ? v.Time.date_start.format() : '',
+        Dateend: v.Time && v.Time.date_end ? v.Time.date_end.format() : '',
         Status: v.Status && v.Status.length ? v.Status.join(',') : ''
       }})
     })
   },
   render() {
     const { getFieldDecorator } = this.props.form
+    const cd = this.state._conditions
     return (
       <div className={styles.toolbars}>
         <Form inline>
@@ -144,11 +154,10 @@ export default connect()(createForm()(Wrapper(React.createClass({
             </FormItem>
             <FormItem>
               {getFieldDecorator('Time')(
-                <RangePicker showTime format='YYYY-MM-DD HH:mm:ss' />
+                //<RangePicker showTime format='YYYY-MM-DD HH:mm:ss' />
+                <DateRange format='YYYY-MM-DD HH:mm:ss' size='small' dateType={cd._ch_} types={{ChooseDate: '指定时间'}} onRangePreset={this.timeSet} />
               )}
             </FormItem>
-            <a href='javascript:void(0)' style={{marginLeft: 5}} onClick={e => this.timeSet(e, 1)}>今天</a>
-            <a href='javascript:void(0)' style={{margin: '0 15px 0 5px'}} onClick={e => this.timeSet(e, 2)}>昨天</a>
             <Button type='primary' size='small' style={{marginLeft: 2}} onClick={this.handleSearch}>搜索</Button>
             <Button size='small' style={{marginLeft: 3}} onClick={this.handleReset}>重置</Button>
           </Row>

@@ -22,7 +22,6 @@ import SetPickor from './SetPickor'
 import BatchLog from './BatchLog'
 import BatchDetail from './BatchDetail'
 import BatchUnique from './BatchUnique'
-import SaleOut from './SaleOut'
 
 export default React.createClass({
   componentDidMount() {
@@ -39,7 +38,6 @@ export default React.createClass({
         <BatchLog />
         <BatchDetail />
         <BatchUnique />
-        <SaleOut />
       </div>
     )
   }
