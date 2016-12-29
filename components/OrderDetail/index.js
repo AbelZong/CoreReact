@@ -15,7 +15,7 @@ import React, {
   createClass
 } from 'react'
 import update from 'react-addons-update'
-import Areas from 'json/AreaCascader'
+import AreasCall from 'json/areas'
 import classNames from 'classnames'
 import SkuAppendPicker from 'components/SkuPicker/append'
 import {
@@ -172,8 +172,16 @@ const ManualOrderPay = connect(state => ({
 const _ComDetailForm1 = createForm()(createClass({
   getInitialState() {
     return {
-      loading: false
+      loading: false,
+      Areas: null
     }
+  },
+  componentWillMount() {
+    AreasCall().then((d) => {
+      this.setState({
+        Areas: d
+      })
+    })
   },
   componentDidMount() {
     this._refresh(this.props.data)
@@ -201,26 +209,28 @@ const _ComDetailForm1 = createForm()(createClass({
         return false
       }
       this.setState({ loading: true })
-      const p1 = Areas.filter(x => x.value === values.s6[0])[0]
-      const p2 = values.s6[1] ? p1.children.filter(x => x.value === values.s6[1])[0] : null
-      const p3 = values.s6[2] && p2 ? p2.children.filter(x => x.value === values.s6[2])[0] : null
-      const data = {
-        OID: this.props.data.oid,
-        ExAmount: values.s1,
-        SendMessage: values.s2,
-        InvoiceTitle: values.s3,
-        RecName: values.s8 || '',
-        RecLogistics: p1 ? p1.label : '',
-        RecCity: p2 ? p2.label : '',
-        RecDistrict: p3 ? p3.label : '',
-        RecAddress: values.s7 || '',
-        RecPhone: values.s10 || '',
-        RecTel: values.s9 || ''
-      }
-      ZPost('Order/UpdateOrder', data, ({d}) => {
-        this.props.updateStates(d)
-      }).then(() => {
-        this.setState({ loading: false })
+      AreasCall().then((Areas) => {
+        const p1 = Areas.filter(x => x.value === values.s6[0])[0]
+        const p2 = values.s6[1] ? p1.children.filter(x => x.value === values.s6[1])[0] : null
+        const p3 = values.s6[2] && p2 ? p2.children.filter(x => x.value === values.s6[2])[0] : null
+        const data = {
+          OID: this.props.data.oid,
+          ExAmount: values.s1,
+          SendMessage: values.s2,
+          InvoiceTitle: values.s3,
+          RecName: values.s8 || '',
+          RecLogistics: p1 ? p1.label : '',
+          RecCity: p2 ? p2.label : '',
+          RecDistrict: p3 ? p3.label : '',
+          RecAddress: values.s7 || '',
+          RecPhone: values.s10 || '',
+          RecTel: values.s9 || ''
+        }
+        ZPost('Order/UpdateOrder', data, ({d}) => {
+          this.props.updateStates(d)
+        }).then(() => {
+          this.setState({ loading: false })
+        })
       })
     })
   },
@@ -231,6 +241,7 @@ const _ComDetailForm1 = createForm()(createClass({
       wrapperCol: { span: 18 }
     }
     const disabledAll = [0, 1, 7].indexOf(this.props.data.status) === -1
+    const {Areas} = this.state
     return (
       <div className={styles.noMBForm}>
         <Form horizontal className='pos-form'>
@@ -318,7 +329,7 @@ const _ComDetailForm1 = createForm()(createClass({
     )
   }
 }))
-const parseArea = function(l, c, d) {
+const parseArea = function(l, c, d, Areas) {
   const s6 = []
   if (l) {
     let index = Areas.findIndex(x => x.label === l)
@@ -355,7 +366,8 @@ const ComDetail1 = connect(state => ({
       items: [],
       expr_vis: false,
       toe_vis: false,
-      tca_vis: false
+      tca_vis: false,
+      Areas: null
     }
   },
   // componentDidMount() {
@@ -365,6 +377,13 @@ const ComDetail1 = connect(state => ({
   //     this.componentWillReceiveProps({doge: 10873})
   //   })
   // },
+  componentWillMount() {
+    AreasCall().then((d) => {
+      this.setState({
+        Areas: d
+      })
+    })
+  },
   componentWillReceiveProps(nextProps) {
     if (this.props.doge !== nextProps.doge) {
       if (nextProps.doge === null) {
@@ -1029,9 +1048,9 @@ const ComDetail1 = connect(state => ({
     }
   },
   render() {
-    const {order} = this.state
+    const {order, Areas} = this.state
     const formData = {
-      areas: parseArea(order.RecLogistics, order.RecCity, order.RecDistrict),
+      areas: parseArea(order.RecLogistics, order.RecCity, order.RecDistrict, Areas),
       address: order.RecAddress,
       tel: order.RecTel,
       phone: order.RecPhone,

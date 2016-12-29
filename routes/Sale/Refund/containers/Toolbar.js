@@ -132,10 +132,10 @@ export default connect()(createForm()(Wrapper(React.createClass({
           </FormItem>
           <FormItem>
             {getFieldDecorator('a2', {
-				initialValue: {
-					date_type: 'RefundDate'
-				}
-			})(
+              initialValue: {
+                date_type: 'RefundDate'
+              }
+            })(
               <DateRange format='YYYY-MM-DD HH:mm:ss' size='small' types={{
                 RefundDate: '退款时间',
                 ConfirmDate: '审核时间',

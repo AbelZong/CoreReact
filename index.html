@@ -6,18 +6,44 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+  html,body {margin:0;}
+	#ant-site-loading {
+		width: 100vw;
+		text-align: center;
+		position: absolute;
+		top: 50%;
+		margin-top: -50px;
+		transition: opacity 0.45s;
+		pointer-events: none;
+		opacity: 0.8;
+		z-index: 9999;
+  }
+  #ant-site-loading img {
+    visibility: hidden;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 10px;
+  }
+	#ant-loading-text {
+		font-family: lato,'Helvetica Neue',Helvetica,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',Arial,'sans-serif';
+		color: #777;
+		font-size: 16px;
+		letter-spacing: 2px;
+  }
+  </style>
 <!--[if lt IE 10]>
 <script src="https://as.alipayobjects.com/g/component/??console-polyfill/0.2.2/index.js,es5-shim/4.5.7/es5-shim.min.js,es5-shim/4.5.7/es5-sham.min.js,html5shiv/3.7.2/html5shiv.min.js,media-match/2.0.2/media.match.min.js"></script>
 <![endif]-->
 </head>
 <body>
-<div class="ant-site-loading" id="ant-site-loading">
+<div id="ant-site-loading">
   <img src='/i/light-logo-80.png' style="max-width:20%" />
-  <div id="loading-text">努力加载中</div>
+  <div id="ant-loading-text">努力加载中</div>
 </div>
 <script>
 (function() {
-  var content = document.getElementById('loading-text');
+  var content = document.getElementById('ant-loading-text');
   content.innerHTML = content.innerText.split('').map(function(letter, i) {
     var className;
     if (i > 0 && i < content.innerText.length - 1) {

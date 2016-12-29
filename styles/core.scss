@@ -189,22 +189,11 @@
 		animation: upDownMove 1.2s ease-in-out infinite;
 	}
 
-	.ant-site-loading {
-		width: 100vw;
-		text-align: center;
-		position: absolute;
-		top: 50%;
-		margin-top: -50px;
-		transition: opacity 0.45s;
-		pointer-events: none;
-		opacity: 1;
-		z-index: 9999;
-
+	#ant-site-loading {
 		img {
 			transform-style: preserve-3d;
-			width: 80px;
-			margin: 0 auto 10px;
 			overflow: hidden;
+			visibility:visible;
 			animation: loadTween 2s cubic-bezier(0.785, 0.135, 0.15, 0.86) infinite;
 		}
 	}
@@ -213,12 +202,7 @@
 		opacity: 1;
 	}
 
-	#loading-text {
-		font-family: lato,Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,Arial,sans-serif;
-		color: #777;
-		font-size: 16px;
-		letter-spacing: 2px;
-
+	#ant-loading-text {
 		> span {
 			display: inline-block;
 
@@ -560,6 +544,21 @@
 }
 
 :global {
+  #ant-fetch-loading-svg {
+    margin: 0 0.5em 0.5em;
+    overflow: visible;
+    position: fixed;
+    left: 0.5em;
+    bottom: 0;
+		opacity: 0;
+		pointer-events: none;
+  }
+	.zhang-fadeIn {
+	  animation: fadeIn 200ms ease forwards;
+	}
+	.hua-fadeOut {
+	  animation: fadeOut 200ms ease forwards;
+	}
 	.dotting {
 		display: inline-block;
 		min-width: 2px;
@@ -602,6 +601,22 @@
 	}
 }
 
+@keyframes:global(fadeIn) {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes:global(fadeOut) {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
 @keyframes:global(dot) {
 	25% {
 		box-shadow: none;
